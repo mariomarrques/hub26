@@ -9,8 +9,8 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <AppSidebar />
-      <main className="pl-64 transition-all duration-300">
-        <div className="mx-auto max-w-6xl px-6 py-8">
+      <main className="pl-sidebar transition-all duration-hover">
+        <div className="mx-auto max-w-[1440px] px-xl py-xl">
           {children}
         </div>
       </main>

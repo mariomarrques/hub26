@@ -38,12 +38,12 @@ export function StatusTag({ variant, children }: StatusTagProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium transition-all duration-150",
+        "inline-flex items-center gap-xxs rounded-pill border px-xs py-1 text-[12px] font-medium transition-all duration-hover",
         config.className,
         variant === "hot" && "pulse-hot"
       )}
     >
-      <Icon className="h-3 w-3" />
+      <Icon className="h-3 w-3" strokeWidth={1.5} />
       {children || config.label}
     </span>
   );

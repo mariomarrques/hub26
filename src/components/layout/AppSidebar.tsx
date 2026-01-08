@@ -28,27 +28,27 @@ export function AppSidebar() {
   return (
     <aside
       className={cn(
-        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 ease-out",
-        collapsed ? "w-16" : "w-64"
+        "fixed left-0 top-0 z-40 flex h-screen flex-col border-r border-sidebar-border bg-sidebar transition-all duration-hover ease-hover",
+        collapsed ? "w-16" : "w-sidebar"
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center border-b border-sidebar-border px-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+      <div className="flex h-16 items-center border-b border-sidebar-border px-md">
+        <div className="flex items-center gap-sm">
+          <div className="flex h-9 w-9 items-center justify-center rounded-nav bg-primary/10">
             <Hexagon className="h-5 w-5 text-primary" />
           </div>
           {!collapsed && (
             <div className="animate-fade-in">
-              <h1 className="text-sm font-semibold text-foreground">Operação Hexa</h1>
-              <p className="text-xs text-muted-foreground">ISA+ECG</p>
+              <h1 className="text-[14px] font-semibold text-foreground">Operação Hexa</h1>
+              <p className="text-small">ISA+ECG</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 px-sm py-md">
         {navigation.map((item, index) => {
           const isActive = location.pathname === item.href;
           return (
@@ -56,18 +56,19 @@ export function AppSidebar() {
               key={item.name}
               to={item.href}
               className={cn(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ease-out",
+                "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium transition-all duration-hover ease-hover",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                  ? "bg-active text-foreground font-semibold"
+                  : "text-text-secondary hover:bg-hover hover:text-foreground"
               )}
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <item.icon
                 className={cn(
-                  "h-5 w-5 flex-shrink-0 transition-colors",
-                  isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+                  "h-[18px] w-[18px] flex-shrink-0 transition-colors",
+                  isActive ? "text-primary" : "text-text-muted group-hover:text-foreground"
                 )}
+                strokeWidth={1.5}
               />
               {!collapsed && (
                 <span className="animate-fade-in truncate">{item.name}</span>
@@ -81,19 +82,19 @@ export function AppSidebar() {
       </nav>
 
       {/* Collapse button */}
-      <div className="border-t border-sidebar-border p-3">
+      <div className="border-t border-sidebar-border p-sm">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setCollapsed(!collapsed)}
-          className="w-full justify-center text-muted-foreground hover:text-foreground"
+          className="w-full justify-center text-text-muted hover:text-foreground hover:bg-hover"
         >
           {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-[18px] w-[18px]" strokeWidth={1.5} />
           ) : (
             <>
-              <ChevronLeft className="h-4 w-4 mr-2" />
-              <span className="text-xs">Recolher</span>
+              <ChevronLeft className="h-[18px] w-[18px] mr-2" strokeWidth={1.5} />
+              <span className="text-small">Recolher</span>
             </>
           )}
         </Button>
