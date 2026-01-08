@@ -1,0 +1,152 @@
+import { Product } from "@/components/products/ProductCard";
+import { Alert } from "@/components/alerts/AlertCard";
+
+export const mockProducts: Product[] = [
+  {
+    id: "1",
+    name: "Camisa Polo Premium Lacoste Style",
+    image: "https://images.unsplash.com/photo-1625910513413-5fc7974e9b3c?w=400&q=80",
+    originPrice: "R$ 45,00",
+    resaleRange: "R$ 120 - 180",
+    status: "hot",
+    category: "Camisas",
+    adminNote: "Giro testado em 3 cidades. Estoque na China com entrega rápida.",
+    affiliateLink: "#",
+  },
+  {
+    id: "2",
+    name: "Tênis Nike Air Force Inspired",
+    image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80",
+    originPrice: "R$ 89,00",
+    resaleRange: "R$ 200 - 280",
+    status: "trending",
+    category: "Calçados",
+    adminNote: "Alta demanda no inverno. Verificar tamanhos disponíveis.",
+    affiliateLink: "#",
+  },
+  {
+    id: "3",
+    name: "Relógio Casual Minimalista",
+    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80",
+    originPrice: "R$ 32,00",
+    resaleRange: "R$ 89 - 120",
+    status: "new",
+    category: "Acessórios",
+    adminNote: "Novo no catálogo. Ótimo para testar mercado.",
+    affiliateLink: "#",
+  },
+  {
+    id: "4",
+    name: "Camiseta Oversized Streetwear",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80",
+    originPrice: "R$ 28,00",
+    resaleRange: "R$ 75 - 110",
+    status: "hot",
+    category: "Camisas",
+    adminNote: "Best-seller absoluto. Não falta estoque.",
+    affiliateLink: "#",
+  },
+  {
+    id: "5",
+    name: "Óculos de Sol Vintage",
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80",
+    originPrice: "R$ 18,00",
+    resaleRange: "R$ 55 - 85",
+    status: "trending",
+    category: "Acessórios",
+    affiliateLink: "#",
+  },
+  {
+    id: "6",
+    name: "Bolsa Crossbody Compacta",
+    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80",
+    originPrice: "R$ 42,00",
+    resaleRange: "R$ 110 - 150",
+    status: "new",
+    category: "Acessórios",
+    adminNote: "Perfeita para público jovem. Cores vibrantes disponíveis.",
+    affiliateLink: "#",
+  },
+];
+
+export const mockAlerts: Alert[] = [
+  {
+    id: "1",
+    type: "urgent",
+    title: "Produto saturando: Camisa Polo Premium",
+    message: "Detectamos aumento de 40% em vendas nos últimos 7 dias. Considere ajustar preço ou pausar divulgação temporariamente.",
+    timestamp: "Há 2 horas",
+    isNew: true,
+  },
+  {
+    id: "2",
+    type: "warning",
+    title: "Fornecedor em pausa temporária",
+    message: "O fornecedor 'Quality Imports' está em manutenção até 15/01. Veja alternativas na aba Fornecedores.",
+    timestamp: "Há 5 horas",
+    isNew: true,
+  },
+  {
+    id: "3",
+    type: "info",
+    title: "Nova remessa chegando",
+    message: "Lote de Tênis Nike Air Force chegando ao armazém BR em 3 dias úteis. Prepare seu estoque.",
+    timestamp: "Ontem",
+  },
+  {
+    id: "4",
+    type: "success",
+    title: "Produto validado pela comunidade",
+    message: "O Relógio Casual Minimalista recebeu 95% de aprovação nos testes. Liberado para escala.",
+    timestamp: "2 dias atrás",
+  },
+];
+
+export interface Supplier {
+  id: string;
+  name: string;
+  status: "active" | "paused" | "new";
+  rating: {
+    quality: number;
+    delivery: number;
+    communication: number;
+  };
+  categories: string[];
+  adminNote?: string;
+  contact?: string;
+}
+
+export const mockSuppliers: Supplier[] = [
+  {
+    id: "1",
+    name: "Quality Imports China",
+    status: "active",
+    rating: { quality: 4.8, delivery: 4.5, communication: 4.9 },
+    categories: ["Camisas", "Acessórios"],
+    adminNote: "Fornecedor principal. Resposta rápida no WhatsApp.",
+  },
+  {
+    id: "2",
+    name: "Fast Fashion Hub",
+    status: "active",
+    rating: { quality: 4.3, delivery: 4.8, communication: 4.2 },
+    categories: ["Calçados", "Streetwear"],
+    adminNote: "Especializado em tênis. Entrega expressa disponível.",
+  },
+  {
+    id: "3",
+    name: "Premium Accessories Co",
+    status: "paused",
+    rating: { quality: 4.6, delivery: 3.8, communication: 4.0 },
+    categories: ["Acessórios", "Relógios"],
+    adminNote: "Em pausa por atraso em entregas. Aguardando normalização.",
+  },
+  {
+    id: "4",
+    name: "Urban Style Direct",
+    status: "new",
+    rating: { quality: 4.5, delivery: 4.5, communication: 4.7 },
+    categories: ["Camisas", "Grifes"],
+    adminNote: "Novo parceiro. Em fase de teste com primeiros pedidos.",
+  },
+];
