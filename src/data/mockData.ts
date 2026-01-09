@@ -7,6 +7,14 @@ export const currentUser: UserProfile = {
   name: "João Silva",
   avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&q=80",
   tier: "gold",
+  email: "joao.silva@email.com",
+  phone: "(11) 99999-9999",
+  memberSince: "Janeiro 2024",
+  stats: {
+    productsBought: 12,
+    suppliersConnected: 8,
+    daysInCommunity: 156,
+  },
 };
 
 export const mockProducts: Product[] = [

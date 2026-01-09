@@ -9,6 +9,7 @@ import Bazar from "./pages/Bazar";
 import Fornecedores from "./pages/Fornecedores";
 import Avisos from "./pages/Avisos";
 import Comunidade from "./pages/Comunidade";
+import Perfil from "./pages/Perfil";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/fornecedores" element={<Fornecedores />} />
               <Route path="/avisos" element={<Avisos />} />
               <Route path="/comunidade" element={<Comunidade />} />
+              <Route path="/perfil" element={<Perfil />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>

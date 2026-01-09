@@ -12,6 +12,14 @@ export interface UserProfile {
   name: string;
   avatar?: string;
   tier: MemberTier;
+  email?: string;
+  phone?: string;
+  memberSince?: string;
+  stats?: {
+    productsBought: number;
+    suppliersConnected: number;
+    daysInCommunity: number;
+  };
 }
 
 export const MEMBER_LEVELS: Record<MemberTier, MemberLevel> = {
