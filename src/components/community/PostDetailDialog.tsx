@@ -109,6 +109,8 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
   const { user, isAdmin, isModerator } = useAuth();
   const [newComment, setNewComment] = useState("");
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
+  const [commentSent, setCommentSent] = useState(false);
+  const [floatingHearts, setFloatingHearts] = useState<string[]>([]);
 
   const { comments, isLoading: loadingComments, addComment, deleteComment } = usePostComments(post?.id);
   const { likesCount, hasLiked, toggleLike } = usePostLikes(post?.id);
@@ -135,11 +137,22 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
     });
   };
 
-  const [commentSent, setCommentSent] = useState(false);
+  const handleLike = () => {
+    toggleLike.mutate();
+    
+    // Adiciona coração flutuante
+    const heartId = Date.now().toString();
+    setFloatingHearts((prev) => [...prev, heartId]);
+    
+    // Remove após animação
+    setTimeout(() => {
+      setFloatingHearts((prev) => prev.filter((id) => id !== heartId));
+    }, 1000);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:slide-in-from-bottom-4 duration-300">
+      <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] md:w-[calc(100vw-4rem)] md:max-w-[calc(100vw-4rem)] md:h-[calc(100vh-4rem)] md:max-h-[calc(100vh-4rem)] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:slide-in-from-bottom-4 duration-300">
         <DialogHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -245,26 +258,41 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
 
         {/* Likes */}
         <div className="flex items-center gap-4 py-3 border-t border-border">
-          {user ? (
-            <Button
-              variant={hasLiked ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleLike.mutate()}
-              disabled={toggleLike.isPending}
-              className="gap-2"
-            >
-              <Heart className={cn("h-4 w-4", hasLiked && "fill-current")} />
-              {hasLiked ? "Curtido" : "Curtir"}
-            </Button>
-          ) : (
-            <Button variant="outline" size="sm" disabled className="gap-2">
-              <Heart className="h-4 w-4" />
-              Curtir
-            </Button>
-          )}
-          <span className="text-sm text-muted-foreground">
-            {likesCount} {likesCount === 1 ? "curtida" : "curtidas"}
-          </span>
+          <div className="relative">
+            {/* Corações flutuantes */}
+            {floatingHearts.map((id) => (
+              <Heart
+                key={id}
+                className="absolute -top-2 left-1/2 -translate-x-1/2 h-5 w-5 text-red-500 fill-red-500 animate-float-up pointer-events-none"
+              />
+            ))}
+            
+            {user ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLike}
+                disabled={toggleLike.isPending}
+                className={cn(
+                  "gap-2 transition-all duration-300",
+                  hasLiked 
+                    ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" 
+                    : "hover:bg-red-500/10 hover:text-red-500"
+                )}
+              >
+                <Heart className={cn(
+                  "h-4 w-4 transition-all duration-200",
+                  hasLiked && "fill-red-500 text-red-500 scale-110"
+                )} />
+                {likesCount}
+              </Button>
+            ) : (
+              <Button variant="ghost" size="sm" disabled className="gap-2 opacity-50">
+                <Heart className="h-4 w-4" />
+                {likesCount}
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Comentários */}
