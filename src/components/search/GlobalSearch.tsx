@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, CheckCircle, PauseCircle, Sparkles, Store } from "lucide-react";
+import { Search, CheckCircle, PauseCircle, Sparkles, Store, Loader2 } from "lucide-react";
 import {
   Command,
   CommandEmpty,
@@ -14,9 +14,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDebounce } from "@/hooks/use-debounce";
-import { mockProducts, mockSuppliers, mockMembers } from "@/data/mockData";
+import { mockSuppliers, mockMembers } from "@/data/mockData";
 import { MEMBER_LEVELS } from "@/types/member";
 import { cn, normalizeSearch } from "@/lib/utils";
+import { useSearchProducts, ProductWithCategory } from "@/hooks/use-products";
 
 interface GlobalSearchProps {
   className?: string;
@@ -42,16 +43,13 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Fetch real products from database
+  const { data: products = [], isLoading: isLoadingProducts } = useSearchProducts(debouncedQuery);
+
   const normalizedQuery = normalizeSearch(debouncedQuery);
 
-  const filteredProducts = debouncedQuery
-    ? mockProducts
-        .filter((p) =>
-          normalizeSearch(p.name).includes(normalizedQuery) ||
-          normalizeSearch(p.category).includes(normalizedQuery)
-        )
-        .slice(0, 5)
-    : [];
+  // Limit to 5 products for the dropdown
+  const filteredProducts = products.slice(0, 5);
 
   const filteredSuppliers = debouncedQuery
     ? mockSuppliers
@@ -72,7 +70,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
 
   const hasResults = filteredProducts.length > 0 || filteredSuppliers.length > 0 || filteredMembers.length > 0;
 
-  const handleProductSelect = (product: (typeof mockProducts)[0]) => {
+  const handleProductSelect = (product: ProductWithCategory) => {
     navigate(`/produto/${product.id}`);
     setOpen(false);
     setMobileOpen(false);
@@ -120,7 +118,12 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
           Digite para buscar...
         </div>
       )}
-      {debouncedQuery && !hasResults && (
+      {debouncedQuery && isLoadingProducts && (
+        <div className="py-6 flex items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+        </div>
+      )}
+      {debouncedQuery && !isLoadingProducts && !hasResults && (
         <CommandEmpty>Nenhum resultado encontrado.</CommandEmpty>
       )}
       {filteredProducts.length > 0 && (
@@ -139,7 +142,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{product.name}</p>
                 <p className="text-xs text-muted-foreground">
-                  {product.category} • {product.originPrice}
+                  {product.category?.name || "Sem categoria"} • {product.origin_price}
                 </p>
               </div>
             </CommandItem>
