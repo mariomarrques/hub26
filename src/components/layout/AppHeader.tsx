@@ -12,10 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
-import { currentUser } from "@/data/mockData";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function AppHeader() {
-  
+  const { profile, signOut } = useAuth();
+
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -24,6 +25,8 @@ export function AppHeader() {
       .toUpperCase()
       .slice(0, 2);
   };
+
+  const displayName = profile?.name || "Usuário";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 border-b border-sidebar-border bg-sidebar">
@@ -50,9 +53,9 @@ export function AppHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-2 px-2 hover:bg-accent">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
+                  <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
                   <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                    {getInitials(currentUser.name)}
+                    {getInitials(displayName)}
                   </AvatarFallback>
                 </Avatar>
                 <ChevronDown className="h-4 w-4 text-muted-foreground hidden sm:block" />
@@ -60,7 +63,7 @@ export function AppHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-card border-border">
               <DropdownMenuLabel className="font-normal">
-                <p className="text-sm font-medium text-foreground">{currentUser.name}</p>
+                <p className="text-sm font-medium text-foreground">{displayName}</p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem asChild className="cursor-pointer">
@@ -76,7 +79,10 @@ export function AppHeader() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem className="cursor-pointer text-destructive focus:text-destructive">
+              <DropdownMenuItem 
+                className="cursor-pointer text-destructive focus:text-destructive"
+                onClick={() => signOut()}
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Sair
               </DropdownMenuItem>
