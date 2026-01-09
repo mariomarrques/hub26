@@ -184,7 +184,7 @@ const Categoria = () => {
     <div className="space-y-6">
       {/* Header */}
       <header className="animate-fade-in">
-        <Link to="/">
+        <Link to="/produtos">
           <Button variant="ghost" size="sm" className="gap-2 mb-4 -ml-2 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" />
             Voltar
