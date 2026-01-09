@@ -140,20 +140,26 @@ function CommentItem({
           
           {/* Input de resposta */}
           {showReplyInput && (
-            <div className="mt-3 flex gap-2">
+            <div className="mt-3 relative">
               <MentionInput
-                placeholder="Escreva uma resposta..."
+                placeholder="Escreva uma resposta... Use @ para mencionar"
                 value={replyText}
                 onChange={setReplyText}
-                className="flex-1 text-sm rounded-lg bg-muted/40 border border-border/50"
+                multiline
+                className="w-full min-h-[80px] pr-14 rounded-2xl bg-muted/40 border border-border/50 focus-within:bg-background focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-300 resize-none text-sm"
               />
-              <Button
-                size="sm"
+              <button
+                type="button"
                 onClick={handleSubmitReply}
                 disabled={!replyText.trim() || isSubmitting}
+                className="absolute right-3 bottom-3 p-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40 disabled:bg-muted transition-all duration-300 shadow-sm hover:shadow-md"
               >
-                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </Button>
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="h-4 w-4" />
+                )}
+              </button>
             </div>
           )}
         </div>
