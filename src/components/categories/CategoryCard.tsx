@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { Category, mockProducts } from "@/data/mockData";
-import { normalizeSearch } from "@/lib/utils";
+import { Category } from "@/hooks/use-categories";
 import { ArrowRight } from "lucide-react";
 
 interface CategoryCardProps {
@@ -9,9 +8,6 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
-  const productCount = mockProducts.filter(
-    (p) => normalizeSearch(p.category) === normalizeSearch(category.name)
-  ).length;
 
   return (
     <Link
@@ -36,9 +32,6 @@ export function CategoryCard({ category, index = 0 }: CategoryCardProps) {
             </h3>
             <p className="text-sm text-white/70">
               {category.description}
-            </p>
-            <p className="text-xs text-white/50 mt-1">
-              {productCount} {productCount === 1 ? "produto" : "produtos"}
             </p>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
