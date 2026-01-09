@@ -16,7 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useDebounce } from "@/hooks/use-debounce";
 import { mockProducts, mockSuppliers, mockMembers } from "@/data/mockData";
 import { MEMBER_LEVELS } from "@/types/member";
-import { cn } from "@/lib/utils";
+import { cn, normalizeSearch } from "@/lib/utils";
 
 interface GlobalSearchProps {
   className?: string;
@@ -42,11 +42,13 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const normalizedQuery = normalizeSearch(debouncedQuery);
+
   const filteredProducts = debouncedQuery
     ? mockProducts
         .filter((p) =>
-          p.name.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
-          p.category.toLowerCase().includes(debouncedQuery.toLowerCase())
+          normalizeSearch(p.name).includes(normalizedQuery) ||
+          normalizeSearch(p.category).includes(normalizedQuery)
         )
         .slice(0, 5)
     : [];
@@ -54,8 +56,8 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
   const filteredSuppliers = debouncedQuery
     ? mockSuppliers
         .filter((s) =>
-          s.name.toLowerCase().includes(debouncedQuery.toLowerCase()) ||
-          s.categories.some((cat) => cat.toLowerCase().includes(debouncedQuery.toLowerCase()))
+          normalizeSearch(s.name).includes(normalizedQuery) ||
+          s.categories.some((cat) => normalizeSearch(cat).includes(normalizedQuery))
         )
         .slice(0, 5)
     : [];
@@ -63,7 +65,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
   const filteredMembers = debouncedQuery
     ? mockMembers
         .filter((m) =>
-          m.name.toLowerCase().includes(debouncedQuery.toLowerCase())
+          normalizeSearch(m.name).includes(normalizedQuery)
         )
         .slice(0, 5)
     : [];
