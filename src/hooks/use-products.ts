@@ -2,6 +2,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export interface ProductWithCategory extends Product {
+  category?: {
+    name: string;
+    slug: string;
+  } | null;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -114,4 +121,20 @@ export function useProducts(categoryId?: string) {
     updateProduct,
     deleteProduct,
   };
+}
+
+export function useProduct(id: string) {
+  return useQuery({
+    queryKey: ["product", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*, category:categories(name, slug)")
+        .eq("id", id)
+        .single();
+      if (error) throw error;
+      return data as ProductWithCategory;
+    },
+    enabled: !!id,
+  });
 }

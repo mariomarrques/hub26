@@ -248,7 +248,7 @@ export default function Busca() {
               {displayProducts.map((product) => (
                 <article
                   key={product.id}
-                  onClick={() => product.affiliateLink && product.affiliateLink !== "#" && window.open(product.affiliateLink, "_blank")}
+                  onClick={() => navigate(`/produto/${product.id}`)}
                   className="flex items-center gap-4 p-4 bg-card border border-border rounded-lg hover:border-primary/30 transition-colors cursor-pointer group"
                 >
                   <img
