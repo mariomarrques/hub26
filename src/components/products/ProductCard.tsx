@@ -1,4 +1,4 @@
-import { ExternalLink, Package, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Package, Pencil, Trash2, Copy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
@@ -21,9 +21,10 @@ interface ProductCardProps {
   canManage?: boolean;
   onEdit?: (product: Product) => void;
   onDelete?: (product: Product) => void;
+  onDuplicate?: (product: Product) => void;
 }
 
-export function ProductCard({ product, index = 0, canManage, onEdit, onDelete }: ProductCardProps) {
+export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, onDuplicate }: ProductCardProps) {
   return (
     <article
       className={cn(
@@ -54,12 +55,26 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete }:
             <Button
               size="icon"
               variant="secondary"
+              className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground border-border"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDuplicate?.(product);
+              }}
+              title="Duplicar produto"
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
               className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background border-border"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onEdit?.(product);
               }}
+              title="Editar produto"
             >
               <Pencil className="h-3.5 w-3.5" />
             </Button>
@@ -72,6 +87,7 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete }:
                 e.stopPropagation();
                 onDelete?.(product);
               }}
+              title="Excluir produto"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>

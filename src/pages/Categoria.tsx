@@ -79,6 +79,7 @@ const Categoria = () => {
   // Product management state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [duplicatingProduct, setDuplicatingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
   const { isModerator } = useAuth();
@@ -89,7 +90,19 @@ const Categoria = () => {
 
   const handleEdit = (cardProduct: ProductCardType) => {
     const dbProduct = products.find((p) => p.id === cardProduct.id);
-    if (dbProduct) setEditingProduct(dbProduct);
+    if (dbProduct) {
+      setDuplicatingProduct(null);
+      setEditingProduct(dbProduct);
+    }
+  };
+
+  const handleDuplicate = (cardProduct: ProductCardType) => {
+    const dbProduct = products.find((p) => p.id === cardProduct.id);
+    if (dbProduct) {
+      setEditingProduct(null);
+      setDuplicatingProduct(dbProduct);
+      setIsFormOpen(true);
+    }
   };
 
   const handleDelete = (cardProduct: ProductCardType) => {
@@ -98,12 +111,14 @@ const Categoria = () => {
   };
 
   const handleFormSubmit = async (data: any) => {
-    if (editingProduct) {
+    if (editingProduct && !duplicatingProduct) {
       await updateProduct.mutateAsync({ id: editingProduct.id, ...data });
       setEditingProduct(null);
     } else {
+      // Both new and duplicate create a new product
       await createProduct.mutateAsync({ ...data, category_id: category?.id || data.category_id });
       setIsFormOpen(false);
+      setDuplicatingProduct(null);
     }
   };
 
@@ -296,6 +311,7 @@ const Categoria = () => {
                 canManage={isModerator}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onDuplicate={handleDuplicate}
               />
             ))}
           </div>
@@ -320,17 +336,19 @@ const Categoria = () => {
 
       {/* Product Form Dialog */}
       <ProductFormDialog
-        open={isFormOpen || !!editingProduct}
+        open={isFormOpen || !!editingProduct || !!duplicatingProduct}
         onOpenChange={(open) => {
           if (!open) {
             setIsFormOpen(false);
             setEditingProduct(null);
+            setDuplicatingProduct(null);
           }
         }}
-        product={editingProduct}
+        product={duplicatingProduct || editingProduct}
         onSubmit={handleFormSubmit}
         isLoading={createProduct.isPending || updateProduct.isPending}
         defaultCategoryId={category?.id}
+        isDuplicating={!!duplicatingProduct}
       />
 
       {/* Delete Confirmation Dialog */}

@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Pencil, Trash2, Loader2, Package } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Loader2, Package, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 const statusLabels: Record<string, string> = {
@@ -56,6 +56,7 @@ export default function AdminProducts() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [duplicatingProduct, setDuplicatingProduct] = useState<Product | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -77,11 +78,19 @@ export default function AdminProducts() {
 
   const handleCreate = () => {
     setEditingProduct(null);
+    setDuplicatingProduct(null);
     setDialogOpen(true);
   };
 
   const handleEdit = (product: Product) => {
+    setDuplicatingProduct(null);
     setEditingProduct(product);
+    setDialogOpen(true);
+  };
+
+  const handleDuplicate = (product: Product) => {
+    setEditingProduct(null);
+    setDuplicatingProduct(product);
     setDialogOpen(true);
   };
 
@@ -102,15 +111,17 @@ export default function AdminProducts() {
   }) => {
     setIsSubmitting(true);
     try {
-      if (editingProduct) {
+      if (editingProduct && !duplicatingProduct) {
         await updateProduct.mutateAsync({
           id: editingProduct.id,
           ...data,
         });
       } else {
+        // Both new and duplicate create a new product
         await createProduct.mutateAsync(data);
       }
       setDialogOpen(false);
+      setDuplicatingProduct(null);
     } catch (error) {
       console.error("Error saving product:", error);
     } finally {
@@ -243,7 +254,16 @@ export default function AdminProducts() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          onClick={() => handleDuplicate(product)}
+                          title="Duplicar produto"
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleEdit(product)}
+                          title="Editar produto"
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -251,6 +271,7 @@ export default function AdminProducts() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDeleteClick(product)}
+                          title="Excluir produto"
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -270,10 +291,16 @@ export default function AdminProducts() {
 
       <ProductFormDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        product={editingProduct}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) {
+            setDuplicatingProduct(null);
+          }
+        }}
+        product={duplicatingProduct || editingProduct}
         onSubmit={handleSubmit}
         isLoading={isSubmitting}
+        isDuplicating={!!duplicatingProduct}
       />
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

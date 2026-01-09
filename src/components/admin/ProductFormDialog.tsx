@@ -59,6 +59,7 @@ interface ProductFormDialogProps {
   }) => Promise<void>;
   isLoading?: boolean;
   defaultCategoryId?: string;
+  isDuplicating?: boolean;
 }
 
 const statusOptions = [
@@ -75,6 +76,7 @@ export function ProductFormDialog({
   onSubmit,
   isLoading,
   defaultCategoryId,
+  isDuplicating,
 }: ProductFormDialogProps) {
   const { categories } = useCategories();
   const { uploadImage, isUploading } = useProductImageUpload();
@@ -95,7 +97,21 @@ export function ProductFormDialog({
   });
 
   useEffect(() => {
-    if (product) {
+    if (product && isDuplicating) {
+      // Duplication mode - prefill with product data + (Cópia) in name
+      form.reset({
+        name: `${product.name} (Cópia)`,
+        origin_price: product.origin_price,
+        resale_range: product.resale_range,
+        status: product.status as "new" | "hot" | "trending" | "paused",
+        category_id: product.category_id || defaultCategoryId || "",
+        admin_note: product.admin_note || "",
+        affiliate_link: product.affiliate_link || "",
+      });
+      setImageUrl(product.image);
+      setImagePreview(product.image);
+    } else if (product) {
+      // Edit mode
       form.reset({
         name: product.name,
         origin_price: product.origin_price,
@@ -108,6 +124,7 @@ export function ProductFormDialog({
       setImageUrl(product.image);
       setImagePreview(product.image);
     } else {
+      // Create mode
       form.reset({
         name: "",
         origin_price: "",
@@ -120,7 +137,7 @@ export function ProductFormDialog({
       setImageUrl("");
       setImagePreview("");
     }
-  }, [product, form, defaultCategoryId]);
+  }, [product, form, defaultCategoryId, isDuplicating]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -167,7 +184,7 @@ export function ProductFormDialog({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {product ? "Editar Produto" : "Novo Produto"}
+            {isDuplicating ? "Duplicar Produto" : product ? "Editar Produto" : "Novo Produto"}
           </DialogTitle>
         </DialogHeader>
 
@@ -357,6 +374,8 @@ export function ProductFormDialog({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Salvando...
                   </>
+                ) : isDuplicating ? (
+                  "Criar Cópia"
                 ) : product ? (
                   "Salvar Alterações"
                 ) : (
