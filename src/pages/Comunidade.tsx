@@ -1,4 +1,4 @@
-import { MessageSquare, Pin, Search, Users, Clock, MessageCircle, Plus, AlertCircle, X, Trash2 } from "lucide-react";
+import { MessageSquare, Pin, Search, Users, Clock, MessageCircle, Plus, AlertCircle, X, Trash2, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -79,8 +79,16 @@ function TopicRow({
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-6 text-sm text-muted-foreground flex-shrink-0">
-        <div className="flex items-center gap-1.5 min-w-[100px]">
+      <div className="flex items-center gap-4 text-sm text-muted-foreground flex-shrink-0">
+        <div className="flex items-center gap-1">
+          <Heart className="h-4 w-4" />
+          <span>{post.likes_count || 0}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <MessageCircle className="h-4 w-4" />
+          <span>{post.comments_count || 0}</span>
+        </div>
+        <div className="flex items-center gap-1.5">
           <Clock className="h-4 w-4" />
           <span>
             {formatDistanceToNow(new Date(post.created_at), {
