@@ -100,14 +100,29 @@ function SupplierCard({ supplier, index, isAdmin, onEdit }: SupplierCardProps) {
 
       {/* Footer Buttons */}
       <div className="mt-4 pt-3 border-t border-border flex gap-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="flex-1 justify-center gap-2 text-muted-foreground hover:text-foreground"
-        >
-          <ExternalLink className="h-4 w-4" />
-          Ver detalhes
-        </Button>
+                      {supplier.link ? (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="flex-1 justify-center gap-2 text-muted-foreground hover:text-foreground"
+                          asChild
+                        >
+                          <a href={supplier.link} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-4 w-4" />
+                            Ver detalhes
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="flex-1 justify-center gap-2 text-muted-foreground"
+                          disabled
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Sem link
+                        </Button>
+                      )}
         {isAdmin && onEdit && (
           <Button 
             variant="ghost" 
