@@ -1,14 +1,26 @@
 import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProductCard } from "@/components/products/ProductCard";
+import { ProductCard, Product as ProductCardType } from "@/components/products/ProductCard";
 import { useCategories } from "@/hooks/use-categories";
 import { useProducts, Product } from "@/hooks/use-products";
 import { normalizeSearch } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
+import { ProductFormDialog } from "@/components/admin/ProductFormDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const parsePrice = (priceStr: string): number => {
   const match = priceStr.match(/[\d.,]+/);
@@ -56,10 +68,43 @@ const Categoria = () => {
   const [sortOrder, setSortOrder] = useState("relevancia");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Product management state
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+
+  const { isModerator } = useAuth();
   const { categories, isLoading: categoriesLoading } = useCategories();
   const category = categories.find((c) => c.slug === slug);
 
-  const { data: products = [], isLoading: productsLoading } = useProducts(category?.id);
+  const { data: products = [], isLoading: productsLoading, createProduct, updateProduct, deleteProduct } = useProducts(category?.id);
+
+  const handleEdit = (cardProduct: ProductCardType) => {
+    const dbProduct = products.find((p) => p.id === cardProduct.id);
+    if (dbProduct) setEditingProduct(dbProduct);
+  };
+
+  const handleDelete = (cardProduct: ProductCardType) => {
+    const dbProduct = products.find((p) => p.id === cardProduct.id);
+    if (dbProduct) setDeletingProduct(dbProduct);
+  };
+
+  const handleFormSubmit = async (data: any) => {
+    if (editingProduct) {
+      await updateProduct.mutateAsync({ id: editingProduct.id, ...data });
+      setEditingProduct(null);
+    } else {
+      await createProduct.mutateAsync({ ...data, category_id: category?.id || data.category_id });
+      setIsFormOpen(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deletingProduct) {
+      await deleteProduct.mutateAsync(deletingProduct.id);
+      setDeletingProduct(null);
+    }
+  };
 
   const filteredProducts = useMemo(() => {
     if (!category) return [];
@@ -145,10 +190,20 @@ const Categoria = () => {
             Voltar
           </Button>
         </Link>
-        <h1 className="text-heading text-foreground mb-2">{category.name}</h1>
-        <p className="text-body-muted">
-          {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} nesta categoria
-        </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-heading text-foreground mb-2">{category.name}</h1>
+            <p className="text-body-muted">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} nesta categoria
+            </p>
+          </div>
+          {isModerator && (
+            <Button onClick={() => setIsFormOpen(true)} className="gap-2 shrink-0">
+              <Plus className="h-4 w-4" />
+              Adicionar Produto
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Search */}
@@ -208,7 +263,14 @@ const Categoria = () => {
         ) : filteredProducts.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
+              <ProductCard
+                key={product.id}
+                product={product}
+                index={index}
+                canManage={isModerator}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         ) : (
@@ -229,6 +291,42 @@ const Categoria = () => {
           </div>
         )}
       </section>
+
+      {/* Product Form Dialog */}
+      <ProductFormDialog
+        open={isFormOpen || !!editingProduct}
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsFormOpen(false);
+            setEditingProduct(null);
+          }
+        }}
+        product={editingProduct}
+        onSubmit={handleFormSubmit}
+        isLoading={createProduct.isPending || updateProduct.isPending}
+        defaultCategoryId={category?.id}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deletingProduct} onOpenChange={() => setDeletingProduct(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir produto?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir "{deletingProduct?.name}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

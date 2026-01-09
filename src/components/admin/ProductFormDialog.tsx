@@ -58,6 +58,7 @@ interface ProductFormDialogProps {
     image: string;
   }) => Promise<void>;
   isLoading?: boolean;
+  defaultCategoryId?: string;
 }
 
 const statusOptions = [
@@ -73,6 +74,7 @@ export function ProductFormDialog({
   product,
   onSubmit,
   isLoading,
+  defaultCategoryId,
 }: ProductFormDialogProps) {
   const { categories } = useCategories();
   const { uploadImage, isUploading } = useProductImageUpload();
@@ -111,14 +113,14 @@ export function ProductFormDialog({
         origin_price: "",
         resale_range: "",
         status: "new",
-        category_id: "",
+        category_id: defaultCategoryId || "",
         admin_note: "",
         affiliate_link: "",
       });
       setImageUrl("");
       setImagePreview("");
     }
-  }, [product, form]);
+  }, [product, form, defaultCategoryId]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
