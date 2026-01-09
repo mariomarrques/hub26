@@ -56,10 +56,15 @@ export function AppHeader() {
           >
             <Menu className="h-5 w-5" strokeWidth={1.5} />
           </Button>
-          <Hexagon className="h-6 w-6 text-primary" strokeWidth={1.5} />
-          <span className="text-lg font-bold text-foreground tracking-tight">
-            Hub 26
-          </span>
+          <Link 
+            to="/" 
+            className="flex items-center gap-sm hover:opacity-80 transition-opacity"
+          >
+            <Hexagon className="h-6 w-6 text-primary" strokeWidth={1.5} />
+            <span className="text-lg font-bold text-foreground tracking-tight">
+              Hub 26
+            </span>
+          </Link>
         </div>
 
         {/* Search */}
