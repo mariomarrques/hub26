@@ -270,10 +270,41 @@ export function useAdminPosts() {
     },
   });
 
+  // Toggle pin post
+  const togglePinPost = useMutation({
+    mutationFn: async (postId: string) => {
+      // Buscar estado atual
+      const { data: post, error: fetchError } = await supabase
+        .from("community_posts")
+        .select("is_pinned")
+        .eq("id", postId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Inverter estado
+      const { error } = await supabase
+        .from("community_posts")
+        .update({ is_pinned: !post?.is_pinned })
+        .eq("id", postId);
+
+      if (error) throw error;
+      return { isPinned: !post?.is_pinned };
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success(result.isPinned ? "Post fixado!" : "Post desfixado!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao fixar/desfixar post: " + error.message);
+    },
+  });
+
   return {
     pendingPosts: pendingPosts || [],
     isLoading,
     approvePost,
     rejectPost,
+    togglePinPost,
   };
 }

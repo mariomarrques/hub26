@@ -17,16 +17,17 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageCircle, Pin, Heart, Trash2, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { CommunityPost } from "@/hooks/use-community-posts";
+import { CommunityPost, useAdminPosts } from "@/hooks/use-community-posts";
 import { usePostComments, usePostLikes, PostComment } from "@/hooks/use-post-interactions";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { MentionInput } from "./MentionInput";
+import { MentionText } from "./MentionText";
 
 const CATEGORY_MAP: Record<string, string> = {
   duvidas: "Dúvidas",
@@ -95,9 +96,10 @@ function CommentItem({
             </Button>
           )}
         </div>
-        <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">
-          {comment.content}
-        </p>
+        <MentionText 
+          content={comment.content} 
+          className="text-sm text-foreground mt-1 whitespace-pre-wrap"
+        />
       </div>
     </div>
   );
@@ -110,10 +112,12 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
 
   const { comments, isLoading: loadingComments, addComment, deleteComment } = usePostComments(post?.id);
   const { likesCount, hasLiked, toggleLike } = usePostLikes(post?.id);
+  const { togglePinPost } = useAdminPosts();
 
   if (!post) return null;
 
   const canDeletePost = user?.id === post.author_id || isAdmin || isModerator;
+  const canPinPost = isAdmin || isModerator;
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,41 +152,61 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
                 </Badge>
               )}
             </div>
-            {canDeletePost && onDelete && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-destructive"
-                    disabled={isDeleting}
-                  >
-                    {isDeleting ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Trash2 className="h-4 w-4 mr-1" />
+            <div className="flex items-center gap-2">
+              {canPinPost && (
+                <Button
+                  variant={post.is_pinned ? "default" : "outline"}
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => togglePinPost.mutate(post.id)}
+                  disabled={togglePinPost.isPending}
+                >
+                  {togglePinPost.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Pin className="h-4 w-4" />
+                      {post.is_pinned ? "Desfixar" : "Fixar"}
+                    </>
+                  )}
+                </Button>
+              )}
+              {canDeletePost && onDelete && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-muted-foreground hover:text-destructive"
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4 mr-1" />
+                          Excluir
+                        </>
+                      )}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Excluir tópico?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta ação não pode ser desfeita. O tópico e todos os comentários serão removidos permanentemente.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => onDelete(post.id)}>
                         Excluir
-                      </>
-                    )}
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Excluir tópico?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Esta ação não pode ser desfeita. O tópico e todos os comentários serão removidos permanentemente.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onDelete(post.id)}>
-                      Excluir
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           </div>
           <DialogTitle className="text-xl leading-relaxed">
             {post.title}
@@ -273,10 +297,10 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
           {/* Form para adicionar comentário */}
           {user ? (
             <form onSubmit={handleSubmitComment} className="flex gap-2 pt-2">
-              <Input
-                placeholder="Escreva um comentário..."
+              <MentionInput
+                placeholder="Escreva um comentário... Use @ para mencionar"
                 value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
+                onChange={setNewComment}
                 className="flex-1"
               />
               <Button 
