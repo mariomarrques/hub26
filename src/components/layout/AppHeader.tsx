@@ -1,4 +1,5 @@
 import { Hexagon, Search, Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -79,9 +80,11 @@ export function AppHeader() {
                 <p className="text-sm font-medium text-foreground">{currentUser.name}</p>
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                Meu Perfil
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link to="/perfil">
+                  <User className="mr-2 h-4 w-4" />
+                  Meu Perfil
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <Settings className="mr-2 h-4 w-4" />
