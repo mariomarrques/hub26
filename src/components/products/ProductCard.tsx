@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
+import cssbuyLogo from "@/assets/cssbuy-logo.png";
 
 export interface Product {
   id: string;
@@ -131,8 +132,23 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
           </p>
         )}
 
-        {/* CTA */}
-        <div className="mt-auto">
+        {/* CTA Buttons */}
+        <div className="mt-auto flex flex-col gap-2">
+          {product.affiliateLink && (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full gap-2 bg-[#7CB342] hover:bg-[#689F38] text-white border-[#7CB342] hover:border-[#689F38]"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(product.affiliateLink, '_blank', 'noopener,noreferrer');
+              }}
+            >
+              <img src={cssbuyLogo} alt="CSSBuy" className="h-4 w-auto" />
+              Abrir produto
+            </Button>
+          )}
           <Button
             variant="secondary"
             size="sm"
