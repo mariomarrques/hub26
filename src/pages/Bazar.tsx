@@ -1,4 +1,13 @@
-import { Store, Package, AlertTriangle, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Store, Package, AlertTriangle, ShoppingCart, Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { cn } from "@/lib/utils";
@@ -147,6 +156,24 @@ function BazarCard({ product, index }: { product: BazarProduct; index: number })
 const Bazar = () => {
   return (
     <div className="space-y-8">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="animate-fade-in">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Bazar</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header */}
       <header className="animate-fade-in">
         <div className="flex items-center gap-2 mb-2">

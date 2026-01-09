@@ -1,6 +1,14 @@
 import { useState, useMemo } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { Search, Package, Users, Store, ArrowRight } from "lucide-react";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import { Search, Package, Users, Store, ArrowRight, Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -106,6 +114,24 @@ export default function Busca() {
 
   return (
     <div className="space-y-6">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="animate-fade-in">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Busca</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">

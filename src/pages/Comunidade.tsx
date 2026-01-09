@@ -1,4 +1,13 @@
-import { MessageSquare, Pin, Search, Users, Clock, MessageCircle, Plus, AlertCircle, X, Trash2, Heart } from "lucide-react";
+import { MessageSquare, Pin, Search, Users, Clock, MessageCircle, Plus, AlertCircle, X, Trash2, Heart, Home } from "lucide-react";
+import { Link } from "react-router-dom";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -243,6 +252,24 @@ const Comunidade = () => {
 
   return (
     <div className="space-y-8">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="animate-fade-in">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Comunidade</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header */}
       <header className="animate-fade-in">
         <div className="flex items-start justify-between gap-4">
