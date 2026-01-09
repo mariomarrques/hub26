@@ -1,11 +1,12 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, Bell } from "lucide-react";
+import { LayoutDashboard, Users, Bell, History } from "lucide-react";
 
 const adminTabs = [
   { value: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { value: "/admin/usuarios", label: "Usuários", icon: Users },
   { value: "/admin/notificacoes", label: "Notificações", icon: Bell },
+  { value: "/admin/logs", label: "Logs", icon: History },
 ];
 
 interface AdminLayoutProps {
@@ -26,7 +27,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       </div>
 
       <Tabs value={location.pathname} onValueChange={(value) => navigate(value)}>
-        <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+        <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
           {adminTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
