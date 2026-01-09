@@ -14,6 +14,7 @@ import Fornecedores from "./pages/Fornecedores";
 import Avisos from "./pages/Avisos";
 import Comunidade from "./pages/Comunidade";
 import Perfil from "./pages/Perfil";
+import EditarPerfil from "./pages/EditarPerfil";
 import Configuracoes from "./pages/Configuracoes";
 import Categoria from "./pages/Categoria";
 import Login from "./pages/Login";
@@ -90,6 +91,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <AppLayout><Perfil /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/editar-perfil"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><EditarPerfil /></AppLayout>
                     </ProtectedRoute>
                   }
                 />
