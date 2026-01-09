@@ -2,6 +2,7 @@ import { AtSign, Package, AlertTriangle, MessageSquare, Megaphone } from "lucide
 import { cn } from "@/lib/utils";
 import { Notification, NotificationType } from "@/types/notification";
 import { Link } from "react-router-dom";
+import { formatRelativeTime } from "@/lib/date-utils";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -37,7 +38,7 @@ export function NotificationItem({ notification, onRead, compact = false }: Noti
   const Icon = config.icon;
 
   const handleClick = () => {
-    if (!notification.isRead) {
+    if (!notification.is_read) {
       onRead(notification.id);
     }
   };
@@ -46,7 +47,7 @@ export function NotificationItem({ notification, onRead, compact = false }: Noti
     <div
       className={cn(
         "flex gap-3 p-3 rounded-lg transition-colors cursor-pointer",
-        !notification.isRead && "bg-accent/50",
+        !notification.is_read && "bg-accent/50",
         "hover:bg-accent"
       )}
       onClick={handleClick}
@@ -65,7 +66,7 @@ export function NotificationItem({ notification, onRead, compact = false }: Noti
           )}>
             {notification.title}
           </p>
-          {!notification.isRead && (
+          {!notification.is_read && (
             <span className="flex-shrink-0 h-2 w-2 rounded-full bg-primary mt-1.5" />
           )}
         </div>
@@ -76,7 +77,7 @@ export function NotificationItem({ notification, onRead, compact = false }: Noti
           {notification.message}
         </p>
         <span className="text-xs text-muted-foreground mt-1 block">
-          {notification.timestamp}
+          {formatRelativeTime(notification.created_at)}
         </span>
       </div>
     </div>

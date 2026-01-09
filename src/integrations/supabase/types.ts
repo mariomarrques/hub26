@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          message: string
+          sender_id: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message: string
+          sender_id?: string | null
+          title: string
+          type: Database["public"]["Enums"]["notification_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message?: string
+          sender_id?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["notification_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -74,6 +110,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "member"
+      notification_type:
+        | "mention"
+        | "product"
+        | "alert"
+        | "community"
+        | "announcement"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -202,6 +244,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "member"],
+      notification_type: [
+        "mention",
+        "product",
+        "alert",
+        "community",
+        "announcement",
+      ],
     },
   },
 } as const

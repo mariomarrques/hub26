@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { useNotifications } from "@/contexts/NotificationContext";
 import { NotificationItem } from "@/components/notifications/NotificationItem";
 import { Button } from "@/components/ui/button";
-import { NotificationType } from "@/types/notification";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const filterOptions: { value: string; label: string }[] = [
   { value: "all", label: "Todos" },
@@ -17,7 +17,7 @@ const filterOptions: { value: string; label: string }[] = [
 
 const Avisos = () => {
   const [activeFilter, setActiveFilter] = useState("all");
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
 
   const filteredNotifications = notifications.filter((notification) => {
     if (activeFilter === "all") return true;
@@ -83,19 +83,33 @@ const Avisos = () => {
 
       {/* Notifications List */}
       <section className="space-y-2">
-        {filteredNotifications.map((notification, index) => (
-          <div 
-            key={notification.id} 
-            className="animate-slide-up border border-border rounded-lg bg-card"
-            style={{ animationDelay: `${index * 50}ms` }}
-          >
-            <NotificationItem
-              notification={notification}
-              onRead={markAsRead}
-            />
+        {isLoading ? (
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex gap-3 p-4 border border-border rounded-lg bg-card">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-1/4" />
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-        {filteredNotifications.length === 0 && (
+        ) : filteredNotifications.length > 0 ? (
+          filteredNotifications.map((notification, index) => (
+            <div 
+              key={notification.id} 
+              className="animate-slide-up border border-border rounded-lg bg-card"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <NotificationItem
+                notification={notification}
+                onRead={markAsRead}
+              />
+            </div>
+          ))
+        ) : (
           <div className="rounded-xl border border-dashed border-border p-8 text-center">
             <p className="text-muted-foreground">Nenhuma notificação encontrada com esse filtro.</p>
           </div>

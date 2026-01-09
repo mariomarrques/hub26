@@ -9,9 +9,10 @@ import {
 import { useNotifications } from "@/contexts/NotificationContext";
 import { NotificationItem } from "./NotificationItem";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function NotificationDropdown() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
 
   // Show only the 5 most recent notifications
   const recentNotifications = notifications.slice(0, 5);
@@ -48,7 +49,19 @@ export function NotificationDropdown() {
         {/* Notifications List */}
         <ScrollArea className="max-h-[320px]">
           <div className="p-1">
-            {recentNotifications.length > 0 ? (
+            {isLoading ? (
+              <div className="space-y-2 p-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex gap-3 p-2">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-full" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : recentNotifications.length > 0 ? (
               recentNotifications.map((notification) => (
                 <NotificationItem
                   key={notification.id}

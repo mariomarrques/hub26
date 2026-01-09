@@ -170,72 +170,7 @@ export const mockProducts: Product[] = [
   },
 ];
 
-export const mockNotifications: Notification[] = [
-  {
-    id: "1",
-    type: "alert",
-    title: "Produto saturando: Camisa Polo Premium",
-    message: "Detectamos aumento de 40% em vendas nos últimos 7 dias. Considere ajustar preço ou pausar divulgação.",
-    timestamp: "Há 2 horas",
-    isRead: false,
-    link: "/categoria/camisas",
-  },
-  {
-    id: "2",
-    type: "mention",
-    title: "Maria Santos te mencionou",
-    message: '"@João, qual fornecedor você usou para esse produto?"',
-    timestamp: "Há 3 horas",
-    isRead: false,
-    link: "/comunidade",
-    senderId: "2",
-  },
-  {
-    id: "3",
-    type: "product",
-    title: "Novo produto disponível",
-    message: "Bolsa Crossbody Compacta foi adicionada ao catálogo. Confira!",
-    timestamp: "Há 5 horas",
-    isRead: false,
-    link: "/categoria/acessorios",
-  },
-  {
-    id: "4",
-    type: "alert",
-    title: "Fornecedor em pausa temporária",
-    message: "O fornecedor 'Quality Imports' está em manutenção até 15/01. Veja alternativas.",
-    timestamp: "Há 8 horas",
-    isRead: true,
-    link: "/fornecedores",
-  },
-  {
-    id: "5",
-    type: "community",
-    title: "Carlos respondeu seu comentário",
-    message: '"Concordo! Esse tênis vende muito bem na minha região também."',
-    timestamp: "Ontem",
-    isRead: true,
-    link: "/comunidade",
-    senderId: "3",
-  },
-  {
-    id: "6",
-    type: "announcement",
-    title: "Nova funcionalidade: Alertas de saturação",
-    message: "Agora você recebe avisos automáticos quando um produto está saturando no mercado.",
-    timestamp: "2 dias atrás",
-    isRead: true,
-  },
-  {
-    id: "7",
-    type: "product",
-    title: "Produto validado pela comunidade",
-    message: "O Relógio Casual Minimalista recebeu 95% de aprovação nos testes. Liberado para escala.",
-    timestamp: "3 dias atrás",
-    isRead: true,
-    link: "/categoria/acessorios",
-  },
-];
+// mockNotifications removed - now using real-time notifications from database
 
 export interface Supplier {
   id: string;
