@@ -138,14 +138,18 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
             <Button
               variant="secondary"
               size="sm"
-              className="w-full gap-2 bg-[#7CB342] hover:bg-[#689F38] text-white border-[#7CB342] hover:border-[#689F38]"
+              className={cn(
+                "w-full gap-2",
+                "bg-gray-900 hover:bg-gray-800 text-white border-gray-900",
+                "dark:bg-white dark:hover:bg-gray-100 dark:text-[#5B8C2A] dark:border-[#7CB342]"
+              )}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.open(product.affiliateLink, '_blank', 'noopener,noreferrer');
               }}
             >
-              <img src={cssbuyLogo} alt="CSSBuy" className="h-4 w-auto" />
+              <img src={cssbuyLogo} alt="CSSBuy" className="h-5 w-auto" />
               Abrir produto
             </Button>
           )}
