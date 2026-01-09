@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home, Search } from "lucide-react";
+import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home, Search, ArrowUpDown } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,6 +16,15 @@ import { Button } from "@/components/ui/button";
 import { SupplierFormDialog } from "@/components/suppliers/SupplierFormDialog";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+type SortOption = "name-asc" | "name-desc" | "rating-desc" | "rating-asc";
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
@@ -156,6 +165,7 @@ const Fornecedores = () => {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("rating-desc");
   
   // Filter suppliers based on search query
   const filteredSuppliers = suppliers.filter((supplier) => {
@@ -167,9 +177,28 @@ const Fornecedores = () => {
     );
     return matchesName || matchesCategory;
   });
+
+  // Sort suppliers
+  const sortedSuppliers = [...filteredSuppliers].sort((a, b) => {
+    const avgRatingA = (a.rating.quality + a.rating.delivery) / 2;
+    const avgRatingB = (b.rating.quality + b.rating.delivery) / 2;
+
+    switch (sortBy) {
+      case "name-asc":
+        return a.name.localeCompare(b.name);
+      case "name-desc":
+        return b.name.localeCompare(a.name);
+      case "rating-desc":
+        return avgRatingB - avgRatingA;
+      case "rating-asc":
+        return avgRatingA - avgRatingB;
+      default:
+        return 0;
+    }
+  });
   
-  const activeSuppliers = filteredSuppliers.filter((s) => s.status === "active");
-  const otherSuppliers = filteredSuppliers.filter((s) => s.status !== "active");
+  const activeSuppliers = sortedSuppliers.filter((s) => s.status === "active");
+  const otherSuppliers = sortedSuppliers.filter((s) => s.status !== "active");
 
   const handleOpenAddDialog = () => {
     setSelectedSupplier(null);
@@ -256,15 +285,32 @@ const Fornecedores = () => {
         </div>
       </header>
 
-      {/* Search Field */}
-      <div className="relative animate-fade-in">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar por nome ou categoria..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      {/* Search and Sort Controls */}
+      <div className="flex flex-col sm:flex-row gap-3 animate-fade-in">
+        {/* Search Field */}
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar por nome ou categoria..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
+        {/* Sort Select */}
+        <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
+          <SelectTrigger className="w-full sm:w-[200px]">
+            <ArrowUpDown className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Ordenar por" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="rating-desc">Maior avaliação</SelectItem>
+            <SelectItem value="rating-asc">Menor avaliação</SelectItem>
+            <SelectItem value="name-asc">Nome (A-Z)</SelectItem>
+            <SelectItem value="name-desc">Nome (Z-A)</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <SupplierFormDialog
