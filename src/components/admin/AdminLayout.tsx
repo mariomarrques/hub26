@@ -24,17 +24,17 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Área de Administração</h1>
         <p className="text-muted-foreground">
-          Gerencie usuários e envie notificações
+          Gerencie usuários, produtos, notificações e monitore atividades
         </p>
       </div>
 
       <Tabs value={location.pathname} onValueChange={(value) => navigate(value)}>
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
+        <TabsList className="inline-flex h-10 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground w-full overflow-x-auto">
           {adminTabs.map((tab) => (
             <TabsTrigger
               key={tab.value}
               value={tab.value}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 whitespace-nowrap px-3"
             >
               <tab.icon className="h-4 w-4" />
               <span className="hidden sm:inline">{tab.label}</span>

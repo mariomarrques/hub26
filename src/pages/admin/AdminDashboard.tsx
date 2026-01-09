@@ -2,11 +2,24 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Users, Shield, UserCheck, User } from "lucide-react";
+import { 
+  Users, 
+  Shield, 
+  UserCheck, 
+  User, 
+  Activity, 
+  Zap, 
+  Bell, 
+  Package,
+  BarChart3,
+  ArrowRight
+} from "lucide-react";
 import { useAdminStats, useAdminUsers } from "@/hooks/use-admin";
 import { formatRelativeTime } from "@/lib/date-utils";
 import { AppRole } from "@/types/auth";
+import { useNavigate } from "react-router-dom";
 
 const roleColors: Record<AppRole, string> = {
   admin: "bg-red-500/10 text-red-500 border-red-500/20",
@@ -21,6 +34,7 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
   const { data: stats, isLoading: loadingStats } = useAdminStats();
   const { data: users, isLoading: loadingUsers } = useAdminUsers();
 
@@ -56,82 +70,185 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {statCards.map((stat) => (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-              </CardHeader>
-              <CardContent>
-                {loadingStats ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  <p className="text-2xl font-bold">{stat.value}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        {/* Seção: Visão Geral */}
+        <div>
+          <h2 className="text-lg font-semibold flex items-center gap-2 mb-4">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            Visão Geral
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {statCards.map((stat) => (
+              <Card key={stat.title}>
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </CardTitle>
+                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                </CardHeader>
+                <CardContent>
+                  {loadingStats ? (
+                    <Skeleton className="h-8 w-16" />
+                  ) : (
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Usuários Recentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {loadingUsers ? (
-              <div className="space-y-4">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="flex-1 space-y-2">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-48" />
+        {/* Grid de duas colunas */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Coluna 1: Usuários Recentes */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Users className="h-5 w-5 text-primary" />
+                Usuários Recentes
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() => navigate('/admin/usuarios')}
+              >
+                Ver todos
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {loadingUsers ? (
+                <div className="space-y-3">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <Skeleton className="h-9 w-9 rounded-full" />
+                      <div className="flex-1 space-y-1.5">
+                        <Skeleton className="h-3.5 w-28" />
+                        <Skeleton className="h-3 w-36" />
+                      </div>
+                      <Skeleton className="h-5 w-14" />
                     </div>
-                    <Skeleton className="h-6 w-16" />
-                  </div>
-                ))}
-              </div>
-            ) : recentUsers.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
-                Nenhum usuário encontrado
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {recentUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center gap-4 rounded-lg border p-3"
-                  >
-                    <Avatar>
-                      <AvatarImage src={user.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {user.name?.charAt(0).toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium truncate">{user.name}</p>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {user.email}
-                      </p>
-                    </div>
-                    <div className="text-right">
+                  ))}
+                </div>
+              ) : recentUsers.length === 0 ? (
+                <p className="text-center text-muted-foreground py-6">
+                  Nenhum usuário encontrado
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {recentUsers.slice(0, 4).map((user) => (
+                    <div
+                      key={user.id}
+                      className="flex items-center gap-3 rounded-lg border p-2.5"
+                    >
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={user.avatar_url || undefined} />
+                        <AvatarFallback className="text-sm">
+                          {user.name?.charAt(0).toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {formatRelativeTime(user.created_at)}
+                        </p>
+                      </div>
                       <Badge
                         variant="outline"
-                        className={roleColors[user.role]}
+                        className={`text-xs ${roleColors[user.role]}`}
                       >
                         {roleLabels[user.role]}
                       </Badge>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatRelativeTime(user.created_at)}
-                      </p>
                     </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Coluna 2: Resumo de Atividade */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Activity className="h-5 w-5 text-primary" />
+                Resumo de Atividade
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-primary/10">
+                      <Users className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-sm">Total de usuários</span>
                   </div>
-                ))}
+                  <Badge variant="secondary">{stats?.total_users || 0}</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-red-500/10">
+                      <Shield className="h-4 w-4 text-red-500" />
+                    </div>
+                    <span className="text-sm">Administradores ativos</span>
+                  </div>
+                  <Badge variant="secondary">{stats?.admin_count || 0}</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-blue-500/10">
+                      <UserCheck className="h-4 w-4 text-blue-500" />
+                    </div>
+                    <span className="text-sm">Moderadores ativos</span>
+                  </div>
+                  <Badge variant="secondary">{stats?.moderator_count || 0}</Badge>
+                </div>
+                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-green-500/10">
+                      <User className="h-4 w-4 text-green-500" />
+                    </div>
+                    <span className="text-sm">Membros registrados</span>
+                  </div>
+                  <Badge variant="secondary">{stats?.member_count || 0}</Badge>
+                </div>
               </div>
-            )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Ações Rápidas */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Zap className="h-5 w-5 text-primary" />
+              Ações Rápidas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/admin/usuarios')}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Gerenciar Usuários
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/admin/notificacoes')}
+              >
+                <Bell className="h-4 w-4 mr-2" />
+                Enviar Notificação
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/admin/produtos')}
+              >
+                <Package className="h-4 w-4 mr-2" />
+                Gerenciar Produtos
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
