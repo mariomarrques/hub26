@@ -1,0 +1,222 @@
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+
+export interface CommunityPost {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  author_id: string;
+  status: "pending" | "approved" | "rejected";
+  is_pinned: boolean;
+  rejection_reason: string | null;
+  created_at: string;
+  updated_at: string;
+  approved_at: string | null;
+  approved_by: string | null;
+  author?: {
+    name: string;
+    avatar_url: string | null;
+  };
+}
+
+export function useCommunityPosts() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Fetch approved posts
+  const { data: approvedPosts, isLoading: loadingApproved } = useQuery({
+    queryKey: ["community-posts", "approved"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_posts")
+        .select("*")
+        .eq("status", "approved")
+        .order("is_pinned", { ascending: false })
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Fetch author profiles separately
+      const authorIds = [...new Set(data?.map((p) => p.author_id) || [])];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, name, avatar_url")
+        .in("id", authorIds);
+
+      const profileMap = new Map(profiles?.map((p) => [p.id, p]));
+
+      return (data || []).map((post) => ({
+        ...post,
+        status: post.status as "pending" | "approved" | "rejected",
+        author: profileMap.get(post.author_id) || { name: "Usuário", avatar_url: null },
+      })) as CommunityPost[];
+    },
+  });
+
+  // Fetch user's own posts (all statuses)
+  const { data: myPosts, isLoading: loadingMyPosts } = useQuery({
+    queryKey: ["community-posts", "my-posts", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      const { data, error } = await supabase
+        .from("community_posts")
+        .select("*")
+        .eq("author_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return (data || []).map((post) => ({
+        ...post,
+        status: post.status as "pending" | "approved" | "rejected",
+      })) as CommunityPost[];
+    },
+    enabled: !!user?.id,
+  });
+
+  // Create new post
+  const createPost = useMutation({
+    mutationFn: async (post: { title: string; content: string; category: string }) => {
+      if (!user?.id) throw new Error("Usuário não autenticado");
+
+      const { data, error } = await supabase
+        .from("community_posts")
+        .insert({
+          title: post.title,
+          content: post.content,
+          category: post.category,
+          author_id: user.id,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success("Tópico enviado para aprovação!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao criar tópico: " + error.message);
+    },
+  });
+
+  // Delete post
+  const deletePost = useMutation({
+    mutationFn: async (postId: string) => {
+      const { error } = await supabase
+        .from("community_posts")
+        .delete()
+        .eq("id", postId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success("Tópico excluído!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao excluir tópico: " + error.message);
+    },
+  });
+
+  return {
+    approvedPosts: approvedPosts || [],
+    myPosts: myPosts || [],
+    loadingApproved,
+    loadingMyPosts,
+    createPost,
+    deletePost,
+  };
+}
+
+export function useAdminPosts() {
+  const queryClient = useQueryClient();
+
+  // Fetch pending posts (admin only)
+  const { data: pendingPosts, isLoading } = useQuery({
+    queryKey: ["community-posts", "pending"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("community_posts")
+        .select("*")
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+
+      // Fetch author profiles
+      const authorIds = [...new Set(data?.map((p) => p.author_id) || [])];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, name, avatar_url")
+        .in("id", authorIds);
+
+      const profileMap = new Map(profiles?.map((p) => [p.id, p]));
+
+      return (data || []).map((post) => ({
+        ...post,
+        status: post.status as "pending" | "approved" | "rejected",
+        author: profileMap.get(post.author_id) || { name: "Usuário", avatar_url: null },
+      })) as CommunityPost[];
+    },
+  });
+
+  // Approve post
+  const approvePost = useMutation({
+    mutationFn: async (postId: string) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { error } = await supabase
+        .from("community_posts")
+        .update({
+          status: "approved",
+          approved_at: new Date().toISOString(),
+          approved_by: user?.id,
+        })
+        .eq("id", postId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success("Post aprovado!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao aprovar post: " + error.message);
+    },
+  });
+
+  // Reject post
+  const rejectPost = useMutation({
+    mutationFn: async ({ postId, reason }: { postId: string; reason?: string }) => {
+      const { error } = await supabase
+        .from("community_posts")
+        .update({
+          status: "rejected",
+          rejection_reason: reason || null,
+        })
+        .eq("id", postId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success("Post rejeitado!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao rejeitar post: " + error.message);
+    },
+  });
+
+  return {
+    pendingPosts: pendingPosts || [],
+    isLoading,
+    approvePost,
+    rejectPost,
+  };
+}

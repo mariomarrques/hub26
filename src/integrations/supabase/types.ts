@@ -41,6 +41,51 @@ export type Database = {
         }
         Relationships: []
       }
+      community_posts: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          author_id: string
+          category: string
+          content: string
+          created_at: string | null
+          id: string
+          is_pinned: boolean | null
+          rejection_reason: string | null
+          status: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          author_id: string
+          category: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          rejection_reason?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          author_id?: string
+          category?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          rejection_reason?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
