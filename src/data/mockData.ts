@@ -184,6 +184,7 @@ export interface Supplier {
   categories: string[];
   adminNote?: string;
   contact?: string;
+  link?: string;
 }
 
 export const mockSuppliers: Supplier[] = [
@@ -194,6 +195,7 @@ export const mockSuppliers: Supplier[] = [
     rating: { quality: 4.8, delivery: 4.5, communication: 4.9 },
     categories: ["Camisas", "Acessórios"],
     adminNote: "Fornecedor principal. Resposta rápida no WhatsApp.",
+    link: "https://wa.me/5511999999999",
   },
   {
     id: "2",
@@ -202,6 +204,7 @@ export const mockSuppliers: Supplier[] = [
     rating: { quality: 4.3, delivery: 4.8, communication: 4.2 },
     categories: ["Calçados", "Streetwear"],
     adminNote: "Especializado em tênis. Entrega expressa disponível.",
+    link: "https://fastfashionhub.com",
   },
   {
     id: "3",
@@ -218,5 +221,6 @@ export const mockSuppliers: Supplier[] = [
     rating: { quality: 4.5, delivery: 4.5, communication: 4.7 },
     categories: ["Camisas", "Grifes"],
     adminNote: "Novo parceiro. Em fase de teste com primeiros pedidos.",
+    link: "https://t.me/urbanstyledirect",
   },
 ];

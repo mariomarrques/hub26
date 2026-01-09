@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle, Pause, Sparkles, Star, Truck, Trash2 } from "lucide-react";
+import { CheckCircle, Pause, Sparkles, Star, Truck, Trash2, Link2 } from "lucide-react";
 import { Supplier } from "@/data/mockData";
 import {
   Dialog,
@@ -60,6 +60,7 @@ const supplierSchema = z.object({
   quality: z.number().min(0).max(5),
   delivery: z.number().min(0).max(5),
   categories: z.array(z.string()).min(1, "Selecione pelo menos 1 categoria"),
+  link: z.string().url("URL inválida").max(500).optional().or(z.literal("")),
   adminNote: z.string().max(300, "Nota deve ter no máximo 300 caracteres").optional(),
   contact: z.string().max(100, "Contato deve ter no máximo 100 caracteres").optional(),
 });
@@ -172,6 +173,7 @@ export function SupplierFormDialog({
       quality: 4.0,
       delivery: 4.0,
       categories: [],
+      link: "",
       adminNote: "",
       contact: "",
     },
@@ -187,6 +189,7 @@ export function SupplierFormDialog({
           quality: supplier.rating.quality,
           delivery: supplier.rating.delivery,
           categories: supplier.categories,
+          link: supplier.link || "",
           adminNote: supplier.adminNote || "",
           contact: supplier.contact || "",
         });
@@ -197,6 +200,7 @@ export function SupplierFormDialog({
           quality: 4.0,
           delivery: 4.0,
           categories: [],
+          link: "",
           adminNote: "",
           contact: "",
         });
@@ -216,6 +220,7 @@ export function SupplierFormDialog({
         communication: 4.0,
       },
       categories: data.categories,
+      link: data.link || undefined,
       adminNote: data.adminNote,
       contact: data.contact,
     });
@@ -384,6 +389,24 @@ export function SupplierFormDialog({
                         />
                       ))}
                     </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Link */}
+              <FormField
+                control={form.control}
+                name="link"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center gap-2">
+                      <Link2 className="h-4 w-4 text-muted-foreground" />
+                      Link do Fornecedor (opcional)
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://exemplo.com ou link do WhatsApp" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
