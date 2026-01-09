@@ -32,12 +32,12 @@ export function MemberBadge({ tier, showLabel = true, className }: MemberBadgePr
         <TooltipTrigger asChild>
           <div
             className={cn(
-              "flex items-center gap-1 text-small",
+              "flex items-center gap-1 text-[11px] opacity-80",
               level.color,
               className
             )}
           >
-            <Icon className="h-3 w-3" strokeWidth={2} />
+            <Icon className="h-2.5 w-2.5" strokeWidth={2} />
             {showLabel && <span>{level.name}</span>}
           </div>
         </TooltipTrigger>
