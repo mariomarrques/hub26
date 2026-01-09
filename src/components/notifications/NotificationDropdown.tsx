@@ -63,12 +63,13 @@ export function NotificationDropdown() {
               </div>
             ) : recentNotifications.length > 0 ? (
               recentNotifications.map((notification) => (
-                <NotificationItem
-                  key={notification.id}
-                  notification={notification}
-                  onRead={markAsRead}
-                  compact
-                />
+                <Link key={notification.id} to="/avisos">
+                  <NotificationItem
+                    notification={notification}
+                    onRead={markAsRead}
+                    compact
+                  />
+                </Link>
               ))
             ) : (
               <div className="p-4 text-center text-sm text-muted-foreground">
