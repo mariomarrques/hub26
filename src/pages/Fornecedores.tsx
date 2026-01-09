@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home, Search, ArrowUpDown } from "lucide-react";
+import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home, Search, ArrowUpDown, X } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -32,8 +32,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type SortOption = "name-asc" | "name-desc" | "rating-desc" | "rating-asc";
+type StatusFilter = "active" | "paused" | "new";
 const ITEMS_PER_PAGE = 6;
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
@@ -177,14 +179,20 @@ const Fornecedores = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("rating-desc");
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<StatusFilter[]>([]);
 
-  // Reset page when search or sort changes
+  // Reset page when search, sort, or status filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, sortBy]);
+  }, [searchQuery, sortBy, statusFilter]);
+
+  // Filter by status first
+  const statusFilteredSuppliers = statusFilter.length === 0
+    ? suppliers
+    : suppliers.filter((s) => statusFilter.includes(s.status as StatusFilter));
   
-  // Filter suppliers based on search query
-  const filteredSuppliers = suppliers.filter((supplier) => {
+  // Then filter by search query
+  const filteredSuppliers = statusFilteredSuppliers.filter((supplier) => {
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
     const matchesName = supplier.name.toLowerCase().includes(query);
@@ -361,6 +369,51 @@ const Fornecedores = () => {
         </Select>
       </div>
 
+      {/* Status Filter */}
+      <div className="flex flex-wrap items-center gap-3 animate-fade-in">
+        <span className="text-sm text-muted-foreground">Filtrar por:</span>
+        <ToggleGroup 
+          type="multiple" 
+          value={statusFilter}
+          onValueChange={(value: StatusFilter[]) => setStatusFilter(value)}
+          className="flex flex-wrap gap-2"
+        >
+          <ToggleGroupItem 
+            value="active" 
+            className="gap-1.5 data-[state=on]:bg-success/15 data-[state=on]:text-success data-[state=on]:border-success/30"
+          >
+            <CheckCircle className="h-3.5 w-3.5" />
+            Ativo
+          </ToggleGroupItem>
+          <ToggleGroupItem 
+            value="paused"
+            className="gap-1.5 data-[state=on]:bg-muted data-[state=on]:text-muted-foreground"
+          >
+            <Pause className="h-3.5 w-3.5" />
+            Pausado
+          </ToggleGroupItem>
+          <ToggleGroupItem 
+            value="new"
+            className="gap-1.5 data-[state=on]:bg-primary/15 data-[state=on]:text-primary data-[state=on]:border-primary/30"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Novo
+          </ToggleGroupItem>
+        </ToggleGroup>
+        
+        {statusFilter.length > 0 && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setStatusFilter([])}
+            className="text-xs text-muted-foreground h-8 px-2"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Limpar
+          </Button>
+        )}
+      </div>
+
       <SupplierFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -410,12 +463,21 @@ const Fornecedores = () => {
       )}
 
       {/* Empty State */}
-      {filteredSuppliers.length === 0 && searchQuery && (
+      {filteredSuppliers.length === 0 && (searchQuery || statusFilter.length > 0) && (
         <div className="text-center py-12 animate-fade-in">
           <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
           <p className="text-muted-foreground">
-            Nenhum fornecedor encontrado para "{searchQuery}"
+            Nenhum fornecedor encontrado
+            {searchQuery && ` para "${searchQuery}"`}
+            {statusFilter.length > 0 && " com os filtros selecionados"}
           </p>
+          <Button 
+            variant="link" 
+            onClick={() => { setSearchQuery(""); setStatusFilter([]); }}
+            className="mt-2"
+          >
+            Limpar filtros
+          </Button>
         </div>
       )}
 
