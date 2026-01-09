@@ -18,7 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, Pin, Heart, Trash2, Loader2, Send } from "lucide-react";
+import { MessageCircle, Pin, Heart, Trash2, Loader2, Send, Reply } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CommunityPost, useAdminPosts } from "@/hooks/use-community-posts";
@@ -51,56 +51,132 @@ function CommentItem({
   currentUserId,
   onDelete,
   isDeleting,
+  onReply,
+  depth = 0,
+  isAdmin,
+  isModerator,
 }: { 
   comment: PostComment; 
   currentUserId?: string;
   onDelete: () => void;
   isDeleting: boolean;
+  onReply?: (parentId: string, content: string) => void;
+  depth?: number;
+  isAdmin?: boolean;
+  isModerator?: boolean;
 }) {
+  const [showReplyInput, setShowReplyInput] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const isOwner = currentUserId === comment.author_id;
+  const canDelete = isOwner || isAdmin || isModerator;
+  const canReply = !!currentUserId && depth < 2;
+
+  const handleSubmitReply = async () => {
+    if (!replyText.trim() || !onReply) return;
+    setIsSubmitting(true);
+    onReply(comment.id, replyText.trim());
+    setReplyText("");
+    setShowReplyInput(false);
+    setIsSubmitting(false);
+  };
 
   return (
-    <div className="flex gap-3 py-3 border-b border-border last:border-0">
-      <Avatar className="h-8 w-8 flex-shrink-0">
-        <AvatarImage src={comment.author?.avatar_url || undefined} />
-        <AvatarFallback className="bg-muted text-muted-foreground text-xs">
-          {comment.author?.name?.charAt(0).toUpperCase() || "U"}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-foreground">
-              {comment.author?.name || "Usuário"}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {formatDistanceToNow(new Date(comment.created_at), {
-                addSuffix: true,
-                locale: ptBR,
-              })}
-            </span>
-          </div>
-          {isOwner && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-destructive"
-              onClick={onDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Trash2 className="h-3 w-3" />
+    <div className={cn("py-3", depth === 0 && "border-b border-border last:border-0")}>
+      <div className="flex gap-3">
+        <Avatar className={cn("flex-shrink-0", depth > 0 ? "h-6 w-6" : "h-8 w-8")}>
+          <AvatarImage src={comment.author?.avatar_url || undefined} />
+          <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+            {comment.author?.name?.charAt(0).toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className={cn("font-medium text-foreground", depth > 0 ? "text-xs" : "text-sm")}>
+                {comment.author?.name || "Usuário"}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(comment.created_at), {
+                  addSuffix: true,
+                  locale: ptBR,
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              {canReply && onReply && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowReplyInput(!showReplyInput)}
+                >
+                  <Reply className="h-3 w-3 mr-1" />
+                  Responder
+                </Button>
               )}
-            </Button>
+              {canDelete && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                  onClick={onDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+          <MentionText 
+            content={comment.content} 
+            className={cn("text-foreground mt-1 whitespace-pre-wrap", depth > 0 ? "text-xs" : "text-sm")}
+          />
+          
+          {/* Input de resposta */}
+          {showReplyInput && (
+            <div className="mt-3 flex gap-2">
+              <MentionInput
+                placeholder="Escreva uma resposta..."
+                value={replyText}
+                onChange={setReplyText}
+                className="flex-1 text-sm rounded-lg bg-muted/40 border border-border/50"
+              />
+              <Button
+                size="sm"
+                onClick={handleSubmitReply}
+                disabled={!replyText.trim() || isSubmitting}
+              >
+                {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              </Button>
+            </div>
           )}
         </div>
-        <MentionText 
-          content={comment.content} 
-          className="text-sm text-foreground mt-1 whitespace-pre-wrap"
-        />
       </div>
+      
+      {/* Respostas aninhadas */}
+      {comment.replies && comment.replies.length > 0 && (
+        <div className="ml-8 mt-2 pl-4 border-l-2 border-muted space-y-0">
+          {comment.replies.map((reply) => (
+            <CommentItem
+              key={reply.id}
+              comment={reply}
+              currentUserId={currentUserId}
+              onDelete={onDelete}
+              isDeleting={isDeleting}
+              onReply={onReply}
+              depth={depth + 1}
+              isAdmin={isAdmin}
+              isModerator={isModerator}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -112,7 +188,7 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
   const [commentSent, setCommentSent] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState<string[]>([]);
 
-  const { comments, isLoading: loadingComments, addComment, deleteComment } = usePostComments(post?.id);
+  const { comments, isLoading: loadingComments, addComment, deleteComment, addReply } = usePostComments(post?.id);
   const { likesCount, hasLiked, toggleLike } = usePostLikes(post?.id);
   const { togglePinPost } = useAdminPosts();
 
@@ -152,7 +228,7 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)] md:w-[calc(100vw-4rem)] md:max-w-[calc(100vw-4rem)] md:h-[calc(100vh-4rem)] md:max-h-[calc(100vh-4rem)] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:slide-in-from-bottom-4 duration-300">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:slide-in-from-bottom-4 duration-300">
         <DialogHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -315,6 +391,9 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
                   currentUserId={user?.id}
                   onDelete={() => handleDeleteComment(comment.id)}
                   isDeleting={deletingCommentId === comment.id}
+                  onReply={(parentId, content) => addReply.mutate({ parentId, content })}
+                  isAdmin={isAdmin}
+                  isModerator={isModerator}
                 />
               ))}
             </div>

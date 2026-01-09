@@ -8,12 +8,14 @@ export interface PostComment {
   post_id: string;
   author_id: string;
   content: string;
+  parent_id: string | null;
   created_at: string;
   updated_at: string;
   author?: {
     name: string;
     avatar_url: string | null;
   };
+  replies?: PostComment[];
 }
 
 export function usePostComments(postId: string | undefined) {
@@ -44,10 +46,29 @@ export function usePostComments(postId: string | undefined) {
 
       const profileMap = new Map(profiles?.map((p) => [p.id, p]));
 
-      return (data || []).map((comment) => ({
+      const commentsWithAuthors = (data || []).map((comment) => ({
         ...comment,
         author: profileMap.get(comment.author_id) || { name: "Usuário", avatar_url: null },
       })) as PostComment[];
+
+      // Organizar em árvore (comentários raiz + replies)
+      const rootComments = commentsWithAuthors.filter(c => !c.parent_id);
+      const replies = commentsWithAuthors.filter(c => c.parent_id);
+
+      // Aninhar replies nos comentários pai
+      const buildTree = (comments: PostComment[]): PostComment[] => {
+        return comments.map(comment => ({
+          ...comment,
+          replies: replies
+            .filter(r => r.parent_id === comment.id)
+            .map(reply => ({
+              ...reply,
+              replies: replies.filter(r2 => r2.parent_id === reply.id)
+            }))
+        }));
+      };
+
+      return buildTree(rootComments);
     },
     enabled: !!postId,
   });
@@ -98,11 +119,40 @@ export function usePostComments(postId: string | undefined) {
     },
   });
 
+  const addReply = useMutation({
+    mutationFn: async ({ parentId, content }: { parentId: string; content: string }) => {
+      if (!user?.id || !postId) throw new Error("Não autenticado");
+
+      const { data, error } = await supabase
+        .from("post_comments")
+        .insert({
+          post_id: postId,
+          author_id: user.id,
+          content,
+          parent_id: parentId,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["post-comments", postId] });
+      queryClient.invalidateQueries({ queryKey: ["community-posts"] });
+      toast.success("Resposta adicionada!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao adicionar resposta: " + error.message);
+    },
+  });
+
   return {
     comments: comments || [],
     isLoading,
     addComment,
     deleteComment,
+    addReply,
   };
 }
 
