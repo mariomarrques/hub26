@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Users, Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home } from "lucide-react";
+import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -226,10 +226,6 @@ const Fornecedores = () => {
       <header className="animate-fade-in">
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="h-5 w-5 text-primary" />
-              <p className="text-label">Diretório</p>
-            </div>
             <h1 className="text-heading text-foreground mb-2">
               Fornecedores Validados
             </h1>
