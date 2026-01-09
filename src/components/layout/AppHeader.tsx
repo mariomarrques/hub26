@@ -1,4 +1,4 @@
-import { Hexagon, Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Hexagon, ChevronDown, User, Settings, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,10 +11,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
-import { currentUser, mockAlerts } from "@/data/mockData";
+import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
+import { currentUser } from "@/data/mockData";
 
 export function AppHeader() {
-  const unreadCount = mockAlerts.filter(alert => alert.type === "urgent" || alert.type === "warning").length;
   
   const getInitials = (name: string) => {
     return name
@@ -43,14 +43,7 @@ export function AppHeader() {
         <div className="flex items-center gap-sm">
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-destructive text-[10px] font-medium text-destructive-foreground">
-                {unreadCount}
-              </span>
-            )}
-          </Button>
+          <NotificationDropdown />
 
           {/* User Menu */}
           <DropdownMenu>
