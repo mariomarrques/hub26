@@ -18,7 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, Pin, Heart, Trash2, Loader2, Send, Reply } from "lucide-react";
+import { MessageCircle, Pin, Heart, Trash2, Loader2, Send, Reply, ChevronDown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CommunityPost, useAdminPosts } from "@/hooks/use-community-posts";
@@ -68,6 +68,9 @@ function CommentItem({
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showReplies, setShowReplies] = useState(true);
+  
+  const repliesCount = comment.replies?.length || 0;
   
   const isOwner = currentUserId === comment.author_id;
   const canDelete = isOwner || isAdmin || isModerator;
@@ -165,8 +168,26 @@ function CommentItem({
         </div>
       </div>
       
+      {/* Indicador de respostas colapsável */}
+      {repliesCount > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowReplies(!showReplies)}
+          className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground mt-3 ml-11 py-1.5 px-2 rounded-md hover:bg-muted/50 transition-colors"
+        >
+          <ChevronDown className={cn(
+            "h-3.5 w-3.5 transition-transform duration-200",
+            !showReplies && "-rotate-90"
+          )} />
+          <MessageCircle className="h-3.5 w-3.5" />
+          <span className="font-medium">
+            {repliesCount} {repliesCount === 1 ? 'resposta' : 'respostas'}
+          </span>
+        </button>
+      )}
+
       {/* Respostas aninhadas */}
-      {comment.replies && comment.replies.length > 0 && (
+      {showReplies && comment.replies && comment.replies.length > 0 && (
         <div className="ml-8 mt-2 pl-4 border-l-2 border-muted space-y-0">
           {comment.replies.map((reply) => (
             <CommentItem
