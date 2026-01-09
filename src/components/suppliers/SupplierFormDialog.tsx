@@ -1,7 +1,8 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle, Pause, Sparkles, Star, Truck } from "lucide-react";
+import { CheckCircle, Pause, Sparkles, Star, Truck, Trash2 } from "lucide-react";
 import { Supplier } from "@/data/mockData";
 import {
   Dialog,
@@ -17,6 +18,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -54,10 +66,13 @@ const supplierSchema = z.object({
 
 type SupplierFormData = z.infer<typeof supplierSchema>;
 
-interface AddSupplierDialogProps {
+interface SupplierFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (supplier: Omit<Supplier, "id">) => void;
+  onDelete?: () => void;
+  supplier?: Supplier | null;
+  mode: "add" | "edit";
 }
 
 function StatusBadgePreview({ status }: { status: Supplier["status"] }) {
@@ -141,7 +156,14 @@ function SupplierPreview({ data }: { data: Partial<SupplierFormData> }) {
   );
 }
 
-export function AddSupplierDialog({ open, onOpenChange, onSubmit }: AddSupplierDialogProps) {
+export function SupplierFormDialog({ 
+  open, 
+  onOpenChange, 
+  onSubmit, 
+  onDelete, 
+  supplier, 
+  mode 
+}: SupplierFormDialogProps) {
   const form = useForm<SupplierFormData>({
     resolver: zodResolver(supplierSchema),
     defaultValues: {
@@ -155,6 +177,33 @@ export function AddSupplierDialog({ open, onOpenChange, onSubmit }: AddSupplierD
     },
   });
 
+  // Reset form when dialog opens or supplier changes
+  useEffect(() => {
+    if (open) {
+      if (supplier && mode === "edit") {
+        form.reset({
+          name: supplier.name,
+          status: supplier.status,
+          quality: supplier.rating.quality,
+          delivery: supplier.rating.delivery,
+          categories: supplier.categories,
+          adminNote: supplier.adminNote || "",
+          contact: supplier.contact || "",
+        });
+      } else {
+        form.reset({
+          name: "",
+          status: "new",
+          quality: 4.0,
+          delivery: 4.0,
+          categories: [],
+          adminNote: "",
+          contact: "",
+        });
+      }
+    }
+  }, [open, supplier, mode, form]);
+
   const watchedValues = form.watch();
 
   const handleSubmit = (data: SupplierFormData) => {
@@ -164,13 +213,12 @@ export function AddSupplierDialog({ open, onOpenChange, onSubmit }: AddSupplierD
       rating: {
         quality: data.quality,
         delivery: data.delivery,
-        communication: 4.0, // Legacy field, keeping for compatibility
+        communication: 4.0,
       },
       categories: data.categories,
       adminNote: data.adminNote,
       contact: data.contact,
     });
-    form.reset();
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -184,7 +232,9 @@ export function AddSupplierDialog({ open, onOpenChange, onSubmit }: AddSupplierD
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Adicionar Fornecedor</DialogTitle>
+          <DialogTitle>
+            {mode === "add" ? "Adicionar Fornecedor" : "Editar Fornecedor"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-6 md:grid-cols-[1fr,280px]">
@@ -213,7 +263,7 @@ export function AddSupplierDialog({ open, onOpenChange, onSubmit }: AddSupplierD
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Status</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Selecione o status" />
@@ -375,11 +425,43 @@ export function AddSupplierDialog({ open, onOpenChange, onSubmit }: AddSupplierD
               />
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-2">
-                <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit">Adicionar Fornecedor</Button>
+              <div className="flex justify-between gap-3 pt-2">
+                {/* Delete Button (only in edit mode) */}
+                {mode === "edit" && onDelete && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button type="button" variant="destructive" size="sm">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Excluir
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir Fornecedor</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir "{supplier?.name}"? 
+                          Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={onDelete}>
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+
+                {/* Cancel and Submit buttons */}
+                <div className="flex gap-3 ml-auto">
+                  <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit">
+                    {mode === "add" ? "Adicionar Fornecedor" : "Salvar Alterações"}
+                  </Button>
+                </div>
               </div>
             </form>
           </Form>
