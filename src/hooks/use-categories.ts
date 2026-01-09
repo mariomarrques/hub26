@@ -49,5 +49,42 @@ export function useCategories() {
     },
   });
 
-  return { categories, isLoading, createCategory };
+  const updateCategory = useMutation({
+    mutationFn: async ({ id, ...category }: Partial<Category> & { id: string }) => {
+      const { data, error } = await supabase
+        .from("categories")
+        .update(category)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Categoria atualizada com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao atualizar categoria: " + error.message);
+    },
+  });
+
+  const deleteCategory = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("categories")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Categoria excluída com sucesso!");
+    },
+    onError: (error) => {
+      toast.error("Erro ao excluir categoria: " + error.message);
+    },
+  });
+
+  return { categories, isLoading, createCategory, updateCategory, deleteCategory };
 }

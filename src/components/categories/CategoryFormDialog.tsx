@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { CategoryImageUpload } from "./CategoryImageUpload";
-import { useCategories } from "@/hooks/use-categories";
+import { useCategories, Category } from "@/hooks/use-categories";
 import { useCategoryImageUpload } from "@/hooks/use-category-image-upload";
 import { toast } from "sonner";
 
@@ -39,6 +39,7 @@ type CategoryFormValues = z.infer<typeof categorySchema>;
 interface CategoryFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  category?: Category;
 }
 
 function generateSlug(name: string): string {
@@ -50,11 +51,13 @@ function generateSlug(name: string): string {
     .replace(/^-|-$/g, "");
 }
 
-export function CategoryFormDialog({ open, onOpenChange }: CategoryFormDialogProps) {
+export function CategoryFormDialog({ open, onOpenChange, category }: CategoryFormDialogProps) {
+  const isEditMode = !!category;
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const { createCategory } = useCategories();
-  const { uploadCategoryImage, isUploading } = useCategoryImageUpload();
+  const [hasNewImage, setHasNewImage] = useState(false);
+  const { createCategory, updateCategory } = useCategories();
+  const { uploadCategoryImage, removeCategoryImage, isUploading } = useCategoryImageUpload();
 
   const form = useForm<CategoryFormValues>({
     resolver: zodResolver(categorySchema),
@@ -67,55 +70,107 @@ export function CategoryFormDialog({ open, onOpenChange }: CategoryFormDialogPro
 
   const watchName = form.watch("name");
 
+  // Populate form when editing
   useEffect(() => {
-    if (watchName) {
+    if (category && open) {
+      form.reset({
+        name: category.name,
+        slug: category.slug,
+        description: category.description || "",
+      });
+      setPreviewUrl(category.image);
+      setHasNewImage(false);
+    }
+  }, [category, open, form]);
+
+  useEffect(() => {
+    if (watchName && !isEditMode) {
       form.setValue("slug", generateSlug(watchName));
     }
-  }, [watchName, form]);
+  }, [watchName, form, isEditMode]);
 
   const handleFileSelect = (file: File) => {
     setImageFile(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    setHasNewImage(true);
   };
 
   const handleRemoveImage = () => {
-    if (previewUrl) {
+    if (previewUrl && hasNewImage) {
       URL.revokeObjectURL(previewUrl);
     }
     setImageFile(null);
     setPreviewUrl(null);
+    setHasNewImage(true);
   };
 
   const resetForm = () => {
     form.reset();
-    handleRemoveImage();
+    if (previewUrl && hasNewImage) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setImageFile(null);
+    setPreviewUrl(null);
+    setHasNewImage(false);
   };
 
   const onSubmit = async (values: CategoryFormValues) => {
-    if (!imageFile) {
+    if (!previewUrl && !imageFile) {
       toast.error("Selecione uma imagem para a categoria");
       return;
     }
 
-    const imageUrl = await uploadCategoryImage(imageFile, values.slug);
-    if (!imageUrl) return;
+    let imageUrl = category?.image || "";
 
-    createCategory.mutate(
-      {
-        name: values.name,
-        slug: values.slug,
-        image: imageUrl,
-        description: values.description || null,
-      },
-      {
-        onSuccess: () => {
-          resetForm();
-          onOpenChange(false);
-        },
+    // Upload new image if changed
+    if (hasNewImage && imageFile) {
+      const newImageUrl = await uploadCategoryImage(imageFile, values.slug);
+      if (!newImageUrl) return;
+      
+      // Remove old image if editing
+      if (isEditMode && category?.image) {
+        await removeCategoryImage(category.image);
       }
-    );
+      
+      imageUrl = newImageUrl;
+    }
+
+    if (isEditMode && category) {
+      updateCategory.mutate(
+        {
+          id: category.id,
+          name: values.name,
+          slug: values.slug,
+          image: imageUrl,
+          description: values.description || null,
+        },
+        {
+          onSuccess: () => {
+            resetForm();
+            onOpenChange(false);
+          },
+        }
+      );
+    } else {
+      createCategory.mutate(
+        {
+          name: values.name,
+          slug: values.slug,
+          image: imageUrl,
+          description: values.description || null,
+        },
+        {
+          onSuccess: () => {
+            resetForm();
+            onOpenChange(false);
+          },
+        }
+      );
+    }
   };
+
+  const isPending = isUploading || createCategory.isPending || updateCategory.isPending;
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
@@ -124,7 +179,7 @@ export function CategoryFormDialog({ open, onOpenChange }: CategoryFormDialogPro
     }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Adicionar Categoria</DialogTitle>
+          <DialogTitle>{isEditMode ? "Editar Categoria" : "Adicionar Categoria"}</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -160,7 +215,7 @@ export function CategoryFormDialog({ open, onOpenChange }: CategoryFormDialogPro
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug (gerado automaticamente)</FormLabel>
+                  <FormLabel>Slug {!isEditMode && "(gerado automaticamente)"}</FormLabel>
                   <FormControl>
                     <Input placeholder="camisetas" {...field} />
                   </FormControl>
@@ -196,11 +251,8 @@ export function CategoryFormDialog({ open, onOpenChange }: CategoryFormDialogPro
               >
                 Cancelar
               </Button>
-              <Button
-                type="submit"
-                disabled={isUploading || createCategory.isPending}
-              >
-                {isUploading || createCategory.isPending ? "Salvando..." : "Adicionar"}
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "Salvando..." : isEditMode ? "Salvar" : "Adicionar"}
               </Button>
             </div>
           </form>
