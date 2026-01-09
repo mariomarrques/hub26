@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home, Search, ArrowUpDown } from "lucide-react";
 import {
@@ -23,8 +23,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type SortOption = "name-asc" | "name-desc" | "rating-desc" | "rating-asc";
+const ITEMS_PER_PAGE = 6;
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
@@ -166,6 +176,12 @@ const Fornecedores = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("rating-desc");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Reset page when search or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
   
   // Filter suppliers based on search query
   const filteredSuppliers = suppliers.filter((supplier) => {
@@ -196,9 +212,41 @@ const Fornecedores = () => {
         return 0;
     }
   });
+
+  // Pagination
+  const totalPages = Math.ceil(sortedSuppliers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedSuppliers = sortedSuppliers.slice(startIndex, endIndex);
   
-  const activeSuppliers = sortedSuppliers.filter((s) => s.status === "active");
-  const otherSuppliers = sortedSuppliers.filter((s) => s.status !== "active");
+  const activeSuppliers = paginatedSuppliers.filter((s) => s.status === "active");
+  const otherSuppliers = paginatedSuppliers.filter((s) => s.status !== "active");
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const getVisiblePages = (): (number | 'ellipsis')[] => {
+    const pages: (number | 'ellipsis')[] = [];
+    
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (currentPage > 3) pages.push('ellipsis');
+      
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) pages.push(i);
+      
+      if (currentPage < totalPages - 2) pages.push('ellipsis');
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  };
 
   const handleOpenAddDialog = () => {
     setSelectedSupplier(null);
@@ -368,6 +416,49 @@ const Fornecedores = () => {
           <p className="text-muted-foreground">
             Nenhum fornecedor encontrado para "{searchQuery}"
           </p>
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex flex-col items-center gap-4 pt-6 animate-fade-in">
+          <p className="text-sm text-muted-foreground">
+            Mostrando {startIndex + 1}-{Math.min(endIndex, sortedSuppliers.length)} de {sortedSuppliers.length} fornecedores
+          </p>
+          
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+              
+              {getVisiblePages().map((page, index) => (
+                <PaginationItem key={index}>
+                  {page === 'ellipsis' ? (
+                    <PaginationEllipsis />
+                  ) : (
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  )}
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       )}
     </div>
