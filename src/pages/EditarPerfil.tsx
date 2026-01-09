@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Loader2, Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -80,21 +88,35 @@ export default function EditarPerfil() {
 
   return (
     <div className="flex flex-col gap-lg max-w-md mx-auto">
-      <div className="flex items-center gap-sm">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate("/perfil")}
-          className="shrink-0"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Editar Perfil</h1>
-          <p className="text-muted-foreground text-sm">
-            Atualize suas informações pessoais
-          </p>
-        </div>
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="animate-fade-in">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/perfil">Meu Perfil</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Editar</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Editar Perfil</h1>
+        <p className="text-muted-foreground text-sm">
+          Atualize suas informações pessoais
+        </p>
       </div>
 
       <div className="bg-card rounded-xl p-lg border border-border">

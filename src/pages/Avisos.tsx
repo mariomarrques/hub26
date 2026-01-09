@@ -1,4 +1,13 @@
-import { Bell, Filter, Check } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Bell, Filter, Check, Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/contexts/NotificationContext";
@@ -26,6 +35,24 @@ const Avisos = () => {
 
   return (
     <div className="space-y-8">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="animate-fade-in">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Avisos</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Header */}
       <header className="animate-fade-in">
         <div className="flex items-center gap-2 mb-2">

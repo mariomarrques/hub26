@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { CategoryCard } from "@/components/categories/CategoryCard";
 import { CategoryFormDialog } from "@/components/categories/CategoryFormDialog";
 import { useCategories, Category } from "@/hooks/use-categories";
@@ -58,6 +67,24 @@ const Index = () => {
 
   return (
     <div className="space-y-8">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb className="animate-fade-in">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/" className="flex items-center gap-1">
+                <Home className="h-4 w-4" />
+                Home
+              </Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Produtos</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       {/* Categories Grid */}
       <section className="animate-slide-up" style={{ animationDelay: "100ms" }}>
         <div className="flex items-center justify-between mb-6">
