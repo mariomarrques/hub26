@@ -214,7 +214,6 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
   const [commentSent, setCommentSent] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState<string[]>([]);
-  const [showComments, setShowComments] = useState(false);
 
   const { comments, isLoading: loadingComments, addComment, deleteComment, addReply } = usePostComments(post?.id);
   const { likesCount, hasLiked, toggleLike } = usePostLikes(post?.id);
@@ -360,143 +359,123 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
           </p>
         </div>
 
-        {/* Interações: Likes e Comentários */}
-        <div className="flex items-center gap-3 py-4 border-t border-border">
-          {/* Botão de Like */}
+        {/* Likes */}
+        <div className="flex items-center gap-4 py-3 border-t border-border">
           <div className="relative">
             {/* Corações flutuantes */}
             {floatingHearts.map((id) => (
               <Heart
                 key={id}
-                className="absolute -top-2 left-1/2 -translate-x-1/2 h-6 w-6 text-red-500 fill-red-500 animate-float-up pointer-events-none"
+                className="absolute -top-2 left-1/2 -translate-x-1/2 h-5 w-5 text-red-500 fill-red-500 animate-float-up pointer-events-none"
               />
             ))}
             
             {user ? (
               <Button
                 variant="ghost"
+                size="sm"
                 onClick={handleLike}
                 disabled={toggleLike.isPending}
                 className={cn(
-                  "gap-2.5 text-base px-4 py-2.5 h-auto transition-all duration-300",
+                  "gap-2 transition-all duration-300",
                   hasLiked 
                     ? "bg-red-500/10 text-red-500 hover:bg-red-500/20" 
                     : "hover:bg-red-500/10 hover:text-red-500"
                 )}
               >
                 <Heart className={cn(
-                  "h-5 w-5 transition-all duration-200",
+                  "h-4 w-4 transition-all duration-200",
                   hasLiked && "fill-red-500 text-red-500 scale-110"
                 )} />
-                <span className="font-medium">{likesCount}</span>
+                {likesCount}
               </Button>
             ) : (
-              <Button variant="ghost" disabled className="gap-2.5 text-base px-4 py-2.5 h-auto opacity-50">
-                <Heart className="h-5 w-5" />
-                <span className="font-medium">{likesCount}</span>
+              <Button variant="ghost" size="sm" disabled className="gap-2 opacity-50">
+                <Heart className="h-4 w-4" />
+                {likesCount}
               </Button>
             )}
           </div>
-
-          {/* Botão de Comentários */}
-          <Button
-            variant="ghost"
-            onClick={() => setShowComments(!showComments)}
-            className={cn(
-              "gap-2.5 text-base px-4 py-2.5 h-auto transition-all duration-300",
-              showComments 
-                ? "bg-primary/10 text-primary hover:bg-primary/20" 
-                : "hover:bg-muted"
-            )}
-          >
-            <MessageCircle className={cn(
-              "h-5 w-5 transition-all duration-200",
-              showComments && "fill-primary/20"
-            )} />
-            <span className="font-medium">{comments.length}</span>
-          </Button>
         </div>
 
-        {/* Comentários - Condicional */}
-        {showComments && (
-          <div className="space-y-4 pt-6 border-t border-border animate-in fade-in-0 slide-in-from-top-2 duration-300">
-            <h4 className="font-semibold text-foreground flex items-center gap-2">
-              <MessageCircle className="h-5 w-5" />
-              Comentários ({comments.length})
-            </h4>
+        {/* Comentários */}
+        <div className="space-y-4 pt-6 border-t border-border">
+          <h4 className="font-semibold text-foreground flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Comentários ({comments.length})
+          </h4>
 
-            {loadingComments ? (
-              <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : comments.length > 0 ? (
-              <div className="space-y-0 max-h-[350px] overflow-y-auto pr-2">
-                {comments.map((comment) => (
-                  <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    currentUserId={user?.id}
-                    onDelete={() => handleDeleteComment(comment.id)}
-                    isDeleting={deletingCommentId === comment.id}
-                    onReply={(parentId, content) => addReply.mutate({ parentId, content })}
-                    isAdmin={isAdmin}
-                    isModerator={isModerator}
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground py-4 text-center bg-muted/30 rounded-lg">
-                Nenhum comentário ainda. Seja o primeiro!
-              </p>
-            )}
+          {loadingComments ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : comments.length > 0 ? (
+            <div className="space-y-0 max-h-[350px] overflow-y-auto pr-2">
+              {comments.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  comment={comment}
+                  currentUserId={user?.id}
+                  onDelete={() => handleDeleteComment(comment.id)}
+                  isDeleting={deletingCommentId === comment.id}
+                  onReply={(parentId, content) => addReply.mutate({ parentId, content })}
+                  isAdmin={isAdmin}
+                  isModerator={isModerator}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center bg-muted/30 rounded-lg">
+              Nenhum comentário ainda. Seja o primeiro!
+            </p>
+          )}
 
-            {/* Form para adicionar comentário */}
-            {user ? (
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                if (!newComment.trim() || addComment.isPending) return;
-                addComment.mutate(newComment.trim(), {
-                  onSuccess: () => {
-                    setNewComment("");
-                    setCommentSent(true);
-                    setTimeout(() => setCommentSent(false), 600);
-                  },
-                });
-              }} className="pt-6">
-                <div className="relative">
-                  <MentionInput
-                    placeholder="Escreva um comentário... Use @ para mencionar"
-                    value={newComment}
-                    onChange={setNewComment}
-                    multiline
-                    className="w-full min-h-[100px] pr-16 rounded-2xl bg-muted/40 border border-border/50 focus-within:bg-background focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-300 resize-none text-base"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!newComment.trim() || addComment.isPending}
-                    className={cn(
-                      "absolute right-4 bottom-4 p-3 rounded-full transition-all duration-300 shadow-sm hover:shadow-md",
-                      commentSent 
-                        ? "bg-green-500 text-white scale-110" 
-                        : "bg-primary text-primary-foreground hover:bg-primary/90",
-                      "disabled:opacity-40 disabled:bg-muted disabled:shadow-none disabled:scale-100"
-                    )}
-                  >
-                    {addComment.isPending ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Send className={cn("h-5 w-5 transition-transform duration-200", commentSent && "scale-0")} />
-                    )}
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <p className="text-sm text-muted-foreground text-center py-6 bg-muted/30 rounded-2xl">
-                Faça login para comentar.
-              </p>
-            )}
-          </div>
-        )}
+          {/* Form para adicionar comentário */}
+          {user ? (
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!newComment.trim() || addComment.isPending) return;
+              addComment.mutate(newComment.trim(), {
+                onSuccess: () => {
+                  setNewComment("");
+                  setCommentSent(true);
+                  setTimeout(() => setCommentSent(false), 600);
+                },
+              });
+            }} className="pt-6">
+              <div className="relative">
+                <MentionInput
+                  placeholder="Escreva um comentário... Use @ para mencionar"
+                  value={newComment}
+                  onChange={setNewComment}
+                  multiline
+                  className="w-full min-h-[100px] pr-16 rounded-2xl bg-muted/40 border border-border/50 focus-within:bg-background focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-300 resize-none text-base"
+                />
+                <button
+                  type="submit"
+                  disabled={!newComment.trim() || addComment.isPending}
+                  className={cn(
+                    "absolute right-4 bottom-4 p-3 rounded-full transition-all duration-300 shadow-sm hover:shadow-md",
+                    commentSent 
+                      ? "bg-green-500 text-white scale-110" 
+                      : "bg-primary text-primary-foreground hover:bg-primary/90",
+                    "disabled:opacity-40 disabled:bg-muted disabled:shadow-none disabled:scale-100"
+                  )}
+                >
+                  {addComment.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Send className={cn("h-5 w-5 transition-transform duration-200", commentSent && "scale-0")} />
+                  )}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6 bg-muted/30 rounded-2xl">
+              Faça login para comentar.
+            </p>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
