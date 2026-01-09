@@ -11,6 +11,7 @@ export interface Category {
   created_by: string | null;
   created_at: string | null;
   updated_at: string | null;
+  product_count?: number;
 }
 
 export type CreateCategoryInput = Omit<Category, "id" | "created_at" | "updated_at" | "created_by">;
@@ -23,10 +24,14 @@ export function useCategories() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("categories")
-        .select("*")
+        .select(`*, products(count)`)
         .order("name");
       if (error) throw error;
-      return data as Category[];
+      return data.map((category: any) => ({
+        ...category,
+        product_count: category.products?.[0]?.count ?? 0,
+        products: undefined,
+      })) as Category[];
     },
   });
 

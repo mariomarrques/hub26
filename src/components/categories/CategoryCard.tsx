@@ -63,8 +63,15 @@ export function CategoryCard({ category, index = 0, canManage, onEdit, onDelete 
             <h3 className="text-lg font-semibold text-white mb-1">
               {category.name}
             </h3>
-            <p className="text-sm text-white/70">
-              {category.description}
+            {category.description && (
+              <p className="text-sm text-white/70">
+                {category.description}
+              </p>
+            )}
+            <p className="text-xs text-white/50 mt-1">
+              {category.product_count === 1 
+                ? "1 produto" 
+                : `${category.product_count ?? 0} produtos`}
             </p>
           </div>
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-all duration-300 group-hover:bg-primary group-hover:text-primary-foreground">
