@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Home } from "lucide-react";
-import { PreferencesSettings } from "@/components/settings/PreferencesSettings";
 import { NotificationsSettings } from "@/components/settings/NotificationsSettings";
 import { PrivacySettings } from "@/components/settings/PrivacySettings";
 import {
@@ -40,7 +39,6 @@ export default function Configuracoes() {
         </p>
       </div>
 
-      <PreferencesSettings />
       <NotificationsSettings />
       <PrivacySettings />
     </div>
