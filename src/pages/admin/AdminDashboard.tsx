@@ -14,9 +14,12 @@ import {
   Bell, 
   Package,
   BarChart3,
-  ArrowRight
+  ArrowRight,
+  MessageSquare
 } from "lucide-react";
 import { useAdminStats, useAdminUsers } from "@/hooks/use-admin";
+import { useAdminPosts } from "@/hooks/use-community-posts";
+import { useProducts } from "@/hooks/use-products";
 import { formatRelativeTime } from "@/lib/date-utils";
 import { AppRole } from "@/types/auth";
 import { useNavigate } from "react-router-dom";
@@ -37,6 +40,8 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const { data: stats, isLoading: loadingStats } = useAdminStats();
   const { data: users, isLoading: loadingUsers } = useAdminUsers();
+  const { pendingPosts, isLoading: loadingPosts } = useAdminPosts();
+  const { data: products, isLoading: loadingProducts } = useProducts();
 
   const recentUsers = users?.slice(0, 5) || [];
 
@@ -175,42 +180,96 @@ export default function AdminDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <div className="space-y-3">
+                {/* Posts Pendentes - Com destaque se houver */}
+                <div 
+                  className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                    (pendingPosts?.length || 0) > 0 
+                      ? "bg-amber-500/10 border border-amber-500/20 hover:bg-amber-500/20" 
+                      : "bg-muted/50 hover:bg-muted"
+                  }`}
+                  onClick={() => navigate('/admin/posts')}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-md ${
+                      (pendingPosts?.length || 0) > 0 ? "bg-amber-500/20" : "bg-muted"
+                    }`}>
+                      <MessageSquare className={`h-4 w-4 ${
+                        (pendingPosts?.length || 0) > 0 ? "text-amber-500" : "text-muted-foreground"
+                      }`} />
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium">Posts pendentes</span>
+                      {(pendingPosts?.length || 0) > 0 && (
+                        <p className="text-xs text-amber-600 dark:text-amber-400">
+                          Aguardando moderação
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {loadingPosts ? (
+                    <Skeleton className="h-5 w-8" />
+                  ) : (
+                    <Badge 
+                      variant={(pendingPosts?.length || 0) > 0 ? "default" : "secondary"}
+                      className={(pendingPosts?.length || 0) > 0 ? "bg-amber-500 hover:bg-amber-600" : ""}
+                    >
+                      {pendingPosts?.length || 0}
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Total de Produtos */}
+                <div 
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
+                  onClick={() => navigate('/admin/produtos')}
+                >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-md bg-primary/10">
-                      <Users className="h-4 w-4 text-primary" />
+                      <Package className="h-4 w-4 text-primary" />
+                    </div>
+                    <span className="text-sm">Produtos cadastrados</span>
+                  </div>
+                  {loadingProducts ? (
+                    <Skeleton className="h-5 w-8" />
+                  ) : (
+                    <Badge variant="secondary">{products?.length || 0}</Badge>
+                  )}
+                </div>
+
+                {/* Total de Usuários */}
+                <div 
+                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted cursor-pointer transition-colors"
+                  onClick={() => navigate('/admin/usuarios')}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-md bg-green-500/10">
+                      <Users className="h-4 w-4 text-green-500" />
                     </div>
                     <span className="text-sm">Total de usuários</span>
                   </div>
-                  <Badge variant="secondary">{stats?.total_users || 0}</Badge>
+                  {loadingStats ? (
+                    <Skeleton className="h-5 w-8" />
+                  ) : (
+                    <Badge variant="secondary">{stats?.total_users || 0}</Badge>
+                  )}
                 </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-md bg-red-500/10">
-                      <Shield className="h-4 w-4 text-red-500" />
-                    </div>
-                    <span className="text-sm">Administradores ativos</span>
-                  </div>
-                  <Badge variant="secondary">{stats?.admin_count || 0}</Badge>
-                </div>
+
+                {/* Equipe (Admins + Moderadores) */}
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-md bg-blue-500/10">
-                      <UserCheck className="h-4 w-4 text-blue-500" />
+                      <Shield className="h-4 w-4 text-blue-500" />
                     </div>
-                    <span className="text-sm">Moderadores ativos</span>
+                    <span className="text-sm">Equipe (Admins + Mods)</span>
                   </div>
-                  <Badge variant="secondary">{stats?.moderator_count || 0}</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-md bg-green-500/10">
-                      <User className="h-4 w-4 text-green-500" />
-                    </div>
-                    <span className="text-sm">Membros registrados</span>
-                  </div>
-                  <Badge variant="secondary">{stats?.member_count || 0}</Badge>
+                  {loadingStats ? (
+                    <Skeleton className="h-5 w-8" />
+                  ) : (
+                    <Badge variant="secondary">
+                      {(stats?.admin_count || 0) + (stats?.moderator_count || 0)}
+                    </Badge>
+                  )}
                 </div>
               </div>
             </CardContent>
