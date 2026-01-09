@@ -148,13 +148,18 @@ export default {
         'slide-up': {
           from: { opacity: '0', transform: 'translateY(4px)' },
           to: { opacity: '1', transform: 'translateY(0)' }
+        },
+        'float-up': {
+          '0%': { opacity: '1', transform: 'translateX(-50%) translateY(0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translateX(-50%) translateY(-40px) scale(1.5)' }
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.3s ease-out forwards',
-        'slide-up': 'slide-up 0.3s ease-out forwards'
+        'slide-up': 'slide-up 0.3s ease-out forwards',
+        'float-up': 'float-up 1s ease-out forwards'
       },
       transitionDuration: {
         'hover': '150ms',
