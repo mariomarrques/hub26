@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Bazar from "./pages/Bazar";
 import Busca from "./pages/Busca";
@@ -45,6 +46,14 @@ const App = () => (
                 {/* Protected routes */}
                 <Route
                   path="/"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Home /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/produtos"
                   element={
                     <ProtectedRoute>
                       <AppLayout><Index /></AppLayout>

@@ -1,5 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
+  Home,
   Package,
   Store,
   Users,
@@ -14,7 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const navigation = [
-  { name: "Produtos", href: "/", icon: Package },
+  { name: "Home", href: "/", icon: Home },
+  { name: "Produtos", href: "/produtos", icon: Package },
   { name: "Bazar do Marin", href: "/bazar", icon: Store },
   { name: "Fornecedores", href: "/fornecedores", icon: Users },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare },
