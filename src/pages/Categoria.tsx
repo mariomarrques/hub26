@@ -2,9 +2,21 @@ import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCard } from "@/components/products/ProductCard";
 import { categories, mockProducts } from "@/data/mockData";
 import { normalizeSearch } from "@/lib/utils";
+
+const parsePrice = (priceStr: string): number => {
+  const match = priceStr.match(/[\d.,]+/);
+  if (!match) return 0;
+  return parseFloat(match[0].replace(".", "").replace(",", "."));
+};
+
+const parseMinResale = (rangeStr: string): number => {
+  const match = rangeStr.match(/[\d]+/);
+  return match ? parseInt(match[0]) : 0;
+};
 
 const statusFilters = [
   { value: "all", label: "Todos" },
@@ -13,25 +25,57 @@ const statusFilters = [
   { value: "new", label: "✨ Novo" },
 ];
 
+const sortOptions = [
+  { value: "relevancia", label: "Relevância" },
+  { value: "nome-az", label: "Nome A-Z" },
+  { value: "nome-za", label: "Nome Z-A" },
+  { value: "menor-preco", label: "Menor Preço" },
+  { value: "maior-preco", label: "Maior Preço" },
+  { value: "maior-margem", label: "Maior Margem" },
+];
+
 const Categoria = () => {
   const { slug } = useParams<{ slug: string }>();
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("relevancia");
 
   const category = categories.find((c) => c.slug === slug);
 
   const filteredProducts = useMemo(() => {
     if (!category) return [];
     
-    let products = mockProducts.filter(
+    let products = [...mockProducts.filter(
       (p) => normalizeSearch(p.category) === normalizeSearch(category.name)
-    );
+    )];
 
     if (statusFilter !== "all") {
       products = products.filter((p) => p.status === statusFilter);
     }
 
+    switch (sortOrder) {
+      case "nome-az":
+        products.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+        break;
+      case "nome-za":
+        products.sort((a, b) => b.name.localeCompare(a.name, 'pt-BR'));
+        break;
+      case "menor-preco":
+        products.sort((a, b) => parsePrice(a.originPrice) - parsePrice(b.originPrice));
+        break;
+      case "maior-preco":
+        products.sort((a, b) => parsePrice(b.originPrice) - parsePrice(a.originPrice));
+        break;
+      case "maior-margem":
+        products.sort((a, b) => {
+          const margemA = parseMinResale(a.resaleRange) - parsePrice(a.originPrice);
+          const margemB = parseMinResale(b.resaleRange) - parsePrice(b.originPrice);
+          return margemB - margemA;
+        });
+        break;
+    }
+
     return products;
-  }, [category, statusFilter]);
+  }, [category, statusFilter, sortOrder]);
 
   if (!category) {
     return (
@@ -67,18 +111,33 @@ const Categoria = () => {
 
       {/* Filters */}
       <section className="animate-slide-up" style={{ animationDelay: "100ms" }}>
-        <div className="flex flex-wrap gap-2">
-          {statusFilters.map((filter) => (
-            <Button
-              key={filter.value}
-              variant={statusFilter === filter.value ? "default" : "outline"}
-              size="sm"
-              onClick={() => setStatusFilter(filter.value)}
-              className="transition-all"
-            >
-              {filter.label}
-            </Button>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap gap-2">
+            {statusFilters.map((filter) => (
+              <Button
+                key={filter.value}
+                variant={statusFilter === filter.value ? "default" : "outline"}
+                size="sm"
+                onClick={() => setStatusFilter(filter.value)}
+                className="transition-all"
+              >
+                {filter.label}
+              </Button>
+            ))}
+          </div>
+          
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </section>
 
