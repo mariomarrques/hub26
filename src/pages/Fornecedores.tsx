@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Users, Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink } from "lucide-react";
+import { Users, Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil } from "lucide-react";
 import { mockSuppliers, Supplier } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { AddSupplierDialog } from "@/components/suppliers/AddSupplierDialog";
+import { SupplierFormDialog } from "@/components/suppliers/SupplierFormDialog";
 import { toast } from "sonner";
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
@@ -44,7 +44,14 @@ function StatusBadge({ status }: { status: Supplier["status"] }) {
   );
 }
 
-function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }) {
+interface SupplierCardProps {
+  supplier: Supplier;
+  index: number;
+  isAdmin?: boolean;
+  onEdit?: () => void;
+}
+
+function SupplierCard({ supplier, index, isAdmin, onEdit }: SupplierCardProps) {
   const avgRating = (supplier.rating.quality + supplier.rating.delivery) / 2;
 
   return (
@@ -91,16 +98,27 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
         </p>
       )}
 
-      {/* Ver Detalhes Button */}
-      <div className="mt-4 pt-3 border-t border-border">
+      {/* Footer Buttons */}
+      <div className="mt-4 pt-3 border-t border-border flex gap-2">
         <Button 
           variant="ghost" 
           size="sm" 
-          className="w-full justify-center gap-2 text-muted-foreground hover:text-foreground"
+          className="flex-1 justify-center gap-2 text-muted-foreground hover:text-foreground"
         >
           <ExternalLink className="h-4 w-4" />
           Ver detalhes
         </Button>
+        {isAdmin && onEdit && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onEdit}
+            className="gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <Pencil className="h-4 w-4" />
+            Editar
+          </Button>
+        )}
       </div>
     </article>
   );
@@ -109,10 +127,24 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
 const Fornecedores = () => {
   const { isAdmin } = useAuth();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
   
   const activeSuppliers = suppliers.filter((s) => s.status === "active");
   const otherSuppliers = suppliers.filter((s) => s.status !== "active");
+
+  const handleOpenAddDialog = () => {
+    setSelectedSupplier(null);
+    setDialogMode("add");
+    setDialogOpen(true);
+  };
+
+  const handleEditSupplier = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
+    setDialogMode("edit");
+    setDialogOpen(true);
+  };
 
   const handleAddSupplier = (newSupplier: Omit<Supplier, "id">) => {
     const supplier: Supplier = {
@@ -122,6 +154,28 @@ const Fornecedores = () => {
     setSuppliers([supplier, ...suppliers]);
     toast.success("Fornecedor adicionado com sucesso!");
     setDialogOpen(false);
+  };
+
+  const handleUpdateSupplier = (updatedData: Omit<Supplier, "id">) => {
+    if (!selectedSupplier) return;
+    
+    setSuppliers(suppliers.map(s => 
+      s.id === selectedSupplier.id 
+        ? { ...updatedData, id: s.id } 
+        : s
+    ));
+    toast.success("Fornecedor atualizado com sucesso!");
+    setDialogOpen(false);
+    setSelectedSupplier(null);
+  };
+
+  const handleDeleteSupplier = () => {
+    if (!selectedSupplier) return;
+    
+    setSuppliers(suppliers.filter(s => s.id !== selectedSupplier.id));
+    toast.success("Fornecedor excluído com sucesso!");
+    setDialogOpen(false);
+    setSelectedSupplier(null);
   };
 
   return (
@@ -143,7 +197,7 @@ const Fornecedores = () => {
           </div>
 
           {isAdmin && (
-            <Button className="gap-2" onClick={() => setDialogOpen(true)}>
+            <Button className="gap-2" onClick={handleOpenAddDialog}>
               <Plus className="h-4 w-4" />
               Adicionar Fornecedor
             </Button>
@@ -151,11 +205,15 @@ const Fornecedores = () => {
         </div>
       </header>
 
-      <AddSupplierDialog
+      <SupplierFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        onSubmit={handleAddSupplier}
+        onSubmit={dialogMode === "add" ? handleAddSupplier : handleUpdateSupplier}
+        onDelete={dialogMode === "edit" ? handleDeleteSupplier : undefined}
+        supplier={selectedSupplier}
+        mode={dialogMode}
       />
+
       {/* Active Suppliers */}
       <section>
         <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -164,7 +222,13 @@ const Fornecedores = () => {
         </h2>
         <div className="grid gap-5 sm:grid-cols-2">
           {activeSuppliers.map((supplier, index) => (
-            <SupplierCard key={supplier.id} supplier={supplier} index={index} />
+            <SupplierCard 
+              key={supplier.id} 
+              supplier={supplier} 
+              index={index}
+              isAdmin={isAdmin}
+              onEdit={() => handleEditSupplier(supplier)}
+            />
           ))}
         </div>
       </section>
@@ -177,7 +241,13 @@ const Fornecedores = () => {
           </h2>
           <div className="grid gap-5 sm:grid-cols-2">
             {otherSuppliers.map((supplier, index) => (
-              <SupplierCard key={supplier.id} supplier={supplier} index={index + activeSuppliers.length} />
+              <SupplierCard 
+                key={supplier.id} 
+                supplier={supplier} 
+                index={index + activeSuppliers.length}
+                isAdmin={isAdmin}
+                onEdit={() => handleEditSupplier(supplier)}
+              />
             ))}
           </div>
         </section>
