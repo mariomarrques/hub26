@@ -33,11 +33,12 @@ export function NotificationsSettings() {
 
       <SettingsItem
         label="Alertas do bazar"
-        description="Avisos sobre ofertas e promoções"
+        description="Em breve - Avisos sobre ofertas e promoções"
       >
         <Switch
-          checked={bazaarAlerts}
-          onCheckedChange={setBazaarAlerts}
+          checked={false}
+          disabled
+          className="opacity-50"
         />
       </SettingsItem>
 
