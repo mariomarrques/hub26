@@ -1,7 +1,6 @@
-import { ProductCard } from "@/components/products/ProductCard";
 import { AlertCard } from "@/components/alerts/AlertCard";
-import { ProductFilters } from "@/components/filters/ProductFilters";
-import { mockProducts, mockAlerts } from "@/data/mockData";
+import { CategoryCard } from "@/components/categories/CategoryCard";
+import { mockAlerts, categories } from "@/data/mockData";
 import { Bell, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -45,24 +44,19 @@ const Index = () => {
         </section>
       )}
 
-      {/* Filters */}
+      {/* Categories Grid */}
       <section className="animate-slide-up" style={{ animationDelay: "200ms" }}>
-        <ProductFilters />
-      </section>
-
-      {/* Products Grid */}
-      <section>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-lg font-semibold text-foreground">Produtos Curados</h2>
+            <h2 className="text-lg font-semibold text-foreground">Categorias</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              {mockProducts.length} produtos com giro validado
+              Explore por tipo de produto
             </p>
           </div>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {mockProducts.map((product, index) => (
-            <ProductCard key={product.id} product={product} index={index} />
+          {categories.map((category, index) => (
+            <CategoryCard key={category.id} category={category} index={index} />
           ))}
         </div>
       </section>

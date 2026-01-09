@@ -12,6 +12,7 @@ import Avisos from "./pages/Avisos";
 import Comunidade from "./pages/Comunidade";
 import Perfil from "./pages/Perfil";
 import Configuracoes from "./pages/Configuracoes";
+import Categoria from "./pages/Categoria";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/comunidade" element={<Comunidade />} />
               <Route path="/perfil" element={<Perfil />} />
               <Route path="/configuracoes" element={<Configuracoes />} />
+              <Route path="/categoria/:slug" element={<Categoria />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
