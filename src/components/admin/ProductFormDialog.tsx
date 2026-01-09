@@ -29,6 +29,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Upload, X } from "lucide-react";
 import { useCategories } from "@/hooks/use-categories";
 import { useProductImageUpload } from "@/hooks/use-product-image-upload";
+import { CurrencyInput } from "@/components/ui/currency-input";
+import { useCurrencyRate } from "@/hooks/use-currency-rate";
 import type { Product } from "@/hooks/use-products";
 
 const productSchema = z.object({
@@ -80,6 +82,7 @@ export function ProductFormDialog({
 }: ProductFormDialogProps) {
   const { categories } = useCategories();
   const { uploadImage, isUploading } = useProductImageUpload();
+  const { formatBRL } = useCurrencyRate();
   const [imageUrl, setImageUrl] = useState<string>("");
   const [imagePreview, setImagePreview] = useState<string>("");
 
@@ -278,15 +281,32 @@ export function ProductFormDialog({
               <FormField
                 control={form.control}
                 name="origin_price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Preço de Origem</FormLabel>
-                    <FormControl>
-                      <Input placeholder="R$ 45,00" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  const numericValue = parseFloat(field.value?.replace(",", ".") || "0");
+                  const convertedPrice = !isNaN(numericValue) && numericValue > 0
+                    ? formatBRL(numericValue)
+                    : null;
+
+                  return (
+                    <FormItem>
+                      <FormLabel>Preço de Origem (Yuan)</FormLabel>
+                      <FormControl>
+                        <CurrencyInput
+                          symbol="¥"
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="45,00"
+                        />
+                      </FormControl>
+                      {convertedPrice && (
+                        <p className="text-xs text-muted-foreground">
+                          ≈ R$ {convertedPrice}
+                        </p>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               <FormField
@@ -294,9 +314,14 @@ export function ProductFormDialog({
                 name="resale_range"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Faixa de Revenda</FormLabel>
+                    <FormLabel>Faixa de Revenda (R$)</FormLabel>
                     <FormControl>
-                      <Input placeholder="R$ 89 - R$ 129" {...field} />
+                      <CurrencyInput
+                        symbol="R$"
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="89 - 129"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
