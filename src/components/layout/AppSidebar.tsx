@@ -17,8 +17,8 @@ const navigation = [
   { name: "Produtos", href: "/", icon: Package },
   { name: "Bazar do Marin", href: "/bazar", icon: Store },
   { name: "Fornecedores", href: "/fornecedores", icon: Users },
-  { name: "Avisos", href: "/avisos", icon: Bell },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare },
+  { name: "Avisos", href: "/avisos", icon: Bell },
 ];
 
 const adminNavigation = [
