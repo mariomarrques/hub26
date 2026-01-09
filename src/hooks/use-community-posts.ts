@@ -16,6 +16,8 @@ export interface CommunityPost {
   updated_at: string;
   approved_at: string | null;
   approved_by: string | null;
+  likes_count?: number;
+  comments_count?: number;
   author?: {
     name: string;
     avatar_url: string | null;
@@ -48,10 +50,36 @@ export function useCommunityPosts() {
 
       const profileMap = new Map(profiles?.map((p) => [p.id, p]));
 
+      // Fetch likes and comments counts
+      const postIds = data?.map((p) => p.id) || [];
+      
+      const { data: likesData } = await supabase
+        .from("post_likes")
+        .select("post_id")
+        .in("post_id", postIds);
+
+      const { data: commentsData } = await supabase
+        .from("post_comments")
+        .select("post_id")
+        .in("post_id", postIds);
+
+      const likesMap = new Map<string, number>();
+      const commentsMap = new Map<string, number>();
+
+      likesData?.forEach((like) => {
+        likesMap.set(like.post_id, (likesMap.get(like.post_id) || 0) + 1);
+      });
+
+      commentsData?.forEach((comment) => {
+        commentsMap.set(comment.post_id, (commentsMap.get(comment.post_id) || 0) + 1);
+      });
+
       return (data || []).map((post) => ({
         ...post,
         status: post.status as "pending" | "approved" | "rejected",
         author: profileMap.get(post.author_id) || { name: "Usuário", avatar_url: null },
+        likes_count: likesMap.get(post.id) || 0,
+        comments_count: commentsMap.get(post.id) || 0,
       })) as CommunityPost[];
     },
   });
