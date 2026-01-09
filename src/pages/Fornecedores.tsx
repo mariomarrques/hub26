@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home } from "lucide-react";
+import { Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink, Pencil, Home, Search } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { SupplierFormDialog } from "@/components/suppliers/SupplierFormDialog";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
@@ -154,9 +155,21 @@ const Fornecedores = () => {
   const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
+  const [searchQuery, setSearchQuery] = useState("");
   
-  const activeSuppliers = suppliers.filter((s) => s.status === "active");
-  const otherSuppliers = suppliers.filter((s) => s.status !== "active");
+  // Filter suppliers based on search query
+  const filteredSuppliers = suppliers.filter((supplier) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    const matchesName = supplier.name.toLowerCase().includes(query);
+    const matchesCategory = supplier.categories.some(cat => 
+      cat.toLowerCase().includes(query)
+    );
+    return matchesName || matchesCategory;
+  });
+  
+  const activeSuppliers = filteredSuppliers.filter((s) => s.status === "active");
+  const otherSuppliers = filteredSuppliers.filter((s) => s.status !== "active");
 
   const handleOpenAddDialog = () => {
     setSelectedSupplier(null);
@@ -243,6 +256,17 @@ const Fornecedores = () => {
         </div>
       </header>
 
+      {/* Search Field */}
+      <div className="relative animate-fade-in">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar por nome ou categoria..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
       <SupplierFormDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
@@ -289,6 +313,16 @@ const Fornecedores = () => {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Empty State */}
+      {filteredSuppliers.length === 0 && searchQuery && (
+        <div className="text-center py-12 animate-fade-in">
+          <Search className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
+          <p className="text-muted-foreground">
+            Nenhum fornecedor encontrado para "{searchQuery}"
+          </p>
+        </div>
       )}
     </div>
   );
