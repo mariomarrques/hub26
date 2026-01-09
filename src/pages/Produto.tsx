@@ -13,6 +13,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useProduct } from "@/hooks/use-products";
+import { RelatedProducts } from "@/components/products/RelatedProducts";
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
   hot: { label: "Hot", icon: Flame, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
@@ -188,6 +189,16 @@ export default function Produto() {
           </p>
         </div>
       </div>
+
+      {/* Related Products */}
+      {product.category_id && (
+        <RelatedProducts
+          categoryId={product.category_id}
+          excludeProductId={product.id}
+          categoryName={product.category?.name}
+          categorySlug={product.category?.slug}
+        />
+      )}
     </div>
   );
 }
