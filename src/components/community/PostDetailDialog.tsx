@@ -4,6 +4,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +41,8 @@ interface PostDetailDialogProps {
   post: CommunityPost | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDelete?: (postId: string) => void;
+  isDeleting?: boolean;
 }
 
 function CommentItem({ 
@@ -90,7 +103,7 @@ function CommentItem({
   );
 }
 
-export function PostDetailDialog({ post, open, onOpenChange }: PostDetailDialogProps) {
+export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeleting }: PostDetailDialogProps) {
   const { user } = useAuth();
   const [newComment, setNewComment] = useState("");
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
@@ -99,6 +112,8 @@ export function PostDetailDialog({ post, open, onOpenChange }: PostDetailDialogP
   const { likesCount, hasLiked, toggleLike } = usePostLikes(post?.id);
 
   if (!post) return null;
+
+  const isPostOwner = user?.id === post.author_id;
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,16 +135,53 @@ export function PostDetailDialog({ post, open, onOpenChange }: PostDetailDialogP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MessageCircle className="h-4 w-4" />
-            <Badge variant="secondary">
-              {CATEGORY_MAP[post.category] || post.category}
-            </Badge>
-            {post.is_pinned && (
-              <Badge className="bg-primary/10 text-primary border-0">
-                <Pin className="h-3 w-3 mr-1" />
-                Fixado
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MessageCircle className="h-4 w-4" />
+              <Badge variant="secondary">
+                {CATEGORY_MAP[post.category] || post.category}
               </Badge>
+              {post.is_pinned && (
+                <Badge className="bg-primary/10 text-primary border-0">
+                  <Pin className="h-3 w-3 mr-1" />
+                  Fixado
+                </Badge>
+              )}
+            </div>
+            {isPostOwner && onDelete && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-destructive"
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Excluir
+                      </>
+                    )}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Excluir tópico?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Esta ação não pode ser desfeita. O tópico e todos os comentários serão removidos permanentemente.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(post.id)}>
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )}
           </div>
           <DialogTitle className="text-xl leading-relaxed">
