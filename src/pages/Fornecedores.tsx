@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { Users, Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink } from "lucide-react";
 import { mockSuppliers, Supplier } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { AddSupplierDialog } from "@/components/suppliers/AddSupplierDialog";
+import { toast } from "sonner";
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
@@ -105,8 +108,21 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
 
 const Fornecedores = () => {
   const { isAdmin } = useAuth();
-  const activeSuppliers = mockSuppliers.filter((s) => s.status === "active");
-  const otherSuppliers = mockSuppliers.filter((s) => s.status !== "active");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
+  
+  const activeSuppliers = suppliers.filter((s) => s.status === "active");
+  const otherSuppliers = suppliers.filter((s) => s.status !== "active");
+
+  const handleAddSupplier = (newSupplier: Omit<Supplier, "id">) => {
+    const supplier: Supplier = {
+      ...newSupplier,
+      id: crypto.randomUUID(),
+    };
+    setSuppliers([supplier, ...suppliers]);
+    toast.success("Fornecedor adicionado com sucesso!");
+    setDialogOpen(false);
+  };
 
   return (
     <div className="space-y-8">
@@ -127,7 +143,7 @@ const Fornecedores = () => {
           </div>
 
           {isAdmin && (
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => setDialogOpen(true)}>
               <Plus className="h-4 w-4" />
               Adicionar Fornecedor
             </Button>
@@ -135,6 +151,11 @@ const Fornecedores = () => {
         </div>
       </header>
 
+      <AddSupplierDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSubmit={handleAddSupplier}
+      />
       {/* Active Suppliers */}
       <section>
         <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
