@@ -135,9 +135,11 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
     });
   };
 
+  const [commentSent, setCommentSent] = useState(false);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-bottom-4 data-[state=open]:slide-in-from-bottom-4 duration-300">
         <DialogHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -296,29 +298,46 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
 
           {/* Form para adicionar comentário */}
           {user ? (
-            <form onSubmit={handleSubmitComment} className="pt-4">
-              <div className="relative flex items-center">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (!newComment.trim() || addComment.isPending) return;
+              addComment.mutate(newComment.trim(), {
+                onSuccess: () => {
+                  setNewComment("");
+                  setCommentSent(true);
+                  setTimeout(() => setCommentSent(false), 600);
+                },
+              });
+            }} className="pt-6">
+              <div className="relative">
                 <MentionInput
-                  placeholder="Escreva um comentário..."
+                  placeholder="Escreva um comentário... Use @ para mencionar"
                   value={newComment}
                   onChange={setNewComment}
-                  className="flex-1 pr-12 rounded-full bg-muted/50 border-0 focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20 transition-all"
+                  multiline
+                  className="w-full min-h-[100px] pr-16 rounded-2xl bg-muted/40 border border-border/50 focus-within:bg-background focus-within:border-primary/30 focus-within:ring-2 focus-within:ring-primary/10 transition-all duration-300 resize-none text-base"
                 />
                 <button
                   type="submit"
                   disabled={!newComment.trim() || addComment.isPending}
-                  className="absolute right-3 p-2 rounded-full text-primary hover:bg-primary/10 disabled:opacity-40 disabled:hover:bg-transparent transition-all"
+                  className={cn(
+                    "absolute right-4 bottom-4 p-3 rounded-full transition-all duration-300 shadow-sm hover:shadow-md",
+                    commentSent 
+                      ? "bg-green-500 text-white scale-110" 
+                      : "bg-primary text-primary-foreground hover:bg-primary/90",
+                    "disabled:opacity-40 disabled:bg-muted disabled:shadow-none disabled:scale-100"
+                  )}
                 >
                   {addComment.isPending ? (
                     <Loader2 className="h-5 w-5 animate-spin" />
                   ) : (
-                    <Send className="h-5 w-5" />
+                    <Send className={cn("h-5 w-5 transition-transform duration-200", commentSent && "scale-0")} />
                   )}
                 </button>
               </div>
             </form>
           ) : (
-            <p className="text-sm text-muted-foreground text-center py-4 bg-muted/30 rounded-lg">
+            <p className="text-sm text-muted-foreground text-center py-6 bg-muted/30 rounded-2xl">
               Faça login para comentar.
             </p>
           )}
