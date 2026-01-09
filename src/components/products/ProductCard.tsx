@@ -1,4 +1,5 @@
-import { ExternalLink, Package, Pencil, Trash2, Copy } from "lucide-react";
+import { ArrowRight, Package, Pencil, Trash2, Copy } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, onDuplicate }: ProductCardProps) {
   return (
-    <article
+    <Link
+      to={`/produto/${product.id}`}
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-card border border-border bg-card transition-all duration-hover ease-hover hover:bg-hover hover:border-primary/30 animate-slide-up"
       )}
@@ -130,15 +132,12 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
             variant="secondary"
             size="sm"
             className="w-full gap-2 bg-card border border-border text-text-secondary transition-all duration-hover hover:bg-primary hover:text-primary-foreground hover:border-primary"
-            asChild
           >
-            <a href={product.affiliateLink || "#"} target="_blank" rel="noopener noreferrer">
-              Ver produto
-              <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
-            </a>
+            Ver detalhes
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5} />
           </Button>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
