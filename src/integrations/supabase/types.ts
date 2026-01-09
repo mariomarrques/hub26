@@ -485,6 +485,8 @@ export type Database = {
         | "alert"
         | "community"
         | "announcement"
+        | "post_approved"
+        | "post_rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -625,6 +627,8 @@ export const Constants = {
         "alert",
         "community",
         "announcement",
+        "post_approved",
+        "post_rejected",
       ],
     },
   },
