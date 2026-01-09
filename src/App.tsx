@@ -23,6 +23,7 @@ import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminNotifications from "./pages/admin/AdminNotifications";
+import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
 
 const queryClient = new QueryClient();
 
@@ -144,6 +145,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <AppLayout><AdminNotifications /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/logs"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminAuditLogs /></AppLayout>
                     </ProtectedRoute>
                   }
                 />

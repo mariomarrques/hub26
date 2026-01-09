@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: Database["public"]["Enums"]["audit_action"]
+          admin_id: string
+          created_at: string
+          details: Json
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["audit_action"]
+          admin_id: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["audit_action"]
+          admin_id?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -111,6 +138,24 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
         }[]
       }
+      get_audit_logs: {
+        Args: {
+          p_action?: string
+          p_admin_id?: string
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          action: string
+          admin_id: string
+          admin_name: string
+          created_at: string
+          details: Json
+          id: string
+          target_user_id: string
+          target_user_name: string
+        }[]
+      }
       get_user_email: { Args: { target_user_id: string }; Returns: string }
       get_user_stats: {
         Args: never
@@ -141,6 +186,11 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "member"
+      audit_action:
+        | "role_change"
+        | "bulk_notification"
+        | "user_delete"
+        | "settings_change"
       notification_type:
         | "mention"
         | "product"
@@ -275,6 +325,12 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "member"],
+      audit_action: [
+        "role_change",
+        "bulk_notification",
+        "user_delete",
+        "settings_change",
+      ],
       notification_type: [
         "mention",
         "product",
