@@ -18,7 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageCircle, Pin, Heart, Trash2, Loader2 } from "lucide-react";
+import { MessageCircle, Pin, Heart, Trash2, Loader2, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CommunityPost, useAdminPosts } from "@/hooks/use-community-posts";
@@ -137,7 +137,7 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -266,18 +266,18 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
         </div>
 
         {/* Comentários */}
-        <div className="space-y-4 pt-4 border-t border-border">
-          <h4 className="font-medium text-foreground flex items-center gap-2">
-            <MessageCircle className="h-4 w-4" />
+        <div className="space-y-4 pt-6 border-t border-border">
+          <h4 className="font-semibold text-foreground flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
             Comentários ({comments.length})
           </h4>
 
           {loadingComments ? (
-            <div className="flex items-center justify-center py-4">
+            <div className="flex items-center justify-center py-6">
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : comments.length > 0 ? (
-            <div className="space-y-0">
+            <div className="space-y-0 max-h-[350px] overflow-y-auto pr-2">
               {comments.map((comment) => (
                 <CommentItem
                   key={comment.id}
@@ -289,33 +289,36 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground py-2">
+            <p className="text-sm text-muted-foreground py-4 text-center bg-muted/30 rounded-lg">
               Nenhum comentário ainda. Seja o primeiro!
             </p>
           )}
 
           {/* Form para adicionar comentário */}
           {user ? (
-            <form onSubmit={handleSubmitComment} className="flex gap-2 pt-2">
-              <MentionInput
-                placeholder="Escreva um comentário... Use @ para mencionar"
-                value={newComment}
-                onChange={setNewComment}
-                className="flex-1"
-              />
-              <Button 
-                type="submit" 
-                disabled={!newComment.trim() || addComment.isPending}
-              >
-                {addComment.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Enviar"
-                )}
-              </Button>
+            <form onSubmit={handleSubmitComment} className="pt-4">
+              <div className="relative flex items-center">
+                <MentionInput
+                  placeholder="Escreva um comentário..."
+                  value={newComment}
+                  onChange={setNewComment}
+                  className="flex-1 pr-12 rounded-full bg-muted/50 border-0 focus-within:bg-background focus-within:ring-2 focus-within:ring-primary/20 transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={!newComment.trim() || addComment.isPending}
+                  className="absolute right-3 p-2 rounded-full text-primary hover:bg-primary/10 disabled:opacity-40 disabled:hover:bg-transparent transition-all"
+                >
+                  {addComment.isPending ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Send className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
             </form>
           ) : (
-            <p className="text-sm text-muted-foreground text-center py-2">
+            <p className="text-sm text-muted-foreground text-center py-4 bg-muted/30 rounded-lg">
               Faça login para comentar.
             </p>
           )}
