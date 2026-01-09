@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCard } from "@/components/products/ProductCard";
-import { categories, mockProducts } from "@/data/mockData";
+import { useCategories } from "@/hooks/use-categories";
+import { useProducts, Product } from "@/hooks/use-products";
 import { normalizeSearch } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const parsePrice = (priceStr: string): number => {
   const match = priceStr.match(/[\d.,]+/);
@@ -35,48 +37,62 @@ const sortOptions = [
   { value: "maior-margem", label: "Maior Margem" },
 ];
 
+// Transform database product to ProductCard format
+const transformProduct = (product: Product, categoryName: string) => ({
+  id: product.id,
+  name: product.name,
+  image: product.image,
+  originPrice: product.origin_price,
+  resaleRange: product.resale_range,
+  status: product.status as "hot" | "trending" | "new" | "paused",
+  category: categoryName,
+  adminNote: product.admin_note ?? undefined,
+  affiliateLink: product.affiliate_link ?? undefined,
+});
+
 const Categoria = () => {
   const { slug } = useParams<{ slug: string }>();
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("relevancia");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const { categories, isLoading: categoriesLoading } = useCategories();
   const category = categories.find((c) => c.slug === slug);
+
+  const { data: products = [], isLoading: productsLoading } = useProducts(category?.id);
 
   const filteredProducts = useMemo(() => {
     if (!category) return [];
-    
-    let products = [...mockProducts.filter(
-      (p) => normalizeSearch(p.category) === normalizeSearch(category.name)
-    )];
+
+    let result = products.map((p) => transformProduct(p, category.name));
 
     // Filtro por nome (busca)
     if (searchQuery.trim()) {
       const normalizedQuery = normalizeSearch(searchQuery);
-      products = products.filter((p) => 
+      result = result.filter((p) =>
         normalizeSearch(p.name).includes(normalizedQuery)
       );
     }
 
     if (statusFilter !== "all") {
-      products = products.filter((p) => p.status === statusFilter);
+      result = result.filter((p) => p.status === statusFilter);
     }
 
     switch (sortOrder) {
       case "nome-az":
-        products.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+        result.sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
         break;
       case "nome-za":
-        products.sort((a, b) => b.name.localeCompare(a.name, 'pt-BR'));
+        result.sort((a, b) => b.name.localeCompare(a.name, "pt-BR"));
         break;
       case "menor-preco":
-        products.sort((a, b) => parsePrice(a.originPrice) - parsePrice(b.originPrice));
+        result.sort((a, b) => parsePrice(a.originPrice) - parsePrice(b.originPrice));
         break;
       case "maior-preco":
-        products.sort((a, b) => parsePrice(b.originPrice) - parsePrice(a.originPrice));
+        result.sort((a, b) => parsePrice(b.originPrice) - parsePrice(a.originPrice));
         break;
       case "maior-margem":
-        products.sort((a, b) => {
+        result.sort((a, b) => {
           const margemA = parseMinResale(a.resaleRange) - parsePrice(a.originPrice);
           const margemB = parseMinResale(b.resaleRange) - parsePrice(b.originPrice);
           return margemB - margemA;
@@ -84,8 +100,24 @@ const Categoria = () => {
         break;
     }
 
-    return products;
-  }, [category, searchQuery, statusFilter, sortOrder]);
+    return result;
+  }, [category, products, searchQuery, statusFilter, sortOrder]);
+
+  const isLoading = categoriesLoading || productsLoading;
+
+  if (categoriesLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-10 w-64" />
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-72 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (!category) {
     return (
@@ -149,7 +181,7 @@ const Categoria = () => {
               </Button>
             ))}
           </div>
-          
+
           <Select value={sortOrder} onValueChange={setSortOrder}>
             <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="Ordenar por" />
@@ -167,7 +199,13 @@ const Categoria = () => {
 
       {/* Products Grid */}
       <section>
-        {filteredProducts.length > 0 ? (
+        {productsLoading ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-72 rounded-xl" />
+            ))}
+          </div>
+        ) : filteredProducts.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product, index) => (
               <ProductCard key={product.id} product={product} index={index} />
