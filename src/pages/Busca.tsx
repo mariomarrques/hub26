@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { Search, Package, Users, Store, ArrowRight, Home } from "lucide-react";
+import { Search, Package, Users, Store, ArrowRight, Home, Loader2 } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,9 +20,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { StatusTag } from "@/components/ui/StatusTag";
-import { mockProducts, mockSuppliers, mockMembers } from "@/data/mockData";
+import { mockSuppliers, mockMembers } from "@/data/mockData";
 import { MEMBER_LEVELS } from "@/types/member";
 import { cn, normalizeSearch } from "@/lib/utils";
+import { useSearchProducts } from "@/hooks/use-products";
+import { useDebounce } from "@/hooks/use-debounce";
 
 type SearchTab = "all" | "products" | "suppliers" | "members";
 
@@ -36,21 +38,20 @@ export default function Busca() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = searchParams.get("q") || "";
+  const debouncedQuery = useDebounce(query, 300);
   
   const [activeTab, setActiveTab] = useState<SearchTab>("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const normalizedQuery = normalizeSearch(query);
+  // Fetch real products from database
+  const { data: products = [], isLoading: isLoadingProducts } = useSearchProducts(debouncedQuery);
 
-  const filteredProducts = useMemo(() => {
-    return mockProducts.filter((p) =>
-      normalizeSearch(p.name).includes(normalizedQuery) ||
-      normalizeSearch(p.category).includes(normalizedQuery)
-    );
-  }, [normalizedQuery]);
+  const normalizedQuery = normalizeSearch(debouncedQuery);
 
+  // Filter suppliers and members from mock data (can be integrated later)
   const filteredSuppliers = useMemo(() => {
+    if (!normalizedQuery) return [];
     return mockSuppliers.filter((s) =>
       normalizeSearch(s.name).includes(normalizedQuery) ||
       s.categories.some((cat) => normalizeSearch(cat).includes(normalizedQuery))
@@ -58,22 +59,23 @@ export default function Busca() {
   }, [normalizedQuery]);
 
   const filteredMembers = useMemo(() => {
+    if (!normalizedQuery) return [];
     return mockMembers.filter((m) =>
       normalizeSearch(m.name).includes(normalizedQuery)
     );
   }, [normalizedQuery]);
 
-  // Apply additional filters
+  // Apply additional filters to products
   const displayProducts = useMemo(() => {
-    let products = filteredProducts;
+    let filtered = products;
     if (categoryFilter !== "all") {
-      products = products.filter((p) => p.category === categoryFilter);
+      filtered = filtered.filter((p) => p.category?.name === categoryFilter);
     }
     if (statusFilter !== "all") {
-      products = products.filter((p) => p.status === statusFilter);
+      filtered = filtered.filter((p) => p.status === statusFilter);
     }
-    return products;
-  }, [filteredProducts, categoryFilter, statusFilter]);
+    return filtered;
+  }, [products, categoryFilter, statusFilter]);
 
   const displaySuppliers = useMemo(() => {
     let suppliers = filteredSuppliers;
@@ -86,14 +88,17 @@ export default function Busca() {
     return suppliers;
   }, [filteredSuppliers, categoryFilter, statusFilter]);
 
-  const totalResults = filteredProducts.length + filteredSuppliers.length + filteredMembers.length;
+  const totalResults = products.length + filteredSuppliers.length + filteredMembers.length;
 
+  // Get unique categories from products
   const categories = useMemo(() => {
     const cats = new Set<string>();
-    mockProducts.forEach((p) => cats.add(p.category));
+    products.forEach((p) => {
+      if (p.category?.name) cats.add(p.category.name);
+    });
     mockSuppliers.forEach((s) => s.categories.forEach((c) => cats.add(c)));
     return Array.from(cats).sort();
-  }, []);
+  }, [products]);
 
   const handleSearchChange = (value: string) => {
     setSearchParams({ q: value });
@@ -141,7 +146,7 @@ export default function Busca() {
             <>Buscar</>
           )}
         </h1>
-        {query && (
+        {query && !isLoadingProducts && (
           <p className="text-muted-foreground">
             {totalResults} {totalResults === 1 ? "resultado encontrado" : "resultados encontrados"}
           </p>
@@ -173,7 +178,7 @@ export default function Busca() {
             <Package className="h-4 w-4" />
             Produtos
             <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
-              {filteredProducts.length}
+              {products.length}
             </Badge>
           </TabsTrigger>
           <TabsTrigger value="suppliers" className="gap-2">
@@ -236,8 +241,15 @@ export default function Busca() {
 
       {/* Results */}
       <div className="space-y-8">
+        {/* Loading state */}
+        {isLoadingProducts && query && (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        )}
+
         {/* Products Section */}
-        {(activeTab === "all" || activeTab === "products") && displayProducts.length > 0 && (
+        {!isLoadingProducts && (activeTab === "all" || activeTab === "products") && displayProducts.length > 0 && (
           <section className="space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Package className="h-5 w-5 text-primary" />
@@ -258,12 +270,12 @@ export default function Busca() {
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <StatusTag variant={product.status} />
-                      <span className="text-xs text-muted-foreground">{product.category}</span>
+                      <StatusTag variant={product.status as "hot" | "trending" | "new"} />
+                      <span className="text-xs text-muted-foreground">{product.category?.name}</span>
                     </div>
                     <h3 className="font-medium truncate">{product.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {product.originPrice} → {product.resaleRange}
+                      {product.origin_price} → {product.resale_range}
                     </p>
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
@@ -350,7 +362,7 @@ export default function Busca() {
         )}
 
         {/* Empty state */}
-        {totalResults === 0 && query && (
+        {!isLoadingProducts && totalResults === 0 && query && (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-2">Nenhum resultado encontrado</h3>

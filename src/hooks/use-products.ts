@@ -131,10 +131,30 @@ export function useProduct(id: string) {
         .from("products")
         .select("*, category:categories(name, slug)")
         .eq("id", id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
-      return data as ProductWithCategory;
+      return data as ProductWithCategory | null;
     },
     enabled: !!id,
+  });
+}
+
+export function useSearchProducts(query: string) {
+  return useQuery({
+    queryKey: ["products", "search", query],
+    queryFn: async () => {
+      if (!query.trim()) return [];
+
+      const { data, error } = await supabase
+        .from("products")
+        .select("*, category:categories(name, slug)")
+        .ilike("name", `%${query}%`)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (error) throw error;
+      return data as ProductWithCategory[];
+    },
+    enabled: query.length >= 2,
   });
 }
