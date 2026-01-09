@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { mockProducts, mockSuppliers, mockMembers } from "@/data/mockData";
 import { MEMBER_LEVELS } from "@/types/member";
-import { cn } from "@/lib/utils";
+import { cn, normalizeSearch } from "@/lib/utils";
 
 type SearchTab = "all" | "products" | "suppliers" | "members";
 
@@ -33,27 +33,27 @@ export default function Busca() {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const lowerQuery = query.toLowerCase();
+  const normalizedQuery = normalizeSearch(query);
 
   const filteredProducts = useMemo(() => {
     return mockProducts.filter((p) =>
-      p.name.toLowerCase().includes(lowerQuery) ||
-      p.category.toLowerCase().includes(lowerQuery)
+      normalizeSearch(p.name).includes(normalizedQuery) ||
+      normalizeSearch(p.category).includes(normalizedQuery)
     );
-  }, [lowerQuery]);
+  }, [normalizedQuery]);
 
   const filteredSuppliers = useMemo(() => {
     return mockSuppliers.filter((s) =>
-      s.name.toLowerCase().includes(lowerQuery) ||
-      s.categories.some((cat) => cat.toLowerCase().includes(lowerQuery))
+      normalizeSearch(s.name).includes(normalizedQuery) ||
+      s.categories.some((cat) => normalizeSearch(cat).includes(normalizedQuery))
     );
-  }, [lowerQuery]);
+  }, [normalizedQuery]);
 
   const filteredMembers = useMemo(() => {
     return mockMembers.filter((m) =>
-      m.name.toLowerCase().includes(lowerQuery)
+      normalizeSearch(m.name).includes(normalizedQuery)
     );
-  }, [lowerQuery]);
+  }, [normalizedQuery]);
 
   // Apply additional filters
   const displayProducts = useMemo(() => {
