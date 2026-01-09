@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import Index from "./pages/Index";
 import Bazar from "./pages/Bazar";
 import Busca from "./pages/Busca";
@@ -20,26 +21,28 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <div className="dark">
-          <AppLayout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/bazar" element={<Bazar />} />
-              <Route path="/busca" element={<Busca />} />
-              <Route path="/fornecedores" element={<Fornecedores />} />
-              <Route path="/avisos" element={<Avisos />} />
-              <Route path="/comunidade" element={<Comunidade />} />
-              <Route path="/perfil" element={<Perfil />} />
-              <Route path="/configuracoes" element={<Configuracoes />} />
-              <Route path="/categoria/:slug" element={<Categoria />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppLayout>
-        </div>
-      </BrowserRouter>
+      <NotificationProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <div className="dark">
+            <AppLayout>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/bazar" element={<Bazar />} />
+                <Route path="/busca" element={<Busca />} />
+                <Route path="/fornecedores" element={<Fornecedores />} />
+                <Route path="/avisos" element={<Avisos />} />
+                <Route path="/comunidade" element={<Comunidade />} />
+                <Route path="/perfil" element={<Perfil />} />
+                <Route path="/configuracoes" element={<Configuracoes />} />
+                <Route path="/categoria/:slug" element={<Categoria />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AppLayout>
+          </div>
+        </BrowserRouter>
+      </NotificationProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

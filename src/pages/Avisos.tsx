@@ -1,20 +1,27 @@
-import { AlertCard } from "@/components/alerts/AlertCard";
-import { mockAlerts } from "@/data/mockData";
-import { Bell, Filter } from "lucide-react";
+import { Bell, Filter, Check } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { NotificationItem } from "@/components/notifications/NotificationItem";
+import { Button } from "@/components/ui/button";
+import { NotificationType } from "@/types/notification";
 
-const filterOptions = ["Todos", "Urgente", "Informativo", "Sucesso"];
+const filterOptions: { value: string; label: string }[] = [
+  { value: "all", label: "Todos" },
+  { value: "mention", label: "Menções" },
+  { value: "product", label: "Produtos" },
+  { value: "alert", label: "Alertas" },
+  { value: "community", label: "Comunidade" },
+  { value: "announcement", label: "Anúncios" },
+];
 
 const Avisos = () => {
-  const [activeFilter, setActiveFilter] = useState("Todos");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
 
-  const filteredAlerts = mockAlerts.filter((alert) => {
-    if (activeFilter === "Todos") return true;
-    if (activeFilter === "Urgente") return alert.type === "urgent" || alert.type === "warning";
-    if (activeFilter === "Informativo") return alert.type === "info";
-    if (activeFilter === "Sucesso") return alert.type === "success";
-    return true;
+  const filteredNotifications = notifications.filter((notification) => {
+    if (activeFilter === "all") return true;
+    return notification.type === activeFilter;
   });
 
   return (
@@ -23,14 +30,31 @@ const Avisos = () => {
       <header className="animate-fade-in">
         <div className="flex items-center gap-2 mb-2">
           <Bell className="h-5 w-5 text-primary" />
-          <p className="text-label">Canal de Alertas</p>
+          <p className="text-label">Central de Notificações</p>
         </div>
-        <h1 className="text-heading text-foreground mb-2">
-          Avisos Importantes
-        </h1>
-        <p className="text-body-muted">
-          Fique por dentro de mudanças, alertas e atualizações críticas.
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-heading text-foreground mb-2">
+              Suas Notificações
+            </h1>
+            <p className="text-body-muted">
+              {unreadCount > 0 
+                ? `Você tem ${unreadCount} notificação${unreadCount > 1 ? 'ões' : ''} não lida${unreadCount > 1 ? 's' : ''}.`
+                : "Você está em dia com todas as notificações."}
+            </p>
+          </div>
+          {unreadCount > 0 && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={markAllAsRead}
+              className="gap-1.5"
+            >
+              <Check className="h-4 w-4" />
+              Marcar todas como lidas
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Filters */}
@@ -42,29 +66,38 @@ const Avisos = () => {
           </div>
           {filterOptions.map((option) => (
             <button
-              key={option}
-              onClick={() => setActiveFilter(option)}
+              key={option.value}
+              onClick={() => setActiveFilter(option.value)}
               className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-150",
-                activeFilter === option
+                activeFilter === option.value
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border bg-card text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground"
               )}
             >
-              {option}
+              {option.label}
             </button>
           ))}
         </div>
       </section>
 
-      {/* Alerts List */}
-      <section className="space-y-3">
-        {filteredAlerts.map((alert, index) => (
-          <AlertCard key={alert.id} alert={alert} index={index} />
+      {/* Notifications List */}
+      <section className="space-y-2">
+        {filteredNotifications.map((notification, index) => (
+          <div 
+            key={notification.id} 
+            className="animate-slide-up border border-border rounded-lg bg-card"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
+            <NotificationItem
+              notification={notification}
+              onRead={markAsRead}
+            />
+          </div>
         ))}
-        {filteredAlerts.length === 0 && (
+        {filteredNotifications.length === 0 && (
           <div className="rounded-xl border border-dashed border-border p-8 text-center">
-            <p className="text-muted-foreground">Nenhum aviso encontrado com esse filtro.</p>
+            <p className="text-muted-foreground">Nenhuma notificação encontrada com esse filtro.</p>
           </div>
         )}
       </section>
