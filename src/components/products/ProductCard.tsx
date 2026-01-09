@@ -1,4 +1,4 @@
-import { ExternalLink, Package } from "lucide-react";
+import { ExternalLink, Package, Pencil, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
@@ -18,9 +18,12 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   index?: number;
+  canManage?: boolean;
+  onEdit?: (product: Product) => void;
+  onDelete?: (product: Product) => void;
 }
 
-export function ProductCard({ product, index = 0 }: ProductCardProps) {
+export function ProductCard({ product, index = 0, canManage, onEdit, onDelete }: ProductCardProps) {
   return (
     <article
       className={cn(
@@ -44,6 +47,36 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <div className="absolute left-sm top-sm">
           <StatusTag variant={product.status} />
         </div>
+
+        {/* Admin/Mod action buttons */}
+        {canManage && (
+          <div className="absolute top-sm right-sm flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-background border-border"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit?.(product);
+              }}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="secondary"
+              className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-destructive hover:text-destructive-foreground border-border"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete?.(product);
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Content */}
