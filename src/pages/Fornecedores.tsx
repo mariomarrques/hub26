@@ -181,6 +181,13 @@ const Fornecedores = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<StatusFilter[]>([]);
 
+  // Status counts for toggle buttons
+  const statusCounts = {
+    active: suppliers.filter((s) => s.status === "active").length,
+    paused: suppliers.filter((s) => s.status === "paused").length,
+    new: suppliers.filter((s) => s.status === "new").length,
+  };
+
   // Reset page when search, sort, or status filter changes
   useEffect(() => {
     setCurrentPage(1);
@@ -383,21 +390,21 @@ const Fornecedores = () => {
             className="gap-1.5 data-[state=on]:bg-success/15 data-[state=on]:text-success data-[state=on]:border-success/30"
           >
             <CheckCircle className="h-3.5 w-3.5" />
-            Ativo
+            Ativo ({statusCounts.active})
           </ToggleGroupItem>
           <ToggleGroupItem 
             value="paused"
             className="gap-1.5 data-[state=on]:bg-muted data-[state=on]:text-muted-foreground"
           >
             <Pause className="h-3.5 w-3.5" />
-            Pausado
+            Pausado ({statusCounts.paused})
           </ToggleGroupItem>
           <ToggleGroupItem 
             value="new"
             className="gap-1.5 data-[state=on]:bg-primary/15 data-[state=on]:text-primary data-[state=on]:border-primary/30"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            Novo
+            Novo ({statusCounts.new})
           </ToggleGroupItem>
         </ToggleGroup>
         
