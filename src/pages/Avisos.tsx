@@ -17,7 +17,7 @@ const filterOptions: { value: string; label: string }[] = [
 
 const Avisos = () => {
   const [activeFilter, setActiveFilter] = useState("all");
-  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
 
   const filteredNotifications = notifications.filter((notification) => {
     if (activeFilter === "all") return true;
@@ -107,6 +107,7 @@ const Avisos = () => {
                 notification={notification}
                 onRead={markAsRead}
                 showLinkButton
+                onDelete={deleteNotification}
               />
             </div>
           ))
