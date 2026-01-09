@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Home,
@@ -14,19 +15,19 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import { useAdminPosts } from "@/hooks/use-community-posts";
+import { ComingSoonDialog } from "@/components/ui/coming-soon-dialog";
 
 interface NavItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  disabled?: boolean;
   comingSoon?: boolean;
 }
 
 const navigation: NavItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Produtos", href: "/produtos", icon: Package },
-  { name: "Bazar do Marin", href: "/bazar", icon: Store, disabled: true, comingSoon: true },
+  { name: "Bazar do Marin", href: "/bazar", icon: Store, comingSoon: true },
   { name: "Fornecedores", href: "/fornecedores", icon: Users },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare },
   { name: "Avisos", href: "/avisos", icon: Bell },
@@ -42,6 +43,9 @@ export function AppSidebar() {
   const { profile, role, isAdmin } = useAuth();
   const { pendingPosts } = useAdminPosts();
   const pendingCount = isAdmin ? (pendingPosts?.length || 0) : 0;
+
+  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [comingSoonFeature, setComingSoonFeature] = useState("");
 
   const getInitials = (name: string) => {
     return name
@@ -68,6 +72,11 @@ export function AppSidebar() {
 
   const handleNavClick = () => {
     close();
+  };
+
+  const handleComingSoonClick = (item: NavItem) => {
+    setComingSoonFeature(item.name);
+    setShowComingSoon(true);
   };
 
   return (
@@ -114,29 +123,22 @@ export function AppSidebar() {
           {navigation.map((item, index) => {
             const isActive = location.pathname === item.href;
             
-            if (item.disabled) {
+            if (item.comingSoon) {
               return (
                 <div
                   key={item.name}
+                  onClick={() => handleComingSoonClick(item)}
                   className={cn(
-                    "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium",
-                    "text-text-muted opacity-60 cursor-not-allowed"
+                    "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium cursor-pointer transition-all duration-hover ease-hover",
+                    "text-text-secondary hover:bg-hover hover:text-foreground"
                   )}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <item.icon
-                    className="h-[18px] w-[18px] flex-shrink-0 text-text-muted"
+                    className="h-[18px] w-[18px] flex-shrink-0 text-text-muted group-hover:text-foreground transition-colors"
                     strokeWidth={1.5}
                   />
                   <span className="truncate">{item.name}</span>
-                  {item.comingSoon && (
-                    <Badge 
-                      variant="outline" 
-                      className="ml-auto text-[9px] px-1.5 py-0 bg-amber-500/20 text-amber-400 border-amber-500/30"
-                    >
-                      Em breve
-                    </Badge>
-                  )}
                 </div>
               );
             }
@@ -213,6 +215,12 @@ export function AppSidebar() {
           )}
         </nav>
       </aside>
+
+      <ComingSoonDialog 
+        open={showComingSoon} 
+        onOpenChange={setShowComingSoon}
+        featureName={comingSoonFeature}
+      />
     </>
   );
 }
