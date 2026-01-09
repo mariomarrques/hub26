@@ -11,8 +11,9 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { UserProfileHeader } from "@/components/member/UserProfileHeader";
-import { currentUser } from "@/data/mockData";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
 const navigation = [
   { name: "Produtos", href: "/", icon: Package },
@@ -25,6 +26,30 @@ const navigation = [
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { profile, role } = useAuth();
+
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const displayName = profile?.name || "Usuário";
+
+  const getRoleBadge = () => {
+    if (!role) return null;
+    const roleConfig = {
+      admin: { label: "Admin", className: "bg-destructive/20 text-destructive border-destructive/30" },
+      moderator: { label: "Mod", className: "bg-amber-500/20 text-amber-400 border-amber-500/30" },
+      member: { label: "Membro", className: "bg-primary/20 text-primary border-primary/30" },
+    };
+    return roleConfig[role];
+  };
+
+  const roleBadge = getRoleBadge();
 
   return (
     <aside
@@ -35,7 +60,26 @@ export function AppSidebar() {
     >
       {/* User Profile */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-md">
-        <UserProfileHeader user={currentUser} collapsed={collapsed} />
+        <div className="flex items-center gap-sm overflow-hidden">
+          <Avatar className="h-9 w-9 flex-shrink-0">
+            <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
+            <AvatarFallback className="bg-primary/10 text-primary text-xs">
+              {getInitials(displayName)}
+            </AvatarFallback>
+          </Avatar>
+          {!collapsed && (
+            <div className="flex flex-col overflow-hidden animate-fade-in">
+              <span className="truncate text-sm font-medium text-foreground">
+                {displayName}
+              </span>
+              {roleBadge && (
+                <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 w-fit", roleBadge.className)}>
+                  {roleBadge.label}
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Navigation */}

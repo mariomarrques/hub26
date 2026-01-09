@@ -5,6 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Bazar from "./pages/Bazar";
 import Busca from "./pages/Busca";
@@ -14,6 +16,8 @@ import Comunidade from "./pages/Comunidade";
 import Perfil from "./pages/Perfil";
 import Configuracoes from "./pages/Configuracoes";
 import Categoria from "./pages/Categoria";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,28 +25,96 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <NotificationProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <div className="dark">
-            <AppLayout>
+      <BrowserRouter>
+        <AuthProvider>
+          <NotificationProvider>
+            <Toaster />
+            <Sonner />
+            <div className="dark">
               <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/bazar" element={<Bazar />} />
-                <Route path="/busca" element={<Busca />} />
-                <Route path="/fornecedores" element={<Fornecedores />} />
-                <Route path="/avisos" element={<Avisos />} />
-                <Route path="/comunidade" element={<Comunidade />} />
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/configuracoes" element={<Configuracoes />} />
-                <Route path="/categoria/:slug" element={<Categoria />} />
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                
+                {/* Protected routes */}
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Index /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/bazar"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Bazar /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/busca"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Busca /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/fornecedores"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Fornecedores /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/avisos"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Avisos /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/comunidade"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Comunidade /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/perfil"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Perfil /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/configuracoes"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Configuracoes /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/categoria/:slug"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Categoria /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </AppLayout>
-          </div>
-        </BrowserRouter>
-      </NotificationProvider>
+            </div>
+          </NotificationProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
