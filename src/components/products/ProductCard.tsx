@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
+import { PriceDisplay } from "@/components/products/PriceDisplay";
 import cssbuyLogo from "@/assets/cssbuy-logo.png";
 
 export interface Product {
@@ -115,13 +116,13 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
 
         {/* Pricing */}
         <div className="mb-md space-y-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-small">Origem</span>
-            <span className="text-[14px] font-medium text-foreground">{product.originPrice}</span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-small shrink-0">Origem</span>
+            <PriceDisplay originPrice={product.originPrice} size="sm" className="text-right" />
           </div>
           <div className="flex items-center justify-between">
             <span className="text-small">Revenda</span>
-            <span className="text-[14px] font-semibold text-primary">{product.resaleRange}</span>
+            <span className="text-[14px] font-semibold text-primary">R$ {product.resaleRange}</span>
           </div>
         </div>
 

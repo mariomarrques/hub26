@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useProduct } from "@/hooks/use-products";
 import { RelatedProducts } from "@/components/products/RelatedProducts";
+import { PriceDisplay } from "@/components/products/PriceDisplay";
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
   hot: { label: "Hot", icon: Flame, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
@@ -136,14 +137,14 @@ export default function Produto() {
           {/* Pricing Card */}
           <Card className="mb-6">
             <CardContent className="p-4 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Preço de Origem</span>
-                <span className="font-medium">{product.origin_price}</span>
+              <div className="flex justify-between items-center gap-4">
+                <span className="text-sm text-muted-foreground shrink-0">Preço de Origem</span>
+                <PriceDisplay originPrice={product.origin_price} size="md" className="text-right" />
               </div>
               <div className="border-t" />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Faixa de Revenda</span>
-                <span className="font-semibold text-primary">{product.resale_range}</span>
+                <span className="font-semibold text-primary">R$ {product.resale_range}</span>
               </div>
             </CardContent>
           </Card>

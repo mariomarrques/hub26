@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useRelatedProducts, ProductWithCategory } from "@/hooks/use-products";
+import { PriceDisplay } from "@/components/products/PriceDisplay";
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
   hot: { label: "Hot", icon: Flame, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
@@ -99,8 +100,9 @@ function RelatedProductCard({ product }: { product: ProductWithCategory }) {
             <h3 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
               {product.name}
             </h3>
-            <p className="text-sm text-primary font-semibold mt-1">
-              {product.resale_range}
+            <PriceDisplay originPrice={product.origin_price} size="sm" className="mt-1" />
+            <p className="text-sm text-primary font-semibold mt-0.5">
+              R$ {product.resale_range}
             </p>
           </div>
         </CardContent>
