@@ -104,7 +104,7 @@ function CommentItem({
 }
 
 export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeleting }: PostDetailDialogProps) {
-  const { user } = useAuth();
+  const { user, isAdmin, isModerator } = useAuth();
   const [newComment, setNewComment] = useState("");
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
 
@@ -113,7 +113,7 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
 
   if (!post) return null;
 
-  const isPostOwner = user?.id === post.author_id;
+  const canDeletePost = user?.id === post.author_id || isAdmin || isModerator;
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,7 +148,7 @@ export function PostDetailDialog({ post, open, onOpenChange, onDelete, isDeletin
                 </Badge>
               )}
             </div>
-            {isPostOwner && onDelete && (
+            {canDeletePost && onDelete && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
