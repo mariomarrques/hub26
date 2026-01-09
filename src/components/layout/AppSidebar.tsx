@@ -13,6 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarContext } from "@/contexts/SidebarContext";
+import { useAdminPosts } from "@/hooks/use-community-posts";
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
@@ -31,6 +32,8 @@ export function AppSidebar() {
   const { isOpen, close } = useSidebarContext();
   const location = useLocation();
   const { profile, role, isAdmin } = useAuth();
+  const { pendingPosts } = useAdminPosts();
+  const pendingCount = isAdmin ? (pendingPosts?.length || 0) : 0;
 
   const getInitials = (name: string) => {
     return name
@@ -157,9 +160,16 @@ export function AppSidebar() {
                       strokeWidth={1.5}
                     />
                     <span className="truncate">{item.name}</span>
-                    {isActive && (
+                    {pendingCount > 0 ? (
+                      <Badge 
+                        variant="destructive" 
+                        className="ml-auto h-5 min-w-5 flex items-center justify-center text-[10px] px-1.5 animate-pulse"
+                      >
+                        {pendingCount > 99 ? "99+" : pendingCount}
+                      </Badge>
+                    ) : isActive ? (
                       <div className="ml-auto h-1.5 w-1.5 rounded-full bg-destructive" />
-                    )}
+                    ) : null}
                   </NavLink>
                 );
               })}
