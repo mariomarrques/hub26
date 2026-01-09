@@ -1,4 +1,4 @@
-import { Hexagon, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Hexagon, ChevronDown, User, Settings, LogOut, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,8 +13,10 @@ import {
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 export function AppHeader() {
+  const { toggle } = useSidebarContext();
   const { profile, signOut } = useAuth();
 
   const getInitials = (name: string) => {
@@ -31,8 +33,16 @@ export function AppHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 border-b border-sidebar-border bg-sidebar">
       <div className="flex h-full items-center justify-between px-lg gap-md">
-        {/* Logo */}
+        {/* Hamburger + Logo */}
         <div className="flex items-center gap-sm">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggle}
+            className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-accent"
+          >
+            <Menu className="h-5 w-5" strokeWidth={1.5} />
+          </Button>
           <Hexagon className="h-6 w-6 text-primary" strokeWidth={1.5} />
           <span className="text-lg font-bold text-foreground tracking-tight">
             Hub 26

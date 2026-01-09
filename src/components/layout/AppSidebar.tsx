@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Package,
@@ -6,15 +5,13 @@ import {
   Users,
   Bell,
   MessageSquare,
-  ChevronLeft,
-  ChevronRight,
   Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const navigation = [
   { name: "Produtos", href: "/", icon: Package },
@@ -29,7 +26,7 @@ const adminNavigation = [
 ];
 
 export function AppSidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+  const { isOpen, close } = useSidebarContext();
   const location = useLocation();
   const { profile, role, isAdmin } = useAuth();
 
@@ -56,24 +53,37 @@ export function AppSidebar() {
 
   const roleBadge = getRoleBadge();
 
+  const handleNavClick = () => {
+    close();
+  };
+
   return (
-    <aside
-      className={cn(
-        "fixed left-0 top-14 z-40 flex h-[calc(100vh-56px)] flex-col border-r border-sidebar-border bg-sidebar transition-all duration-hover ease-hover",
-        collapsed ? "w-16" : "w-sidebar"
+    <>
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
+          onClick={close}
+        />
       )}
-    >
-      {/* User Profile */}
-      <div className="flex h-16 items-center border-b border-sidebar-border px-md">
-        <div className="flex items-center gap-sm overflow-hidden">
-          <Avatar className="h-9 w-9 flex-shrink-0">
-            <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
-            <AvatarFallback className="bg-primary/10 text-primary text-xs">
-              {getInitials(displayName)}
-            </AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <div className="flex flex-col overflow-hidden animate-fade-in">
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed left-0 top-14 z-50 flex h-[calc(100vh-56px)] w-sidebar flex-col border-r border-sidebar-border bg-sidebar transition-transform duration-300 ease-in-out",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* User Profile */}
+        <div className="flex h-16 items-center border-b border-sidebar-border px-md">
+          <div className="flex items-center gap-sm overflow-hidden">
+            <Avatar className="h-9 w-9 flex-shrink-0">
+              <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                {getInitials(displayName)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col overflow-hidden">
               <span className="truncate text-sm font-medium text-foreground">
                 {displayName}
               </span>
@@ -83,99 +93,78 @@ export function AppSidebar() {
                 </Badge>
               )}
             </div>
-          )}
+          </div>
         </div>
-      </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-sm py-md">
-        {navigation.map((item, index) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <NavLink
-              key={item.name}
-              to={item.href}
-              className={cn(
-                "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium transition-all duration-hover ease-hover",
-                isActive
-                  ? "bg-active text-foreground font-semibold"
-                  : "text-text-secondary hover:bg-hover hover:text-foreground"
-              )}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <item.icon
+        {/* Navigation */}
+        <nav className="flex-1 space-y-1 px-sm py-md">
+          {navigation.map((item, index) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                onClick={handleNavClick}
                 className={cn(
-                  "h-[18px] w-[18px] flex-shrink-0 transition-colors",
-                  isActive ? "text-primary" : "text-text-muted group-hover:text-foreground"
+                  "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium transition-all duration-hover ease-hover",
+                  isActive
+                    ? "bg-active text-foreground font-semibold"
+                    : "text-text-secondary hover:bg-hover hover:text-foreground"
                 )}
-                strokeWidth={1.5}
-              />
-              {!collapsed && (
-                <span className="animate-fade-in truncate">{item.name}</span>
-              )}
-              {isActive && !collapsed && (
-                <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
-              )}
-            </NavLink>
-          );
-        })}
-
-        {/* Admin Navigation */}
-        {isAdmin && (
-          <>
-            <div className="my-2 border-t border-sidebar-border" />
-            {adminNavigation.map((item, index) => {
-              const isActive = location.pathname.startsWith(item.href);
-              return (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <item.icon
                   className={cn(
-                    "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium transition-all duration-hover ease-hover",
-                    isActive
-                      ? "bg-destructive/10 text-destructive font-semibold"
-                      : "text-text-secondary hover:bg-hover hover:text-foreground"
+                    "h-[18px] w-[18px] flex-shrink-0 transition-colors",
+                    isActive ? "text-primary" : "text-text-muted group-hover:text-foreground"
                   )}
-                  style={{ animationDelay: `${(navigation.length + index) * 50}ms` }}
-                >
-                  <item.icon
-                    className={cn(
-                      "h-[18px] w-[18px] flex-shrink-0 transition-colors",
-                      isActive ? "text-destructive" : "text-text-muted group-hover:text-foreground"
-                    )}
-                    strokeWidth={1.5}
-                  />
-                  {!collapsed && (
-                    <span className="animate-fade-in truncate">{item.name}</span>
-                  )}
-                  {isActive && !collapsed && (
-                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-destructive" />
-                  )}
-                </NavLink>
-              );
-            })}
-          </>
-        )}
-      </nav>
+                  strokeWidth={1.5}
+                />
+                <span className="truncate">{item.name}</span>
+                {isActive && (
+                  <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                )}
+              </NavLink>
+            );
+          })}
 
-      {/* Collapse button */}
-      <div className="border-t border-sidebar-border p-sm">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-full justify-center text-text-muted hover:text-foreground hover:bg-hover"
-        >
-          {collapsed ? (
-            <ChevronRight className="h-[18px] w-[18px]" strokeWidth={1.5} />
-          ) : (
+          {/* Admin Navigation */}
+          {isAdmin && (
             <>
-              <ChevronLeft className="h-[18px] w-[18px] mr-2" strokeWidth={1.5} />
-              <span className="text-small">Recolher</span>
+              <div className="my-2 border-t border-sidebar-border" />
+              {adminNavigation.map((item, index) => {
+                const isActive = location.pathname.startsWith(item.href);
+                return (
+                  <NavLink
+                    key={item.name}
+                    to={item.href}
+                    onClick={handleNavClick}
+                    className={cn(
+                      "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium transition-all duration-hover ease-hover",
+                      isActive
+                        ? "bg-destructive/10 text-destructive font-semibold"
+                        : "text-text-secondary hover:bg-hover hover:text-foreground"
+                    )}
+                    style={{ animationDelay: `${(navigation.length + index) * 50}ms` }}
+                  >
+                    <item.icon
+                      className={cn(
+                        "h-[18px] w-[18px] flex-shrink-0 transition-colors",
+                        isActive ? "text-destructive" : "text-text-muted group-hover:text-foreground"
+                      )}
+                      strokeWidth={1.5}
+                    />
+                    <span className="truncate">{item.name}</span>
+                    {isActive && (
+                      <div className="ml-auto h-1.5 w-1.5 rounded-full bg-destructive" />
+                    )}
+                  </NavLink>
+                );
+              })}
             </>
           )}
-        </Button>
-      </div>
-    </aside>
+        </nav>
+      </aside>
+    </>
   );
 }
