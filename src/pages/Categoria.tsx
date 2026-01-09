@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -38,6 +39,7 @@ const Categoria = () => {
   const { slug } = useParams<{ slug: string }>();
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("relevancia");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const category = categories.find((c) => c.slug === slug);
 
@@ -47,6 +49,14 @@ const Categoria = () => {
     let products = [...mockProducts.filter(
       (p) => normalizeSearch(p.category) === normalizeSearch(category.name)
     )];
+
+    // Filtro por nome (busca)
+    if (searchQuery.trim()) {
+      const normalizedQuery = normalizeSearch(searchQuery);
+      products = products.filter((p) => 
+        normalizeSearch(p.name).includes(normalizedQuery)
+      );
+    }
 
     if (statusFilter !== "all") {
       products = products.filter((p) => p.status === statusFilter);
@@ -75,7 +85,7 @@ const Categoria = () => {
     }
 
     return products;
-  }, [category, statusFilter, sortOrder]);
+  }, [category, searchQuery, statusFilter, sortOrder]);
 
   if (!category) {
     return (
@@ -108,6 +118,20 @@ const Categoria = () => {
           {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} nesta categoria
         </p>
       </header>
+
+      {/* Search */}
+      <section className="animate-slide-up" style={{ animationDelay: "50ms" }}>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Buscar produto..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </section>
 
       {/* Filters */}
       <section className="animate-slide-up" style={{ animationDelay: "100ms" }}>
@@ -157,7 +181,10 @@ const Categoria = () => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setStatusFilter("all")}
+              onClick={() => {
+                setStatusFilter("all");
+                setSearchQuery("");
+              }}
             >
               Limpar filtros
             </Button>
