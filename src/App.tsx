@@ -19,6 +19,7 @@ import Perfil from "./pages/Perfil";
 import EditarPerfil from "./pages/EditarPerfil";
 import Configuracoes from "./pages/Configuracoes";
 import Categoria from "./pages/Categoria";
+import Produto from "./pages/Produto";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
@@ -131,6 +132,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <AppLayout><Categoria /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/produto/:id"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Produto /></AppLayout>
                     </ProtectedRoute>
                   }
                 />

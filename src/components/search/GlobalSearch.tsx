@@ -73,9 +73,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
   const hasResults = filteredProducts.length > 0 || filteredSuppliers.length > 0 || filteredMembers.length > 0;
 
   const handleProductSelect = (product: (typeof mockProducts)[0]) => {
-    if (product.affiliateLink && product.affiliateLink !== "#") {
-      window.open(product.affiliateLink, "_blank");
-    }
+    navigate(`/produto/${product.id}`);
     setOpen(false);
     setMobileOpen(false);
     setQuery("");
