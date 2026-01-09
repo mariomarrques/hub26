@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { CategoryCard } from "@/components/categories/CategoryCard";
 import { CategoryFormDialog } from "@/components/categories/CategoryFormDialog";
+import { ImportBanner } from "@/components/products/ImportBanner";
 import { useCategories, Category } from "@/hooks/use-categories";
 import { useCategoryImageUpload } from "@/hooks/use-category-image-upload";
 import { useAuth } from "@/contexts/AuthContext";
@@ -84,6 +85,9 @@ const Index = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
+
+      {/* Import Banner */}
+      <ImportBanner />
 
       {/* Categories Grid */}
       <section className="animate-slide-up" style={{ animationDelay: "100ms" }}>
