@@ -23,6 +23,7 @@ import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminProducts from "./pages/admin/AdminProducts";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminPosts from "./pages/admin/AdminPosts";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
@@ -147,6 +148,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <AppLayout><AdminUsers /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/produtos"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminProducts /></AppLayout>
                     </ProtectedRoute>
                   }
                 />
