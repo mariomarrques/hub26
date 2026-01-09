@@ -158,3 +158,24 @@ export function useSearchProducts(query: string) {
     enabled: query.length >= 2,
   });
 }
+
+export function useRelatedProducts(categoryId: string | null, excludeProductId: string) {
+  return useQuery({
+    queryKey: ["products", "related", categoryId, excludeProductId],
+    queryFn: async () => {
+      if (!categoryId) return [];
+
+      const { data, error } = await supabase
+        .from("products")
+        .select("*, category:categories(name, slug)")
+        .eq("category_id", categoryId)
+        .neq("id", excludeProductId)
+        .order("created_at", { ascending: false })
+        .limit(4);
+
+      if (error) throw error;
+      return data as ProductWithCategory[];
+    },
+    enabled: !!categoryId,
+  });
+}
