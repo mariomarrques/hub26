@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCard, Product as ProductCardType } from "@/components/products/ProductCard";
+import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
 import { useCategories } from "@/hooks/use-categories";
 import { useProducts, Product } from "@/hooks/use-products";
 import { normalizeSearch } from "@/lib/utils";
@@ -179,8 +180,8 @@ const Categoria = () => {
         <Skeleton className="h-8 w-32" />
         <Skeleton className="h-10 w-64" />
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-72 rounded-xl" />
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <ProductCardSkeleton key={i} />
           ))}
         </div>
       </div>
@@ -297,8 +298,8 @@ const Categoria = () => {
       <section>
         {productsLoading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <Skeleton key={i} className="h-72 rounded-xl" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <ProductCardSkeleton key={i} />
             ))}
           </div>
         ) : filteredProducts.length > 0 ? (
