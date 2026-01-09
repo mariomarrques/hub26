@@ -106,6 +106,7 @@ const Avisos = () => {
               <NotificationItem
                 notification={notification}
                 onRead={markAsRead}
+                showLinkButton
               />
             </div>
           ))

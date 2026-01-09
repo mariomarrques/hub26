@@ -1,13 +1,13 @@
-import { AtSign, Package, AlertTriangle, MessageSquare, Megaphone } from "lucide-react";
+import { AtSign, Package, AlertTriangle, MessageSquare, Megaphone, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Notification, NotificationType } from "@/types/notification";
-import { Link } from "react-router-dom";
 import { formatRelativeTime } from "@/lib/date-utils";
 
 interface NotificationItemProps {
   notification: Notification;
   onRead: (id: string) => void;
   compact?: boolean;
+  showLinkButton?: boolean;
 }
 
 const typeConfig: Record<NotificationType, { icon: typeof AtSign; className: string }> = {
@@ -33,7 +33,7 @@ const typeConfig: Record<NotificationType, { icon: typeof AtSign; className: str
   },
 };
 
-export function NotificationItem({ notification, onRead, compact = false }: NotificationItemProps) {
+export function NotificationItem({ notification, onRead, compact = false, showLinkButton = false }: NotificationItemProps) {
   const config = typeConfig[notification.type];
   const Icon = config.icon;
 
@@ -43,7 +43,7 @@ export function NotificationItem({ notification, onRead, compact = false }: Noti
     }
   };
 
-  const content = (
+  return (
     <div
       className={cn(
         "flex gap-3 p-3 rounded-lg transition-colors cursor-pointer",
@@ -79,13 +79,23 @@ export function NotificationItem({ notification, onRead, compact = false }: Noti
         <span className="text-xs text-muted-foreground mt-1 block">
           {formatRelativeTime(notification.created_at)}
         </span>
+
+        {/* Link Button - only shown on full page */}
+        {showLinkButton && notification.link && (
+          <div className="mt-2 pt-2 border-t border-border">
+            <a
+              href={notification.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLink className="h-3 w-3" />
+              Abrir link
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
-
-  if (notification.link) {
-    return <Link to={notification.link}>{content}</Link>;
-  }
-
-  return content;
 }
