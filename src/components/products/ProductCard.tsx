@@ -1,4 +1,4 @@
-import { ExternalLink, Package, Pencil } from "lucide-react";
+import { ExternalLink, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,9 @@ export interface Product {
 interface ProductCardProps {
   product: Product;
   index?: number;
-  onEdit?: () => void;
 }
 
-export function ProductCard({ product, index = 0, onEdit }: ProductCardProps) {
+export function ProductCard({ product, index = 0 }: ProductCardProps) {
   return (
     <article
       className={cn(
@@ -45,17 +44,6 @@ export function ProductCard({ product, index = 0, onEdit }: ProductCardProps) {
         <div className="absolute left-sm top-sm">
           <StatusTag variant={product.status} />
         </div>
-        
-        {onEdit && (
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={onEdit}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-        )}
       </div>
 
       {/* Content */}
