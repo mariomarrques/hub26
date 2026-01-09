@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PostFormDialog } from "@/components/community/PostFormDialog";
+import { PostDetailDialog } from "@/components/community/PostDetailDialog";
 import { useCommunityPosts, CommunityPost } from "@/hooks/use-community-posts";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
@@ -34,9 +35,18 @@ const CATEGORY_MAP: Record<string, string> = {
   geral: "Geral",
 };
 
-function TopicRow({ post, index }: { post: CommunityPost; index: number }) {
+function TopicRow({ 
+  post, 
+  index, 
+  onClick 
+}: { 
+  post: CommunityPost; 
+  index: number; 
+  onClick: () => void;
+}) {
   return (
     <article
+      onClick={onClick}
       className={cn(
         "flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all duration-200 ease-out hover:border-primary/30 hover:bg-surface-elevated animate-slide-up cursor-pointer",
         post.is_pinned && "border-primary/20 bg-primary/5"
@@ -197,8 +207,15 @@ const Comunidade = () => {
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
 
   const { approvedPosts, myPosts, loadingApproved, createPost, deletePost } = useCommunityPosts();
+
+  const handlePostClick = (post: CommunityPost) => {
+    setSelectedPost(post);
+    setDetailDialogOpen(true);
+  };
 
   const handleCreatePost = (post: { title: string; content: string; category: string }) => {
     createPost.mutate(post, {
@@ -298,10 +315,10 @@ const Comunidade = () => {
         ) : (
           <>
             {pinnedPosts.map((post, index) => (
-              <TopicRow key={post.id} post={post} index={index} />
+              <TopicRow key={post.id} post={post} index={index} onClick={() => handlePostClick(post)} />
             ))}
             {regularPosts.map((post, index) => (
-              <TopicRow key={post.id} post={post} index={index + pinnedPosts.length} />
+              <TopicRow key={post.id} post={post} index={index + pinnedPosts.length} onClick={() => handlePostClick(post)} />
             ))}
             {filteredPosts.length === 0 && (
               <div className="rounded-xl border border-dashed border-border p-8 text-center">
@@ -318,6 +335,13 @@ const Comunidade = () => {
         onOpenChange={setDialogOpen}
         onSubmit={handleCreatePost}
         isSubmitting={createPost.isPending}
+      />
+
+      {/* Post Detail Dialog */}
+      <PostDetailDialog
+        post={selectedPost}
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
       />
     </div>
   );
