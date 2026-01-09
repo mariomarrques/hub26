@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Notification, NotificationType } from "@/types/notification";
 import { formatRelativeTime } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -12,34 +13,53 @@ interface NotificationItemProps {
   onDelete?: (id: string) => void;
 }
 
-const typeConfig: Record<NotificationType, { icon: typeof AtSign; className: string }> = {
-  mention: {
-    icon: AtSign,
-    className: "text-blue-500 bg-blue-500/10",
-  },
+const typeConfig: Record<NotificationType, { 
+  icon: typeof AtSign; 
+  className: string;
+  badgeClassName: string;
+  label: string;
+}> = {
   product: {
     icon: Package,
-    className: "text-success bg-success/10",
-  },
-  alert: {
-    icon: AlertTriangle,
-    className: "text-hot bg-hot/10",
+    className: "text-emerald-500 bg-emerald-500/10",
+    badgeClassName: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    label: "Novo Produto",
   },
   community: {
     icon: MessageSquare,
     className: "text-purple-500 bg-purple-500/10",
+    badgeClassName: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+    label: "Comunidade",
+  },
+  mention: {
+    icon: AtSign,
+    className: "text-blue-500 bg-blue-500/10",
+    badgeClassName: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    label: "Menção",
   },
   announcement: {
     icon: Megaphone,
-    className: "text-primary bg-primary/10",
+    className: "text-amber-500 bg-amber-500/10",
+    badgeClassName: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    label: "Anúncio",
+  },
+  alert: {
+    icon: AlertTriangle,
+    className: "text-red-500 bg-red-500/10",
+    badgeClassName: "bg-red-500/10 text-red-500 border-red-500/20",
+    label: "Alerta",
   },
   post_approved: {
     icon: CheckCircle,
-    className: "text-success bg-success/10",
+    className: "text-green-500 bg-green-500/10",
+    badgeClassName: "bg-green-500/10 text-green-500 border-green-500/20",
+    label: "Aprovado",
   },
   post_rejected: {
     icon: XCircle,
     className: "text-destructive bg-destructive/10",
+    badgeClassName: "bg-destructive/10 text-destructive border-destructive/20",
+    label: "Rejeitado",
   },
 };
 
@@ -50,6 +70,11 @@ export function NotificationItem({ notification, onRead, compact = false, showLi
   const handleClick = () => {
     if (!notification.is_read) {
       onRead(notification.id);
+    }
+    
+    // Se tiver link, navega para ele
+    if (notification.link) {
+      window.location.href = notification.link;
     }
   };
 
@@ -76,17 +101,23 @@ export function NotificationItem({ notification, onRead, compact = false, showLi
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-start gap-2">
-          <p className={cn(
-            "text-sm font-medium text-foreground",
-            compact && "line-clamp-1"
-          )}>
-            {notification.title}
-          </p>
+        <div className="flex items-start gap-2 flex-wrap">
+          <Badge 
+            variant="outline" 
+            className={cn("text-[10px] px-1.5 py-0 h-4 font-medium", config.badgeClassName)}
+          >
+            {config.label}
+          </Badge>
           {!notification.is_read && (
-            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-primary mt-1.5" />
+            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-primary" />
           )}
         </div>
+        <p className={cn(
+          "text-sm font-medium text-foreground mt-1",
+          compact && "line-clamp-1"
+        )}>
+          {notification.title}
+        </p>
         <p className={cn(
           "text-sm text-muted-foreground mt-0.5",
           compact ? "line-clamp-1" : "line-clamp-2"
@@ -102,8 +133,6 @@ export function NotificationItem({ notification, onRead, compact = false, showLi
           <div className="mt-2 pt-2 border-t border-border">
             <a
               href={notification.link}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
               onClick={(e) => e.stopPropagation()}
             >

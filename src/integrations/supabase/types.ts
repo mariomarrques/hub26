@@ -399,6 +399,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_settings: {
+        Row: {
+          bazar_alerts: boolean
+          community_messages: boolean
+          created_at: string
+          id: string
+          new_products: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bazar_alerts?: boolean
+          community_messages?: boolean
+          created_at?: string
+          id?: string
+          new_products?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bazar_alerts?: boolean
+          community_messages?: boolean
+          created_at?: string
+          id?: string
+          new_products?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
