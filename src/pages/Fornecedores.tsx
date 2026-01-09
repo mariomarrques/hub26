@@ -1,6 +1,8 @@
-import { Users, Star, Truck, MessageCircle, CheckCircle, Pause, Sparkles } from "lucide-react";
+import { Users, Star, Truck, CheckCircle, Pause, Sparkles, Plus, ExternalLink } from "lucide-react";
 import { mockSuppliers, Supplier } from "@/data/mockData";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 
 function RatingBar({ label, value, icon: Icon }: { label: string; value: number; icon: React.ElementType }) {
   return (
@@ -40,7 +42,7 @@ function StatusBadge({ status }: { status: Supplier["status"] }) {
 }
 
 function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }) {
-  const avgRating = (supplier.rating.quality + supplier.rating.delivery + supplier.rating.communication) / 3;
+  const avgRating = (supplier.rating.quality + supplier.rating.delivery) / 2;
 
   return (
     <article
@@ -77,7 +79,6 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
       <div className="space-y-3 mb-4">
         <RatingBar label="Qualidade" value={supplier.rating.quality} icon={Star} />
         <RatingBar label="Prazo de Entrega" value={supplier.rating.delivery} icon={Truck} />
-        <RatingBar label="Comunicação" value={supplier.rating.communication} icon={MessageCircle} />
       </div>
 
       {/* Admin Note */}
@@ -86,11 +87,24 @@ function SupplierCard({ supplier, index }: { supplier: Supplier; index: number }
           "{supplier.adminNote}"
         </p>
       )}
+
+      {/* Ver Detalhes Button */}
+      <div className="mt-4 pt-3 border-t border-border">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="w-full justify-center gap-2 text-muted-foreground hover:text-foreground"
+        >
+          <ExternalLink className="h-4 w-4" />
+          Ver detalhes
+        </Button>
+      </div>
     </article>
   );
 }
 
 const Fornecedores = () => {
+  const { isAdmin } = useAuth();
   const activeSuppliers = mockSuppliers.filter((s) => s.status === "active");
   const otherSuppliers = mockSuppliers.filter((s) => s.status !== "active");
 
@@ -98,16 +112,27 @@ const Fornecedores = () => {
     <div className="space-y-8">
       {/* Header */}
       <header className="animate-fade-in">
-        <div className="flex items-center gap-2 mb-2">
-          <Users className="h-5 w-5 text-primary" />
-          <p className="text-label">Diretório</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="h-5 w-5 text-primary" />
+              <p className="text-label">Diretório</p>
+            </div>
+            <h1 className="text-heading text-foreground mb-2">
+              Fornecedores Validados
+            </h1>
+            <p className="text-body-muted">
+              Parceiros avaliados pela comunidade. Veja status e observações antes de comprar.
+            </p>
+          </div>
+
+          {isAdmin && (
+            <Button className="gap-2">
+              <Plus className="h-4 w-4" />
+              Adicionar Fornecedor
+            </Button>
+          )}
         </div>
-        <h1 className="text-heading text-foreground mb-2">
-          Fornecedores Validados
-        </h1>
-        <p className="text-body-muted">
-          Parceiros avaliados pela comunidade. Veja status e observações antes de comprar.
-        </p>
       </header>
 
       {/* Active Suppliers */}
