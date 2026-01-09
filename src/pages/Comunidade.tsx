@@ -350,6 +350,12 @@ const Comunidade = () => {
         post={selectedPost}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
+        onDelete={(postId) => {
+          deletePost.mutate(postId, {
+            onSuccess: () => setDetailDialogOpen(false),
+          });
+        }}
+        isDeleting={deletePost.isPending}
       />
     </div>
   );
