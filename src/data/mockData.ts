@@ -2,6 +2,52 @@ import { Product } from "@/components/products/ProductCard";
 import { Alert } from "@/components/alerts/AlertCard";
 import { UserProfile } from "@/types/member";
 
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  image: string;
+  description: string;
+}
+
+export const categories: Category[] = [
+  {
+    id: "1",
+    name: "Camisas",
+    slug: "camisas",
+    image: "https://images.unsplash.com/photo-1625910513413-5fc7974e9b3c?w=400&q=80",
+    description: "Polos, camisetas e streetwear",
+  },
+  {
+    id: "2",
+    name: "Calçados",
+    slug: "calcados",
+    image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80",
+    description: "Tênis e sapatos de grife",
+  },
+  {
+    id: "3",
+    name: "Acessórios",
+    slug: "acessorios",
+    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80",
+    description: "Relógios, óculos e bolsas",
+  },
+  {
+    id: "4",
+    name: "Grifes",
+    slug: "grifes",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
+    description: "Produtos de marcas premium",
+  },
+  {
+    id: "5",
+    name: "Eletrônicos",
+    slug: "eletronicos",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80",
+    description: "Gadgets e acessórios tech",
+  },
+];
+
 export const currentUser: UserProfile = {
   id: "1",
   name: "João Silva",
