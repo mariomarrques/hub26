@@ -4,23 +4,12 @@ import { SettingsItem } from "./SettingsItem";
 import { Switch } from "@/components/ui/switch";
 
 export function NotificationsSettings() {
-  const [emailNotifications, setEmailNotifications] = useState(true);
   const [newProducts, setNewProducts] = useState(true);
   const [bazaarAlerts, setBazaarAlerts] = useState(false);
   const [communityMessages, setCommunityMessages] = useState(true);
 
   return (
     <SettingsSection title="Notificações">
-      <SettingsItem
-        label="Notificações por email"
-        description="Receba alertas importantes por email"
-      >
-        <Switch
-          checked={emailNotifications}
-          onCheckedChange={setEmailNotifications}
-        />
-      </SettingsItem>
-
       <SettingsItem
         label="Novos produtos"
         description="Seja notificado sobre novos produtos"
