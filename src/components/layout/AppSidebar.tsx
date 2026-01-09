@@ -6,12 +6,13 @@ import {
   Users,
   Bell,
   MessageSquare,
-  Hexagon,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { UserProfileHeader } from "@/components/member/UserProfileHeader";
+import { currentUser } from "@/data/mockData";
 
 const navigation = [
   { name: "Produtos", href: "/", icon: Package },
@@ -32,19 +33,9 @@ export function AppSidebar() {
         collapsed ? "w-16" : "w-sidebar"
       )}
     >
-      {/* Logo */}
+      {/* User Profile */}
       <div className="flex h-16 items-center border-b border-sidebar-border px-md">
-        <div className="flex items-center gap-sm">
-          <div className="flex h-9 w-9 items-center justify-center rounded-nav bg-primary/10">
-            <Hexagon className="h-5 w-5 text-primary" />
-          </div>
-          {!collapsed && (
-            <div className="animate-fade-in">
-              <h1 className="text-[14px] font-semibold text-foreground">Operação Hexa</h1>
-              <p className="text-small">ISA+ECG</p>
-            </div>
-          )}
-        </div>
+        <UserProfileHeader user={currentUser} collapsed={collapsed} />
       </div>
 
       {/* Navigation */}

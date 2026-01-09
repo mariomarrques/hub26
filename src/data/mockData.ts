@@ -1,5 +1,13 @@
 import { Product } from "@/components/products/ProductCard";
 import { Alert } from "@/components/alerts/AlertCard";
+import { UserProfile } from "@/types/member";
+
+export const currentUser: UserProfile = {
+  id: "1",
+  name: "João Silva",
+  avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&q=80",
+  tier: "gold",
+};
 
 export const mockProducts: Product[] = [
   {
