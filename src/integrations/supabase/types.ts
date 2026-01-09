@@ -100,12 +100,43 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_all_users_with_roles: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
+      get_user_email: { Args: { target_user_id: string }; Returns: string }
+      get_user_stats: {
+        Args: never
+        Returns: {
+          admin_count: number
+          member_count: number
+          moderator_count: number
+          total_users: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      send_bulk_notification: {
+        Args: {
+          p_link?: string
+          p_message: string
+          p_target_roles?: Database["public"]["Enums"]["app_role"][]
+          p_title: string
+          p_type: Database["public"]["Enums"]["notification_type"]
+        }
+        Returns: number
       }
     }
     Enums: {

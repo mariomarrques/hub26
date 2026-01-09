@@ -8,6 +8,7 @@ import {
   MessageSquare,
   ChevronLeft,
   ChevronRight,
+  Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,14 @@ const navigation = [
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare },
 ];
 
+const adminNavigation = [
+  { name: "Administração", href: "/admin", icon: Shield },
+];
+
 export function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
-  const { profile, role } = useAuth();
+  const { profile, role, isAdmin } = useAuth();
 
   const getInitials = (name: string) => {
     return name
@@ -114,6 +119,43 @@ export function AppSidebar() {
             </NavLink>
           );
         })}
+
+        {/* Admin Navigation */}
+        {isAdmin && (
+          <>
+            <div className="my-2 border-t border-sidebar-border" />
+            {adminNavigation.map((item, index) => {
+              const isActive = location.pathname.startsWith(item.href);
+              return (
+                <NavLink
+                  key={item.name}
+                  to={item.href}
+                  className={cn(
+                    "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium transition-all duration-hover ease-hover",
+                    isActive
+                      ? "bg-destructive/10 text-destructive font-semibold"
+                      : "text-text-secondary hover:bg-hover hover:text-foreground"
+                  )}
+                  style={{ animationDelay: `${(navigation.length + index) * 50}ms` }}
+                >
+                  <item.icon
+                    className={cn(
+                      "h-[18px] w-[18px] flex-shrink-0 transition-colors",
+                      isActive ? "text-destructive" : "text-text-muted group-hover:text-foreground"
+                    )}
+                    strokeWidth={1.5}
+                  />
+                  {!collapsed && (
+                    <span className="animate-fade-in truncate">{item.name}</span>
+                  )}
+                  {isActive && !collapsed && (
+                    <div className="ml-auto h-1.5 w-1.5 rounded-full bg-destructive" />
+                  )}
+                </NavLink>
+              );
+            })}
+          </>
+        )}
       </nav>
 
       {/* Collapse button */}
