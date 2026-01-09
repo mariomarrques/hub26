@@ -220,7 +220,7 @@ function MyPostsSection({
 }
 
 const Comunidade = () => {
-  const { user } = useAuth();
+  const { user, isAdmin, isModerator } = useAuth();
   const [activeCategory, setActiveCategory] = useState("Todos");
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -235,9 +235,10 @@ const Comunidade = () => {
   };
 
   const handleCreatePost = (post: { title: string; content: string; category: string }) => {
-    createPost.mutate(post, {
-      onSuccess: () => setDialogOpen(false),
-    });
+    createPost.mutate(
+      { ...post, autoApprove: isAdmin || isModerator },
+      { onSuccess: () => setDialogOpen(false) }
+    );
   };
 
   const filteredPosts = approvedPosts.filter((post) => {
@@ -370,6 +371,7 @@ const Comunidade = () => {
         onOpenChange={setDialogOpen}
         onSubmit={handleCreatePost}
         isSubmitting={createPost.isPending}
+        skipApproval={isAdmin || isModerator}
       />
 
       {/* Post Detail Dialog */}

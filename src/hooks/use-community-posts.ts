@@ -107,8 +107,33 @@ export function useCommunityPosts() {
 
   // Create new post
   const createPost = useMutation({
-    mutationFn: async (post: { title: string; content: string; category: string }) => {
+    mutationFn: async (post: { 
+      title: string; 
+      content: string; 
+      category: string;
+      autoApprove?: boolean;
+    }) => {
       if (!user?.id) throw new Error("Usuário não autenticado");
+
+      // Se for admin/moderador, auto-aprovar
+      if (post.autoApprove) {
+        const { data, error } = await supabase
+          .from("community_posts")
+          .insert({
+            title: post.title,
+            content: post.content,
+            category: post.category,
+            author_id: user.id,
+            status: "approved",
+            approved_at: new Date().toISOString(),
+            approved_by: user.id,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return { data, wasAutoApproved: true };
+      }
 
       const { data, error } = await supabase
         .from("community_posts")
@@ -122,11 +147,15 @@ export function useCommunityPosts() {
         .single();
 
       if (error) throw error;
-      return data;
+      return { data, wasAutoApproved: false };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["community-posts"] });
-      toast.success("Tópico enviado para aprovação!");
+      if (result.wasAutoApproved) {
+        toast.success("Tópico publicado com sucesso!");
+      } else {
+        toast.success("Tópico enviado para aprovação!");
+      }
     },
     onError: (error) => {
       toast.error("Erro ao criar tópico: " + error.message);
