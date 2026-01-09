@@ -29,6 +29,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Send } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { MentionInput } from "@/components/community/MentionInput";
 
 const CATEGORIES = [
   { value: "duvidas", label: "Dúvidas" },
@@ -150,10 +151,12 @@ export function PostFormDialog({
                 <FormItem>
                   <FormLabel>Conteúdo *</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Escreva aqui o conteúdo do seu tópico..."
-                      className="min-h-[120px] resize-none"
-                      {...field}
+                    <MentionInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Escreva aqui o conteúdo do seu tópico... Use @ para mencionar usuários"
+                      className="min-h-[120px]"
+                      multiline
                     />
                   </FormControl>
                   <div className="flex justify-between text-xs text-muted-foreground">

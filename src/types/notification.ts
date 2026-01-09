@@ -3,7 +3,9 @@ export type NotificationType =
   | "product" 
   | "alert" 
   | "community" 
-  | "announcement";
+  | "announcement"
+  | "post_approved"
+  | "post_rejected";
 
 export interface Notification {
   id: string;

@@ -1,4 +1,4 @@
-import { AtSign, Package, AlertTriangle, MessageSquare, Megaphone, ExternalLink, Trash2 } from "lucide-react";
+import { AtSign, Package, AlertTriangle, MessageSquare, Megaphone, ExternalLink, Trash2, CheckCircle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Notification, NotificationType } from "@/types/notification";
 import { formatRelativeTime } from "@/lib/date-utils";
@@ -32,6 +32,14 @@ const typeConfig: Record<NotificationType, { icon: typeof AtSign; className: str
   announcement: {
     icon: Megaphone,
     className: "text-primary bg-primary/10",
+  },
+  post_approved: {
+    icon: CheckCircle,
+    className: "text-success bg-success/10",
+  },
+  post_rejected: {
+    icon: XCircle,
+    className: "text-destructive bg-destructive/10",
   },
 };
 
