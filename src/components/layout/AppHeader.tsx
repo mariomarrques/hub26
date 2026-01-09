@@ -1,6 +1,5 @@
-import { Hexagon, Search, Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Hexagon, Bell, ChevronDown, User, Settings, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -11,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { currentUser, mockAlerts } from "@/data/mockData";
 
 export function AppHeader() {
@@ -37,20 +37,10 @@ export function AppHeader() {
         </div>
 
         {/* Search */}
-        <div className="relative flex-1 max-w-[400px] hidden md:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar produtos, membros..."
-            className="pl-10 h-10 bg-card border-border rounded-[10px] placeholder:text-muted-foreground"
-          />
-        </div>
+        <GlobalSearch className="flex-1 max-w-[400px]" />
 
         {/* Right side: Notifications + User Menu */}
         <div className="flex items-center gap-sm">
-          {/* Mobile search button */}
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Search className="h-5 w-5 text-muted-foreground" />
-          </Button>
 
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative">
