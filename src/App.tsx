@@ -20,6 +20,9 @@ import Categoria from "./pages/Categoria";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminNotifications from "./pages/admin/AdminNotifications";
 
 const queryClient = new QueryClient();
 
@@ -118,6 +121,33 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                
+                {/* Admin routes */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminDashboard /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/usuarios"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminUsers /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/notificacoes"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminNotifications /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
