@@ -41,6 +41,84 @@ export type Database = {
         }
         Relationships: []
       }
+      bazar_products: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          image: string
+          is_kit: boolean | null
+          kit_items: number | null
+          max_stock: number
+          name: string
+          original_price: string | null
+          price: string
+          stock: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          image: string
+          is_kit?: boolean | null
+          kit_items?: number | null
+          max_stock?: number
+          name: string
+          original_price?: string | null
+          price: string
+          stock?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          image?: string
+          is_kit?: boolean | null
+          kit_items?: number | null
+          max_stock?: number
+          name?: string
+          original_price?: string | null
+          price?: string
+          stock?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      categories: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          image: string
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image: string
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image?: string
+          name?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       community_posts: {
         Row: {
           approved_at: string | null
@@ -186,6 +264,59 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          admin_note: string | null
+          affiliate_link: string | null
+          category_id: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          image: string
+          name: string
+          origin_price: string
+          resale_range: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_note?: string | null
+          affiliate_link?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          image: string
+          name: string
+          origin_price: string
+          resale_range: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_note?: string | null
+          affiliate_link?: string | null
+          category_id?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          image?: string
+          name?: string
+          origin_price?: string
+          resale_range?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -206,6 +337,54 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      suppliers: {
+        Row: {
+          admin_note: string | null
+          categories: string[] | null
+          contact: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          link: string | null
+          name: string
+          rating_communication: number | null
+          rating_delivery: number | null
+          rating_quality: number | null
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          admin_note?: string | null
+          categories?: string[] | null
+          contact?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          link?: string | null
+          name: string
+          rating_communication?: number | null
+          rating_delivery?: number | null
+          rating_quality?: number | null
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          admin_note?: string | null
+          categories?: string[] | null
+          contact?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          link?: string | null
+          name?: string
+          rating_communication?: number | null
+          rating_delivery?: number | null
+          rating_quality?: number | null
+          status?: string
           updated_at?: string | null
         }
         Relationships: []

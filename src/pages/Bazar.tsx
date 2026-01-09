@@ -1,57 +1,11 @@
-import { Store, Package, AlertTriangle, ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { Store, Plus, AlertTriangle, ShoppingCart, Loader2, Package, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { StatusTag } from "@/components/ui/StatusTag";
+import { BazarProductFormDialog } from "@/components/bazar/BazarProductFormDialog";
+import { useBazarProducts, BazarProduct } from "@/hooks/use-bazar-products";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-
-interface BazarProduct {
-  id: string;
-  name: string;
-  image: string;
-  price: string;
-  originalPrice?: string;
-  stock: number;
-  maxStock: number;
-  isKit?: boolean;
-  kitItems?: number;
-}
-
-const bazarProducts: BazarProduct[] = [
-  {
-    id: "1",
-    name: "Camisa Polo Premium - Pronta Entrega",
-    image: "https://images.unsplash.com/photo-1625910513413-5fc7974e9b3c?w=400&q=80",
-    price: "R$ 89,90",
-    originalPrice: "R$ 120,00",
-    stock: 12,
-    maxStock: 50,
-  },
-  {
-    id: "2",
-    name: "Kit 3 Camisetas Streetwear",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80",
-    price: "R$ 149,90",
-    stock: 5,
-    maxStock: 20,
-    isKit: true,
-    kitItems: 3,
-  },
-  {
-    id: "3",
-    name: "Óculos de Sol Vintage - Últimas Unidades",
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80",
-    price: "R$ 45,00",
-    stock: 3,
-    maxStock: 30,
-  },
-  {
-    id: "4",
-    name: "Relógio Minimalista Black Edition",
-    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80",
-    price: "R$ 79,90",
-    stock: 8,
-    maxStock: 25,
-  },
-];
 
 function StockBar({ stock, maxStock }: { stock: number; maxStock: number }) {
   const percentage = (stock / maxStock) * 100;
@@ -82,8 +36,15 @@ function StockBar({ stock, maxStock }: { stock: number; maxStock: number }) {
   );
 }
 
-function BazarCard({ product, index }: { product: BazarProduct; index: number }) {
-  const isLowStock = (product.stock / product.maxStock) < 0.2;
+interface BazarCardProps {
+  product: BazarProduct;
+  index: number;
+  canManage?: boolean;
+  onEdit?: () => void;
+}
+
+function BazarCard({ product, index, canManage, onEdit }: BazarCardProps) {
+  const isLowStock = (product.stock / product.max_stock) < 0.2;
 
   return (
     <article
@@ -101,8 +62,19 @@ function BazarCard({ product, index }: { product: BazarProduct; index: number })
         />
         <div className="absolute left-3 top-3 flex gap-2">
           {isLowStock && <StatusTag variant="hot">Últimas unidades</StatusTag>}
-          {product.isKit && <StatusTag variant="new">Kit {product.kitItems}x</StatusTag>}
+          {product.is_kit && <StatusTag variant="new">Kit {product.kit_items}x</StatusTag>}
         </div>
+        
+        {canManage && onEdit && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={onEdit}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       {/* Content */}
@@ -120,15 +92,15 @@ function BazarCard({ product, index }: { product: BazarProduct; index: number })
         <div className="mb-4">
           <div className="flex items-baseline gap-2">
             <span className="text-xl font-bold text-primary">{product.price}</span>
-            {product.originalPrice && (
-              <span className="text-sm text-muted-foreground line-through">{product.originalPrice}</span>
+            {product.original_price && (
+              <span className="text-sm text-muted-foreground line-through">{product.original_price}</span>
             )}
           </div>
         </div>
 
         {/* Stock */}
         <div className="mb-4">
-          <StockBar stock={product.stock} maxStock={product.maxStock} />
+          <StockBar stock={product.stock} maxStock={product.max_stock} />
         </div>
 
         {/* CTA */}
@@ -145,38 +117,105 @@ function BazarCard({ product, index }: { product: BazarProduct; index: number })
 }
 
 const Bazar = () => {
+  const { data: products, isLoading } = useBazarProducts();
+  const { isAdmin, isModerator } = useAuth();
+  const canManage = isAdmin || isModerator;
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<BazarProduct | null>(null);
+
+  const handleAddProduct = () => {
+    setSelectedProduct(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditProduct = (product: BazarProduct) => {
+    setSelectedProduct(product);
+    setDialogOpen(true);
+  };
+
+  const hasLowStock = products?.some(p => (p.stock / p.max_stock) < 0.2);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <header className="animate-fade-in">
-        <div className="flex items-center gap-2 mb-2">
-          <Store className="h-5 w-5 text-primary" />
-          <p className="text-label">Pronta Entrega</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Store className="h-5 w-5 text-primary" />
+              <p className="text-label">Pronta Entrega</p>
+            </div>
+            <h1 className="text-heading text-foreground mb-2">
+              Bazar do Marin
+            </h1>
+            <p className="text-body-muted">
+              Produtos com estoque no Brasil. Compra rápida, entrega imediata.
+            </p>
+          </div>
+
+          {canManage && (
+            <Button className="gap-2" onClick={handleAddProduct}>
+              <Plus className="h-4 w-4" />
+              Adicionar Produto
+            </Button>
+          )}
         </div>
-        <h1 className="text-heading text-foreground mb-2">
-          Bazar do Marin
-        </h1>
-        <p className="text-body-muted">
-          Produtos com estoque no Brasil. Compra rápida, entrega imediata.
-        </p>
       </header>
 
       {/* Low Stock Alert */}
-      <div className="flex items-center gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4 animate-slide-up" style={{ animationDelay: "100ms" }}>
-        <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0" />
-        <p className="text-sm text-foreground">
-          <span className="font-medium">Atenção:</span> Alguns produtos estão com estoque limitado. Garanta o seu antes que acabe.
-        </p>
-      </div>
+      {hasLowStock && (
+        <div className="flex items-center gap-3 rounded-xl border border-warning/30 bg-warning/5 p-4 animate-slide-up" style={{ animationDelay: "100ms" }}>
+          <AlertTriangle className="h-5 w-5 text-warning flex-shrink-0" />
+          <p className="text-sm text-foreground">
+            <span className="font-medium">Atenção:</span> Alguns produtos estão com estoque limitado. Garanta o seu antes que acabe.
+          </p>
+        </div>
+      )}
 
       {/* Products Grid */}
       <section>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {bazarProducts.map((product, index) => (
-            <BazarCard key={product.id} product={product} index={index} />
-          ))}
-        </div>
+        {products && products.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {products.map((product, index) => (
+              <BazarCard 
+                key={product.id} 
+                product={product} 
+                index={index}
+                canManage={canManage}
+                onEdit={() => handleEditProduct(product)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <Package className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-muted-foreground mb-2">
+              Nenhum produto no bazar ainda.
+            </p>
+            {canManage && (
+              <Button variant="outline" onClick={handleAddProduct}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar primeiro produto
+              </Button>
+            )}
+          </div>
+        )}
       </section>
+
+      <BazarProductFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        product={selectedProduct}
+      />
     </div>
   );
 };
