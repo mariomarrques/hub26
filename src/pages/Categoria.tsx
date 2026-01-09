@@ -21,8 +21,8 @@ const parseMinResale = (rangeStr: string): number => {
 
 const statusFilters = [
   { value: "all", label: "Todos" },
-  { value: "hot", label: "🔥 Hot" },
-  { value: "trending", label: "📈 Trending" },
+  { value: "hot", label: "🔥 Quente" },
+  { value: "trending", label: "📈 Em Alta" },
   { value: "new", label: "✨ Novo" },
 ];
 

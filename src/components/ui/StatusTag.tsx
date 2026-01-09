@@ -11,7 +11,7 @@ interface StatusTagProps {
 const variantConfig = {
   hot: {
     icon: Flame,
-    label: "Quente agora",
+    label: "Quente",
     className: "bg-hot/15 text-hot border-hot/20",
   },
   trending: {
