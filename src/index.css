@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Grid background pattern */
+.bg-grid-pattern {
+  background-image: 
+    radial-gradient(circle, hsl(var(--muted-foreground) / 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Radial gradient for home */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
+}
+
 /* Dark Community Dashboard Design System v1.0 */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
