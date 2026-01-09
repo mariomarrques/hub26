@@ -1,5 +1,7 @@
-import { Hexagon, ChevronDown, User, Settings, LogOut, Menu } from "lucide-react";
+import { Hexagon, ChevronDown, User, Settings, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +21,16 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 export function AppHeader() {
   const { toggle } = useSidebarContext();
   const { profile, signOut } = useAuth();
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -52,8 +65,31 @@ export function AppHeader() {
         {/* Search */}
         <GlobalSearch className="flex-1 max-w-[400px]" />
 
-        {/* Right side: Notifications + User Menu */}
+        {/* Right side: Theme Toggle + Notifications + User Menu */}
         <div className="flex items-center gap-sm">
+
+          {/* Theme Toggle */}
+          {mounted && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-accent"
+                >
+                  {resolvedTheme === "dark" ? (
+                    <Sun className="h-5 w-5 transition-transform duration-300 hover:rotate-45" strokeWidth={1.5} />
+                  ) : (
+                    <Moon className="h-5 w-5 transition-transform duration-300 hover:-rotate-12" strokeWidth={1.5} />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{resolvedTheme === "dark" ? "Tema claro" : "Tema escuro"}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           {/* Notifications */}
           <NotificationDropdown />

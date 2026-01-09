@@ -39,7 +39,7 @@ const App = () => (
           <NotificationProvider>
             <Toaster />
             <Sonner />
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
