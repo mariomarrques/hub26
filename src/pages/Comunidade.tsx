@@ -1,4 +1,5 @@
-import { MessageSquare, Pin, Search, Users, Clock, MessageCircle, Plus, AlertCircle, X, Trash2, Heart, Home } from "lucide-react";
+import { Pin, Search, Users, Clock, MessageCircle, Plus, AlertCircle, X, Trash2, Heart, Home } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import {
   Breadcrumb,
@@ -62,15 +63,21 @@ function TopicRow({
       )}
       style={{ animationDelay: `${index * 50}ms` }}
     >
-      {/* Icon */}
-      <div className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-lg flex-shrink-0",
-        post.is_pinned ? "bg-primary/10" : "bg-muted"
-      )}>
-        {post.is_pinned ? (
-          <Pin className="h-5 w-5 text-primary" />
-        ) : (
-          <MessageCircle className="h-5 w-5 text-muted-foreground" />
+      {/* Author Avatar */}
+      <div className="relative flex-shrink-0">
+        <Avatar className="h-10 w-10">
+          <AvatarImage
+            src={post.author?.avatar_url || undefined}
+            alt={post.author?.name || "Usuário"}
+          />
+          <AvatarFallback className="bg-muted text-muted-foreground">
+            {post.author?.name?.charAt(0).toUpperCase() || "U"}
+          </AvatarFallback>
+        </Avatar>
+        {post.is_pinned && (
+          <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+            <Pin className="h-2.5 w-2.5 text-primary-foreground" />
+          </div>
         )}
       </div>
 
