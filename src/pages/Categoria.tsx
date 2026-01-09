@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Search } from "lucide-react";
+import { ArrowLeft, Search, Plus, Loader2, Package } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProductCard } from "@/components/products/ProductCard";
-import { categories, mockProducts } from "@/data/mockData";
+import { ProductFormDialog } from "@/components/products/ProductFormDialog";
+import { useCategory } from "@/hooks/use-categories";
+import { useProducts, ProductWithCategory } from "@/hooks/use-products";
+import { useAuth } from "@/contexts/AuthContext";
 import { normalizeSearch } from "@/lib/utils";
 
 const parsePrice = (priceStr: string): number => {
@@ -37,55 +40,78 @@ const sortOptions = [
 
 const Categoria = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { data: category, isLoading: categoryLoading } = useCategory(slug);
+  const { data: products, isLoading: productsLoading } = useProducts(slug);
+  const { isAdmin, isModerator } = useAuth();
+  const canManage = isAdmin || isModerator;
+
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("relevancia");
   const [searchQuery, setSearchQuery] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithCategory | null>(null);
 
-  const category = categories.find((c) => c.slug === slug);
+  const isLoading = categoryLoading || productsLoading;
 
   const filteredProducts = useMemo(() => {
-    if (!category) return [];
+    if (!products) return [];
     
-    let products = [...mockProducts.filter(
-      (p) => normalizeSearch(p.category) === normalizeSearch(category.name)
-    )];
+    let filtered = [...products];
 
     // Filtro por nome (busca)
     if (searchQuery.trim()) {
       const normalizedQuery = normalizeSearch(searchQuery);
-      products = products.filter((p) => 
+      filtered = filtered.filter((p) => 
         normalizeSearch(p.name).includes(normalizedQuery)
       );
     }
 
     if (statusFilter !== "all") {
-      products = products.filter((p) => p.status === statusFilter);
+      filtered = filtered.filter((p) => p.status === statusFilter);
     }
 
     switch (sortOrder) {
       case "nome-az":
-        products.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+        filtered.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
         break;
       case "nome-za":
-        products.sort((a, b) => b.name.localeCompare(a.name, 'pt-BR'));
+        filtered.sort((a, b) => b.name.localeCompare(a.name, 'pt-BR'));
         break;
       case "menor-preco":
-        products.sort((a, b) => parsePrice(a.originPrice) - parsePrice(b.originPrice));
+        filtered.sort((a, b) => parsePrice(a.origin_price) - parsePrice(b.origin_price));
         break;
       case "maior-preco":
-        products.sort((a, b) => parsePrice(b.originPrice) - parsePrice(a.originPrice));
+        filtered.sort((a, b) => parsePrice(b.origin_price) - parsePrice(a.origin_price));
         break;
       case "maior-margem":
-        products.sort((a, b) => {
-          const margemA = parseMinResale(a.resaleRange) - parsePrice(a.originPrice);
-          const margemB = parseMinResale(b.resaleRange) - parsePrice(b.originPrice);
+        filtered.sort((a, b) => {
+          const margemA = parseMinResale(a.resale_range) - parsePrice(a.origin_price);
+          const margemB = parseMinResale(b.resale_range) - parsePrice(b.origin_price);
           return margemB - margemA;
         });
         break;
     }
 
-    return products;
-  }, [category, searchQuery, statusFilter, sortOrder]);
+    return filtered;
+  }, [products, searchQuery, statusFilter, sortOrder]);
+
+  const handleAddProduct = () => {
+    setSelectedProduct(null);
+    setDialogOpen(true);
+  };
+
+  const handleEditProduct = (product: ProductWithCategory) => {
+    setSelectedProduct(product);
+    setDialogOpen(true);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!category) {
     return (
@@ -93,7 +119,7 @@ const Categoria = () => {
         <h1 className="text-2xl font-bold text-foreground mb-4">
           Categoria não encontrada
         </h1>
-        <Link to="/">
+        <Link to="/produtos">
           <Button variant="outline" className="gap-2">
             <ArrowLeft className="h-4 w-4" />
             Voltar para o início
@@ -107,16 +133,27 @@ const Categoria = () => {
     <div className="space-y-6">
       {/* Header */}
       <header className="animate-fade-in">
-        <Link to="/">
-          <Button variant="ghost" size="sm" className="gap-2 mb-4 -ml-2 text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" />
-            Voltar
-          </Button>
-        </Link>
-        <h1 className="text-heading text-foreground mb-2">{category.name}</h1>
-        <p className="text-body-muted">
-          {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} nesta categoria
-        </p>
+        <div className="flex items-start justify-between">
+          <div>
+            <Link to="/produtos">
+              <Button variant="ghost" size="sm" className="gap-2 mb-4 -ml-2 text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </Button>
+            </Link>
+            <h1 className="text-heading text-foreground mb-2">{category.name}</h1>
+            <p className="text-body-muted">
+              {filteredProducts.length} {filteredProducts.length === 1 ? "produto" : "produtos"} nesta categoria
+            </p>
+          </div>
+
+          {canManage && (
+            <Button className="gap-2" onClick={handleAddProduct}>
+              <Plus className="h-4 w-4" />
+              Adicionar Produto
+            </Button>
+          )}
+        </div>
       </header>
 
       {/* Search */}
@@ -170,27 +207,59 @@ const Categoria = () => {
         {filteredProducts.length > 0 ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product, index) => (
-              <ProductCard key={product.id} product={product} index={index} />
+              <ProductCard 
+                key={product.id} 
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  image: product.image,
+                  originPrice: product.origin_price,
+                  resaleRange: product.resale_range,
+                  status: product.status as "hot" | "trending" | "new",
+                  category: product.categories?.name || "",
+                  adminNote: product.admin_note || undefined,
+                  affiliateLink: product.affiliate_link || undefined,
+                }} 
+                index={index}
+                onEdit={canManage ? () => handleEditProduct(product) : undefined}
+              />
             ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center">
+            <Package className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground mb-2">
-              Nenhum produto encontrado com os filtros selecionados.
+              {products?.length === 0 
+                ? "Nenhum produto cadastrado nesta categoria." 
+                : "Nenhum produto encontrado com os filtros selecionados."}
             </p>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setStatusFilter("all");
-                setSearchQuery("");
-              }}
-            >
-              Limpar filtros
-            </Button>
+            {products?.length === 0 && canManage ? (
+              <Button variant="outline" onClick={handleAddProduct}>
+                <Plus className="h-4 w-4 mr-2" />
+                Adicionar primeiro produto
+              </Button>
+            ) : products?.length !== 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setStatusFilter("all");
+                  setSearchQuery("");
+                }}
+              >
+                Limpar filtros
+              </Button>
+            )}
           </div>
         )}
       </section>
+
+      <ProductFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        product={selectedProduct}
+        defaultCategoryId={category.id}
+      />
     </div>
   );
 };
