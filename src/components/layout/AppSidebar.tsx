@@ -15,10 +15,18 @@ import { Badge } from "@/components/ui/badge";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import { useAdminPosts } from "@/hooks/use-community-posts";
 
-const navigation = [
+interface NavItem {
+  name: string;
+  href: string;
+  icon: React.ElementType;
+  disabled?: boolean;
+  comingSoon?: boolean;
+}
+
+const navigation: NavItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Produtos", href: "/produtos", icon: Package },
-  { name: "Bazar do Marin", href: "/bazar", icon: Store },
+  { name: "Bazar do Marin", href: "/bazar", icon: Store, disabled: true, comingSoon: true },
   { name: "Fornecedores", href: "/fornecedores", icon: Users },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare },
   { name: "Avisos", href: "/avisos", icon: Bell },
@@ -105,6 +113,34 @@ export function AppSidebar() {
         <nav className="flex-1 space-y-1 px-sm py-md">
           {navigation.map((item, index) => {
             const isActive = location.pathname === item.href;
+            
+            if (item.disabled) {
+              return (
+                <div
+                  key={item.name}
+                  className={cn(
+                    "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium",
+                    "text-text-muted opacity-60 cursor-not-allowed"
+                  )}
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <item.icon
+                    className="h-[18px] w-[18px] flex-shrink-0 text-text-muted"
+                    strokeWidth={1.5}
+                  />
+                  <span className="truncate">{item.name}</span>
+                  {item.comingSoon && (
+                    <Badge 
+                      variant="outline" 
+                      className="ml-auto text-[9px] px-1.5 py-0 bg-amber-500/20 text-amber-400 border-amber-500/30"
+                    >
+                      Em breve
+                    </Badge>
+                  )}
+                </div>
+              );
+            }
+            
             return (
               <NavLink
                 key={item.name}
