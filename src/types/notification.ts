@@ -7,11 +7,12 @@ export type NotificationType =
 
 export interface Notification {
   id: string;
+  user_id: string;
   type: NotificationType;
   title: string;
   message: string;
-  timestamp: string;
-  isRead: boolean;
-  link?: string;
-  senderId?: string;
+  is_read: boolean;
+  link?: string | null;
+  sender_id?: string | null;
+  created_at: string;
 }

@@ -1,34 +1,40 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { Notification } from "@/types/notification";
-import { mockNotifications } from "@/data/mockData";
+import { useNotificationsQuery } from "@/hooks/use-notifications";
+import { useAuth } from "./AuthContext";
 
 interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
+  isLoading: boolean;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  deleteNotification: (id: string) => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
-
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
-  };
+  const { user } = useAuth();
+  const {
+    notifications,
+    unreadCount,
+    isLoading,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+  } = useNotificationsQuery(user?.id);
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, unreadCount, markAsRead, markAllAsRead }}
+      value={{ 
+        notifications, 
+        unreadCount, 
+        isLoading,
+        markAsRead, 
+        markAllAsRead,
+        deleteNotification 
+      }}
     >
       {children}
     </NotificationContext.Provider>
