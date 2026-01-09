@@ -58,6 +58,7 @@ interface PostFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (post: PostFormData) => void;
   isSubmitting?: boolean;
+  skipApproval?: boolean;
 }
 
 export function PostFormDialog({
@@ -65,6 +66,7 @@ export function PostFormDialog({
   onOpenChange,
   onSubmit,
   isSubmitting,
+  skipApproval = false,
 }: PostFormDialogProps) {
   const form = useForm<PostFormData>({
     resolver: zodResolver(postSchema),
@@ -165,7 +167,9 @@ export function PostFormDialog({
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Seu tópico será analisado antes de ser publicado na comunidade.
+                {skipApproval 
+                  ? "Seu tópico será publicado imediatamente."
+                  : "Seu tópico será analisado antes de ser publicado na comunidade."}
               </AlertDescription>
             </Alert>
 
