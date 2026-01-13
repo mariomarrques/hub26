@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, Lock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,6 +13,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
@@ -52,22 +53,32 @@ export function AuthForm({ mode, onSubmit, isLoading, error }: AuthFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
         {mode === "signup" && (
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome</FormLabel>
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium text-foreground/80">
+                  Nome
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Seu nome"
-                    {...field}
-                    className="bg-input border-border"
-                  />
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+                    <Input
+                      placeholder="Seu nome"
+                      {...field}
+                      className={cn(
+                        "h-11 pl-10 bg-white/[0.03] border-white/[0.08]",
+                        "placeholder:text-muted-foreground/40",
+                        "focus:bg-white/[0.05] focus:border-primary/50",
+                        "transition-all duration-200"
+                      )}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
@@ -77,17 +88,27 @@ export function AuthForm({ mode, onSubmit, isLoading, error }: AuthFormProps) {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-medium text-foreground/80">
+                Email
+              </FormLabel>
               <FormControl>
-                <Input
-                  type="email"
-                  placeholder="seu@email.com"
-                  {...field}
-                  className="bg-input border-border"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+                  <Input
+                    type="email"
+                    placeholder="seu@email.com"
+                    {...field}
+                    className={cn(
+                      "h-11 pl-10 bg-white/[0.03] border-white/[0.08]",
+                      "placeholder:text-muted-foreground/40",
+                      "focus:bg-white/[0.05] focus:border-primary/50",
+                      "transition-all duration-200"
+                    )}
+                  />
+                </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -96,32 +117,38 @@ export function AuthForm({ mode, onSubmit, isLoading, error }: AuthFormProps) {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Senha</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-medium text-foreground/80">
+                Senha
+              </FormLabel>
               <FormControl>
                 <div className="relative">
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
                   <Input
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     {...field}
-                    className="bg-input border-border pr-10"
+                    className={cn(
+                      "h-11 pl-10 pr-11 bg-white/[0.03] border-white/[0.08]",
+                      "placeholder:text-muted-foreground/40",
+                      "focus:bg-white/[0.05] focus:border-primary/50",
+                      "transition-all duration-200"
+                    )}
                   />
-                  <Button
+                  <button
                     type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      <EyeOff className="h-4 w-4" />
                     ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      <Eye className="h-4 w-4" />
                     )}
-                  </Button>
+                  </button>
                 </div>
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -131,35 +158,58 @@ export function AuthForm({ mode, onSubmit, isLoading, error }: AuthFormProps) {
             control={form.control}
             name="confirmPassword"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Confirmar Senha</FormLabel>
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium text-foreground/80">
+                  Confirmar Senha
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="••••••••"
-                    {...field}
-                    className="bg-input border-border"
-                  />
+                  <div className="relative">
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                      className={cn(
+                        "h-11 pl-10 bg-white/[0.03] border-white/[0.08]",
+                        "placeholder:text-muted-foreground/40",
+                        "focus:bg-white/[0.05] focus:border-primary/50",
+                        "transition-all duration-200"
+                      )}
+                    />
+                  </div>
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs" />
               </FormItem>
             )}
           />
         )}
 
         {error && (
-          <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+          <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+            <div className="h-1.5 w-1.5 rounded-full bg-destructive" />
             {error}
           </div>
         )}
 
         <Button
           type="submit"
-          className="w-full"
           disabled={isLoading}
+          className={cn(
+            "w-full h-11 mt-2 font-medium",
+            "bg-primary hover:bg-primary/90",
+            "shadow-lg shadow-primary/20",
+            "transition-all duration-200",
+            "disabled:opacity-50"
+          )}
         >
-          {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {mode === "login" ? "Entrar" : "Criar conta"}
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {mode === "login" ? "Entrando..." : "Criando conta..."}
+            </>
+          ) : (
+            mode === "login" ? "Entrar" : "Criar conta"
+          )}
         </Button>
       </form>
     </Form>

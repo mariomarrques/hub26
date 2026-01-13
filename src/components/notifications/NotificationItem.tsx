@@ -3,7 +3,17 @@ import { cn } from "@/lib/utils";
 import { Notification, NotificationType } from "@/types/notification";
 import { formatRelativeTime } from "@/lib/date-utils";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface NotificationItemProps {
   notification: Notification;
@@ -15,55 +25,61 @@ interface NotificationItemProps {
 
 const typeConfig: Record<NotificationType, { 
   icon: typeof AtSign; 
-  className: string;
-  badgeClassName: string;
+  bgColor: string;
+  iconColor: string;
   label: string;
 }> = {
   product: {
     icon: Package,
-    className: "text-emerald-500 bg-emerald-500/10",
-    badgeClassName: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+    bgColor: "bg-emerald-500/15",
+    iconColor: "text-emerald-500",
     label: "Novo Produto",
   },
   community: {
     icon: MessageSquare,
-    className: "text-purple-500 bg-purple-500/10",
-    badgeClassName: "bg-purple-500/10 text-purple-500 border-purple-500/20",
+    bgColor: "bg-violet-500/15",
+    iconColor: "text-violet-500",
     label: "Comunidade",
   },
   mention: {
     icon: AtSign,
-    className: "text-blue-500 bg-blue-500/10",
-    badgeClassName: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    bgColor: "bg-blue-500/15",
+    iconColor: "text-blue-500",
     label: "Menção",
   },
   announcement: {
     icon: Megaphone,
-    className: "text-amber-500 bg-amber-500/10",
-    badgeClassName: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+    bgColor: "bg-amber-500/15",
+    iconColor: "text-amber-500",
     label: "Anúncio",
   },
   alert: {
     icon: AlertTriangle,
-    className: "text-red-500 bg-red-500/10",
-    badgeClassName: "bg-red-500/10 text-red-500 border-red-500/20",
+    bgColor: "bg-red-500/15",
+    iconColor: "text-red-500",
     label: "Alerta",
   },
   post_approved: {
     icon: CheckCircle,
-    className: "text-green-500 bg-green-500/10",
-    badgeClassName: "bg-green-500/10 text-green-500 border-green-500/20",
+    bgColor: "bg-green-500/15",
+    iconColor: "text-green-500",
     label: "Aprovado",
   },
   post_rejected: {
     icon: XCircle,
-    className: "text-destructive bg-destructive/10",
-    badgeClassName: "bg-destructive/10 text-destructive border-destructive/20",
+    bgColor: "bg-destructive/15",
+    iconColor: "text-destructive",
     label: "Rejeitado",
   },
 };
 
-export function NotificationItem({ notification, onRead, compact = false, showLinkButton = false, onDelete }: NotificationItemProps) {
+export function NotificationItem({ 
+  notification, 
+  onRead, 
+  compact = false, 
+  showLinkButton = false, 
+  onDelete 
+}: NotificationItemProps) {
   const config = typeConfig[notification.type];
   const Icon = config.icon;
 
@@ -72,14 +88,12 @@ export function NotificationItem({ notification, onRead, compact = false, showLi
       onRead(notification.id);
     }
     
-    // Se tiver link, navega para ele
     if (notification.link) {
       window.location.href = notification.link;
     }
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDelete = () => {
     if (onDelete) {
       onDelete(notification.id);
     }
@@ -88,71 +102,106 @@ export function NotificationItem({ notification, onRead, compact = false, showLi
   return (
     <div
       className={cn(
-        "flex gap-3 p-3 rounded-lg transition-colors cursor-pointer",
-        !notification.is_read && "bg-accent/50",
-        "hover:bg-accent"
+        "group relative flex items-start gap-4 p-4 transition-all duration-200",
+        !notification.is_read && "bg-primary/5",
+        "hover:bg-muted/50"
       )}
       onClick={handleClick}
+      role="button"
+      tabIndex={0}
     >
-      {/* Icon */}
-      <div className={cn("flex-shrink-0 p-2 rounded-full", config.className)}>
-        <Icon className="h-4 w-4" />
+      {/* Indicador de não lida */}
+      {!notification.is_read && (
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-lg" />
+      )}
+
+      {/* Ícone com fundo colorido */}
+      <div className={cn(
+        "flex-shrink-0 flex items-center justify-center w-11 h-11 rounded-xl",
+        config.bgColor
+      )}>
+        <Icon className={cn("h-5 w-5", config.iconColor)} />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start gap-2 flex-wrap">
-          <Badge 
-            variant="outline" 
-            className={cn("text-[10px] px-1.5 py-0 h-4 font-medium", config.badgeClassName)}
-          >
+      {/* Conteúdo */}
+      <div className="flex-1 min-w-0 space-y-1">
+        {/* Header: Label + Tempo */}
+        <div className="flex items-center gap-2">
+          <span className={cn(
+            "text-[11px] font-semibold uppercase tracking-wide",
+            config.iconColor
+          )}>
             {config.label}
-          </Badge>
-          {!notification.is_read && (
-            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-primary" />
-          )}
+          </span>
+          <span className="text-[11px] text-muted-foreground">
+            • {formatRelativeTime(notification.created_at)}
+          </span>
         </div>
+
+        {/* Título */}
         <p className={cn(
-          "text-sm font-medium text-foreground mt-1",
+          "text-sm font-medium text-foreground leading-snug",
           compact && "line-clamp-1"
         )}>
           {notification.title}
         </p>
+
+        {/* Mensagem */}
         <p className={cn(
-          "text-sm text-muted-foreground mt-0.5",
+          "text-sm text-muted-foreground leading-relaxed",
           compact ? "line-clamp-1" : "line-clamp-2"
         )}>
           {notification.message}
         </p>
-        <span className="text-xs text-muted-foreground mt-1 block">
-          {formatRelativeTime(notification.created_at)}
-        </span>
 
-        {/* Link Button - only shown on full page */}
+        {/* Link Button */}
         {showLinkButton && notification.link && (
-          <div className="mt-2 pt-2 border-t border-border">
-            <a
-              href={notification.link}
-              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ExternalLink className="h-3 w-3" />
-              Abrir link
-            </a>
-          </div>
+          <a
+            href={notification.link}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline mt-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Ver detalhes
+          </a>
         )}
       </div>
 
-      {/* Delete Button - only shown when onDelete is provided */}
+      {/* Botão de Delete com confirmação */}
       {onDelete && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="flex-shrink-0 h-8 w-8 text-muted-foreground hover:text-destructive"
-          onClick={handleDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "flex-shrink-0 h-9 w-9 rounded-lg",
+                "text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10",
+                "opacity-0 group-hover:opacity-100 transition-opacity"
+              )}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remover notificação?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. A notificação será permanentemente removida.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDelete}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Remover
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </div>
   );

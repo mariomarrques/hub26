@@ -8,6 +8,7 @@ import {
   Bell,
   MessageSquare,
   Shield,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -139,6 +140,11 @@ export function AppSidebar() {
                     strokeWidth={1.5}
                   />
                   <span className="truncate">{item.name}</span>
+                  {/* Badge "Em breve" */}
+                  <span className="ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-amber-500/15 text-amber-500 border border-amber-500/25">
+                    <Sparkles className="h-2.5 w-2.5" />
+                    Breve
+                  </span>
                 </div>
               );
             }

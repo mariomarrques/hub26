@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Package, Store, Users, MessageSquare, Bell } from "lucide-react";
+import { Package, Store, Users, MessageSquare, Bell, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ComingSoonDialog } from "@/components/ui/coming-soon-dialog";
@@ -15,18 +15,23 @@ interface NavigationItem {
 
 const navigationItems: NavigationItem[] = [
   { name: "Produtos", href: "/produtos", icon: Package, color: "cyan" },
-  { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "cyan", comingSoon: true },
+  { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "amber", comingSoon: true },
   { name: "Fornecedores", href: "/fornecedores", icon: Users, color: "blue" },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare, color: "teal" },
   { name: "Avisos", href: "/avisos", icon: Bell, color: "emerald" },
 ];
 
-const getButtonClasses = (color: string) => {
+const getButtonClasses = (color: string, comingSoon?: boolean) => {
+  if (comingSoon) {
+    return "border-amber-500/50 text-amber-400 hover:bg-amber-500/10 hover:border-amber-400";
+  }
+  
   const colorMap: Record<string, string> = {
     cyan: "border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400",
     blue: "border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400",
     teal: "border-teal-500/50 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400",
     emerald: "border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400",
+    amber: "border-amber-500/50 text-amber-400 hover:bg-amber-500/10 hover:border-amber-400",
   };
   return colorMap[color] || colorMap.cyan;
 };
@@ -75,12 +80,20 @@ const Home = () => {
                 <Button 
                   variant="outline" 
                   className={cn(
-                    "min-w-[140px] md:min-w-[160px] h-11 md:h-12 text-sm md:text-base border-2 bg-card/30 backdrop-blur-sm transition-all duration-300",
-                    getButtonClasses(item.color)
+                    "relative min-w-[140px] md:min-w-[160px] h-11 md:h-12 text-sm md:text-base border-2 bg-card/30 backdrop-blur-sm transition-all duration-300",
+                    getButtonClasses(item.color, item.comingSoon)
                   )}
                 >
                   <item.icon className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                   {item.name}
+                  
+                  {/* Badge "Em breve" para itens comingSoon */}
+                  {item.comingSoon && (
+                    <span className="absolute -top-2 -right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase bg-amber-500 text-amber-950 shadow-lg">
+                      <Sparkles className="h-2 w-2" />
+                      Breve
+                    </span>
+                  )}
                 </Button>
               );
 

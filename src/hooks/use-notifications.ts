@@ -88,6 +88,12 @@ export function useNotificationsQuery(userId: string | undefined) {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   const markAsRead = async (id: string) => {
+    // Atualização otimista
+    queryClient.setQueryData<Notification[]>(
+      ["notifications", userId],
+      (old = []) => old.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+    );
+
     const { error } = await supabase
       .from("notifications")
       .update({ is_read: true })
@@ -96,11 +102,19 @@ export function useNotificationsQuery(userId: string | undefined) {
     if (error) {
       console.error("Erro ao marcar como lida:", error);
       toast.error("Erro ao marcar notificação como lida");
+      // Reverter em caso de erro
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
     }
   };
 
   const markAllAsRead = async () => {
     if (!userId) return;
+
+    // Atualização otimista
+    queryClient.setQueryData<Notification[]>(
+      ["notifications", userId],
+      (old = []) => old.map((n) => ({ ...n, is_read: true }))
+    );
 
     const { error } = await supabase
       .from("notifications")
@@ -111,10 +125,19 @@ export function useNotificationsQuery(userId: string | undefined) {
     if (error) {
       console.error("Erro ao marcar todas como lidas:", error);
       toast.error("Erro ao marcar notificações como lidas");
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+    } else {
+      toast.success("Todas as notificações foram marcadas como lidas");
     }
   };
 
   const deleteNotification = async (id: string) => {
+    // Atualização otimista - remove imediatamente da UI
+    queryClient.setQueryData<Notification[]>(
+      ["notifications", userId],
+      (old = []) => old.filter((n) => n.id !== id)
+    );
+
     const { error } = await supabase
       .from("notifications")
       .delete()
@@ -123,6 +146,32 @@ export function useNotificationsQuery(userId: string | undefined) {
     if (error) {
       console.error("Erro ao deletar notificação:", error);
       toast.error("Erro ao deletar notificação");
+      // Reverter em caso de erro
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+    } else {
+      toast.success("Notificação removida");
+    }
+  };
+
+  const deleteAllNotifications = async () => {
+    if (!userId) return;
+
+    const count = notifications.length;
+    
+    // Atualização otimista
+    queryClient.setQueryData<Notification[]>(["notifications", userId], []);
+
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("user_id", userId);
+
+    if (error) {
+      console.error("Erro ao deletar notificações:", error);
+      toast.error("Erro ao limpar notificações");
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
+    } else {
+      toast.success(`${count} notificação${count > 1 ? "ões" : ""} removida${count > 1 ? "s" : ""}`);
     }
   };
 
@@ -133,5 +182,6 @@ export function useNotificationsQuery(userId: string | undefined) {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    deleteAllNotifications,
   };
 }

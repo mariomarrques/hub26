@@ -1,24 +1,24 @@
+/* ==========================================================================
+   Hub 26 - Dark Community Dashboard Design System v1.0
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. IMPORTS - Devem ficar sempre no topo do arquivo
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* --------------------------------------------------------------------------
+   2. TAILWIND DIRECTIVES
+   -------------------------------------------------------------------------- */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Grid background pattern */
-.bg-grid-pattern {
-  background-image: 
-    radial-gradient(circle, hsl(var(--muted-foreground) / 0.15) 1px, transparent 1px);
-  background-size: 40px 40px;
-}
-
-/* Radial gradient for home */
-.bg-gradient-radial {
-  background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
-}
-
-/* Dark Community Dashboard Design System v1.0 */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
+/* --------------------------------------------------------------------------
+   3. CSS VARIABLES (Design Tokens)
+   -------------------------------------------------------------------------- */
 @layer base {
+  /* Dark Theme (default) */
   :root,
   .dark {
     /* App backgrounds - converted from hex to HSL */
@@ -115,6 +115,7 @@
     --spacing: 0.25rem;
   }
 
+  /* Light Theme */
   .light {
     /* App backgrounds - light mode */
     --background: 0 0% 98%; /* #FAFAFA */
@@ -211,6 +212,9 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   4. BASE STYLES (Reset e estilos globais)
+   -------------------------------------------------------------------------- */
 @layer base {
   * {
     @apply border-border;
@@ -237,6 +241,26 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   5. COMPONENT STYLES
+   -------------------------------------------------------------------------- */
+@layer components {
+  /* Grid background pattern */
+  .bg-grid-pattern {
+    background-image: 
+      radial-gradient(circle, hsl(var(--muted-foreground) / 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  /* Radial gradient for home */
+  .bg-gradient-radial {
+    background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   6. UTILITY CLASSES
+   -------------------------------------------------------------------------- */
 @layer utilities {
   /* Typography utilities matching design spec */
   .text-page-title {
@@ -301,6 +325,9 @@
   }
 }
 
+/* --------------------------------------------------------------------------
+   7. KEYFRAMES (Animações)
+   -------------------------------------------------------------------------- */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -331,6 +358,10 @@
     opacity: 0.7;
   }
 }
+
+/* --------------------------------------------------------------------------
+   8. GLOBAL OVERRIDES (Scrollbar, Focus, etc.)
+   -------------------------------------------------------------------------- */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

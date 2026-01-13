@@ -10,6 +10,7 @@ interface NotificationContextType {
   markAsRead: (id: string) => Promise<void>;
   markAllAsRead: () => Promise<void>;
   deleteNotification: (id: string) => Promise<void>;
+  deleteAllNotifications: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -23,6 +24,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    deleteAllNotifications,
   } = useNotificationsQuery(user?.id);
 
   return (
@@ -33,7 +35,8 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         isLoading,
         markAsRead, 
         markAllAsRead,
-        deleteNotification 
+        deleteNotification,
+        deleteAllNotifications,
       }}
     >
       {children}
