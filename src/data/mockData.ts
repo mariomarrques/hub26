@@ -130,7 +130,7 @@ export const mockProducts: Product[] = [
     name: "Relógio Casual Minimalista",
     image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80",
     originPrice: "R$ 32,00",
-    resaleRange: "R$ 89 - 120",
+    
     status: "new",
     category: "Acessórios",
     adminNote: "Novo no catálogo. Ótimo para testar mercado.",
