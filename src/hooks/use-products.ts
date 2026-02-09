@@ -21,6 +21,7 @@ export interface Product {
   affiliate_link: string | null;
   description: string | null;
   tags: string[] | null;
+  real_photos: string[] | null;
   created_at: string | null;
   updated_at: string | null;
 }
@@ -34,6 +35,7 @@ export type CreateProductInput = {
   category_id: string | null;
   admin_note?: string | null;
   affiliate_link?: string | null;
+  real_photos?: string[] | null;
 };
 export type UpdateProductInput = Partial<CreateProductInput> & { id: string };
 
