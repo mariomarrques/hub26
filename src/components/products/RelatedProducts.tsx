@@ -1,17 +1,10 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Flame, TrendingUp, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useRelatedProducts, ProductWithCategory } from "@/hooks/use-products";
 import { PriceDisplay } from "@/components/products/PriceDisplay";
-
-const statusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
-  hot: { label: "Hot", icon: Flame, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
-  trending: { label: "Trending", icon: TrendingUp, className: "bg-purple-500/10 text-purple-500 border-purple-500/20" },
-  new: { label: "Novo", icon: Sparkles, className: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" },
-};
 
 interface RelatedProductsProps {
   categoryId: string;
@@ -24,7 +17,6 @@ export function RelatedProducts({
   categoryId, 
   excludeProductId, 
   categoryName,
-  categorySlug 
 }: RelatedProductsProps) {
   const { data: products = [], isLoading } = useRelatedProducts(categoryId, excludeProductId);
 
@@ -45,9 +37,7 @@ export function RelatedProducts({
     );
   }
 
-  if (products.length === 0) {
-    return null;
-  }
+  if (products.length === 0) return null;
 
   return (
     <div className="mt-12">
@@ -55,14 +45,6 @@ export function RelatedProducts({
         <h2 className="text-xl font-semibold">
           {categoryName ? `Mais em ${categoryName}` : "Produtos Relacionados"}
         </h2>
-        {categorySlug && (
-          <Button variant="ghost" size="sm" asChild>
-            <Link to={`/categoria/${categorySlug}`}>
-              Ver todos
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
-        )}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -75,35 +57,23 @@ export function RelatedProducts({
 }
 
 function RelatedProductCard({ product }: { product: ProductWithCategory }) {
-  const status = statusConfig[product.status] || statusConfig.new;
-  const StatusIcon = status.icon;
-
   return (
     <Link to={`/produto/${product.id}`}>
-      <Card className="group overflow-hidden hover:shadow-md transition-all duration-200 h-full">
+      <Card className="group overflow-hidden hover:shadow-md transition-all duration-200 h-full bg-card/50 hover:bg-card border-0">
         <CardContent className="p-0">
-          <div className="relative aspect-square overflow-hidden bg-muted">
+          <div className="relative aspect-square overflow-hidden bg-panel">
             <img
               src={product.image}
               alt={product.name}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = "/placeholder.svg";
-              }}
+              className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
+              onError={(e) => { (e.target as HTMLImageElement).src = "/placeholder.svg"; }}
             />
-            <Badge className={`absolute top-2 left-2 text-xs ${status.className}`}>
-              <StatusIcon className="mr-1 h-2.5 w-2.5" />
-              {status.label}
-            </Badge>
           </div>
           <div className="p-3">
             <h3 className="font-medium text-sm line-clamp-2 group-hover:text-primary transition-colors">
               {product.name}
             </h3>
             <PriceDisplay originPrice={product.origin_price} size="sm" className="mt-1" />
-            <p className="text-sm text-primary font-semibold mt-0.5">
-              R$ {product.resale_range}
-            </p>
           </div>
         </CardContent>
       </Card>

@@ -1,8 +1,8 @@
-import { ExternalLink, Package, Pencil, Trash2, Copy } from "lucide-react";
+import { Package, Pencil, Trash2, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { StatusTag } from "@/components/ui/StatusTag";
 import { Button } from "@/components/ui/button";
+import { PriceDisplay } from "@/components/products/PriceDisplay";
 import cssbuyLogo from "@/assets/cssbuy-logo.png";
 
 export interface Product {
@@ -10,7 +10,7 @@ export interface Product {
   name: string;
   image?: string;
   originPrice: string;
-  status: "hot" | "trending" | "new" | "paused";
+  status: string;
   category: string;
   adminNote?: string;
   affiliateLink?: string;
@@ -26,18 +26,12 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, onDuplicate }: ProductCardProps) {
-  // Format origin price with Yuan symbol
-  const formattedPrice = product.originPrice.includes("¥")
-    ? product.originPrice
-    : `¥ ${product.originPrice}`;
-
   return (
     <div
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-card border border-border bg-card",
+        "group relative flex flex-col overflow-hidden rounded-card bg-card/50",
         "transition-all duration-hover ease-hover",
-        "hover:border-primary/50 hover:shadow-lg hover:-translate-y-1",
-        "animate-slide-up"
+        "hover:bg-card animate-slide-up"
       )}
       style={{ animationDelay: `${index * 75}ms` }}
     >
@@ -54,9 +48,6 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
             <Package className="h-12 w-12 text-muted-foreground/30" strokeWidth={1.5} />
           </div>
         )}
-        <div className="absolute left-sm top-sm">
-          <StatusTag variant={product.status} />
-        </div>
 
         {/* Admin action buttons */}
         {canManage && (
@@ -106,8 +97,8 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
           </h3>
         </Link>
 
-        {/* Origin Price - simple and discrete */}
-        <p className="text-sm text-muted-foreground mb-3">{formattedPrice}</p>
+        {/* Prices: Yuan + estimated BRL */}
+        <PriceDisplay originPrice={product.originPrice} size="md" className="mb-3" />
 
         {/* CTA - Comprar via Agente */}
         <div className="mt-auto">
@@ -123,7 +114,6 @@ export function ProductCard({ product, index = 0, canManage, onEdit, onDelete, o
             >
               <img src={cssbuyLogo} alt="CSSBuy" className="h-4 w-auto" />
               Comprar via Agente
-              <ExternalLink className="h-3.5 w-3.5" />
             </Button>
           ) : (
             <Button
