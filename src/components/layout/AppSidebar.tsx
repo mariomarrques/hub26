@@ -38,9 +38,6 @@ export function AppSidebar() {
   const { pendingPosts } = useAdminPosts();
   const pendingCount = isAdmin ? (pendingPosts?.length || 0) : 0;
 
-  const [showComingSoon, setShowComingSoon] = useState(false);
-  const [comingSoonFeature, setComingSoonFeature] = useState("");
-
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -66,11 +63,6 @@ export function AppSidebar() {
 
   const handleNavClick = () => {
     close();
-  };
-
-  const handleComingSoonClick = (item: NavItem) => {
-    setComingSoonFeature(item.name);
-    setShowComingSoon(true);
   };
 
   return (
