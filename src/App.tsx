@@ -64,22 +64,6 @@ const App = () => (
                   }
                 />
                 <Route
-                  path="/bazar"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout><Bazar /></AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/busca"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout><Busca /></AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
                   path="/fornecedores"
                   element={
                     <ProtectedRoute>
