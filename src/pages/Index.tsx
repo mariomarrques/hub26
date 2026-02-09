@@ -1,13 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Home, Search, X, Package, AlertTriangle } from "lucide-react";
+import { Home, Search, X, Package, AlertTriangle, ArrowUpDown } from "lucide-react";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
@@ -17,7 +12,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
+
+type SortOption = "default" | "price_asc" | "price_desc";
+
+function parseYuanPrice(priceStr: string): number {
+  const cleaned = priceStr.replace(/[¥R$\s]/g, "").replace(",", ".");
+  const val = parseFloat(cleaned);
+  return isNaN(val) ? 0 : val;
+}
 
 const Index = () => {
   const { isAdmin, isModerator } = useAuth();
@@ -26,44 +30,43 @@ const Index = () => {
 
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<SortOption>("default");
   const debouncedSearch = useDebounce(search, 300);
 
-  // Build available tags from categories + product tags
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>();
     categories?.forEach((c) => tagSet.add(c.name));
     products?.forEach((p) => {
-      if ((p as any).tags) {
-        ((p as any).tags as string[]).forEach((t) => tagSet.add(t));
-      }
+      if (p.tags) p.tags.forEach((t) => tagSet.add(t));
     });
     return Array.from(tagSet).sort();
   }, [categories, products]);
 
-  // Filter products
   const filteredProducts = useMemo(() => {
     if (!products) return [];
-    return products.filter((p) => {
-      // Text search
+    let result = products.filter((p) => {
       if (debouncedSearch) {
         const q = debouncedSearch.toLowerCase();
         if (!p.name.toLowerCase().includes(q)) return false;
       }
-      // Tag filter
       if (selectedTags.length > 0) {
         const productTags = new Set<string>();
-        if ((p as any).tags) {
-          ((p as any).tags as string[]).forEach((t) => productTags.add(t));
-        }
-        // Also match by category
+        if (p.tags) p.tags.forEach((t) => productTags.add(t));
         const cat = categories?.find((c) => c.id === p.category_id);
         if (cat) productTags.add(cat.name);
-        
         if (!selectedTags.some((tag) => productTags.has(tag))) return false;
       }
       return true;
     });
-  }, [products, debouncedSearch, selectedTags, categories]);
+
+    if (sortBy === "price_asc") {
+      result = [...result].sort((a, b) => parseYuanPrice(a.origin_price) - parseYuanPrice(b.origin_price));
+    } else if (sortBy === "price_desc") {
+      result = [...result].sort((a, b) => parseYuanPrice(b.origin_price) - parseYuanPrice(a.origin_price));
+    }
+
+    return result;
+  }, [products, debouncedSearch, selectedTags, categories, sortBy]);
 
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
@@ -74,6 +77,7 @@ const Index = () => {
   const clearFilters = () => {
     setSearch("");
     setSelectedTags([]);
+    setSortBy("default");
   };
 
   const canManage = isAdmin || isModerator;
@@ -107,23 +111,36 @@ const Index = () => {
         </p>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar produtos..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 pr-9"
-        />
-        {search && (
-          <button
-            onClick={() => setSearch("")}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
+      {/* Search + Sort */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar produtos..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 pr-9"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+        <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+          <SelectTrigger className="w-[180px]">
+            <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
+            <SelectValue placeholder="Ordenar" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Mais recentes</SelectItem>
+            <SelectItem value="price_asc">Menor preço</SelectItem>
+            <SelectItem value="price_desc">Maior preço</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Tag Filters */}
@@ -179,7 +196,7 @@ const Index = () => {
                     name: product.name,
                     image: product.image,
                     originPrice: product.origin_price,
-                    status: product.status as any,
+                    status: product.status,
                     category: categories?.find((c) => c.id === product.category_id)?.name || "",
                     adminNote: product.admin_note || undefined,
                     affiliateLink: product.affiliate_link || undefined,
