@@ -286,6 +286,7 @@ export type Database = {
           image: string
           name: string
           origin_price: string
+          real_photos: string[] | null
           resale_range: string
           status: string
           tags: string[] | null
@@ -302,6 +303,7 @@ export type Database = {
           image: string
           name: string
           origin_price: string
+          real_photos?: string[] | null
           resale_range: string
           status?: string
           tags?: string[] | null
@@ -318,6 +320,7 @@ export type Database = {
           image?: string
           name?: string
           origin_price?: string
+          real_photos?: string[] | null
           resale_range?: string
           status?: string
           tags?: string[] | null
