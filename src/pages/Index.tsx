@@ -169,7 +169,7 @@ const Index = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-page-title">Produtos</h1>
+        <h1 className="text-page-title">Produtos Indicados</h1>
         <p className="text-sm text-muted-foreground">
           Encontre produtos para importação via agente de compras
         </p>
