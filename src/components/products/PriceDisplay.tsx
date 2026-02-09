@@ -31,15 +31,15 @@ export function PriceDisplay({
     : `¥ ${originPrice}`;
 
   const sizeClasses = {
-    sm: { origin: "text-xs text-muted-foreground", converted: "text-sm font-semibold text-primary" },
-    md: { origin: "text-xs text-muted-foreground", converted: "text-[15px] font-bold text-success" },
-    lg: { origin: "text-sm text-muted-foreground", converted: "text-xl font-bold text-success" },
+    sm: { origin: "text-xs font-bold text-muted-foreground", converted: "text-sm font-semibold text-primary" },
+    md: { origin: "text-xs font-bold text-muted-foreground", converted: "text-[15px] font-bold text-success" },
+    lg: { origin: "text-sm font-bold text-muted-foreground", converted: "text-xl font-bold text-success" },
   };
 
   return (
     <div className={className}>
       <div className="flex items-baseline justify-between gap-2">
-        {/* Yuan price - left, small */}
+        {/* Yuan price - left, bold */}
         <span className={sizeClasses[size].origin}>
           Preço China {formattedOrigin}
         </span>

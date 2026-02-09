@@ -109,10 +109,9 @@ const Index = () => {
   };
 
   const handleViewRealPhotos = (card: ProductCardData) => {
-    // TODO: real photos from DB - for now placeholder
     const product = findProduct(card);
-    if (product) {
-      setRealPhotosProduct({ name: product.name, photos: [product.image] });
+    if (product && product.real_photos && product.real_photos.length > 0) {
+      setRealPhotosProduct({ name: product.name, photos: product.real_photos });
       setRealPhotosOpen(true);
     }
   };
@@ -126,6 +125,7 @@ const Index = () => {
     admin_note?: string;
     affiliate_link?: string;
     image: string;
+    real_photos?: string[];
   }) => {
     setIsSubmitting(true);
     try {
@@ -160,7 +160,9 @@ const Index = () => {
     image: p.image,
     originPrice: p.origin_price,
     affiliateLink: p.affiliate_link || undefined,
-    hasRealPhotos: false, // TODO: real photos support
+    hasRealPhotos: (p.real_photos?.length ?? 0) > 0,
+    realPhotosCount: p.real_photos?.length || 0,
+    adminNote: p.admin_note || undefined,
   });
 
   return (

@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { PriceDisplay } from "@/components/products/PriceDisplay";
-import cssbuyLogo from "@/assets/cssbuy-logo.png";
 
 export interface ProductCardData {
   id: string;
@@ -12,6 +11,8 @@ export interface ProductCardData {
   originPrice: string;
   affiliateLink?: string;
   hasRealPhotos?: boolean;
+  realPhotosCount?: number;
+  adminNote?: string;
 }
 
 interface ProductCardProps {
@@ -90,16 +91,31 @@ export function ProductCard({
             <Package className="h-12 w-12 text-muted-foreground/20" strokeWidth={1.5} />
           </div>
         )}
+
+        {/* Real photos badge on image */}
+        {product.hasRealPhotos && product.realPhotosCount && product.realPhotosCount > 0 && (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-md px-2 py-1 text-xs text-foreground">
+            <Camera className="h-3 w-3" />
+            <span>{product.realPhotosCount}</span>
+          </div>
+        )}
       </Link>
 
       {/* Content */}
       <div className="flex flex-1 flex-col pt-3 pb-1 px-1">
-        {/* Name */}
+        {/* Name - bigger and bolder */}
         <Link to={`/produto/${product.id}`}>
-          <h3 className="text-[14px] font-semibold text-foreground line-clamp-2 hover:text-primary transition-colors duration-hover mb-2">
+          <h3 className="text-[15px] font-bold text-foreground line-clamp-2 hover:text-primary transition-colors duration-hover mb-1">
             {product.name}
           </h3>
         </Link>
+
+        {/* Admin note / observations - lighter, below title */}
+        {product.adminNote && (
+          <p className="text-xs text-muted-foreground font-normal line-clamp-2 mb-2">
+            {product.adminNote}
+          </p>
+        )}
 
         {/* Dual price display */}
         <PriceDisplay originPrice={product.originPrice} size="md" className="mb-3" />
@@ -109,16 +125,15 @@ export function ProductCard({
           {product.affiliateLink ? (
             <Button
               size="sm"
-              className="w-full gap-2 font-semibold bg-primary text-primary-foreground hover:bg-primary/90"
+              className="w-full justify-center items-center gap-2 font-bold text-[13px] bg-[hsl(100,55%,40%)] hover:bg-[hsl(100,55%,35%)] text-white"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 window.open(product.affiliateLink, "_blank", "noopener,noreferrer");
               }}
             >
-              <img src={cssbuyLogo} alt="CSSBuy" className="h-4 w-auto" />
               Comprar via CSSBuy
-              <ExternalLink className="h-3 w-3 ml-auto opacity-60" />
+              <ExternalLink className="h-3.5 w-3.5 opacity-70" />
             </Button>
           ) : (
             <Button variant="outline" size="sm" className="w-full" asChild>
@@ -126,8 +141,8 @@ export function ProductCard({
             </Button>
           )}
 
-          {/* Real photos link */}
-          {product.hasRealPhotos && (
+          {/* Real photos link with counter */}
+          {product.hasRealPhotos && product.realPhotosCount && product.realPhotosCount > 0 && (
             <button
               className="w-full flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors py-1"
               onClick={(e) => {
@@ -137,7 +152,7 @@ export function ProductCard({
               }}
             >
               <Camera className="h-3 w-3" />
-              Ver fotos reais
+              Ver fotos reais ({product.realPhotosCount})
             </button>
           )}
         </div>
