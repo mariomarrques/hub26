@@ -71,7 +71,7 @@ const AdminNavLinks = () => {
   };
 
   return (
-    <AdminLayout title="Links de Navegação" description="Configure os links externos da navbar">
+    <AdminLayout>
       <div className="space-y-8">
         {positions.map((position) => {
           const links = navLinks.filter((l) => l.position === position);

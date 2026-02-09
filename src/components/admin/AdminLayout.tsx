@@ -9,6 +9,7 @@ const adminTabs = [
   { value: "/admin/notificacoes", label: "Notificações", icon: Bell },
   { value: "/admin/posts", label: "Posts", icon: MessageSquare },
   { value: "/admin/logs", label: "Logs", icon: History },
+  { value: "/admin/links", label: "Links", icon: Link2 },
 ];
 
 interface AdminLayoutProps {
