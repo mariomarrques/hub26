@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { GlobalSearch } from "@/components/search/GlobalSearch";
+
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSidebarContext } from "@/contexts/SidebarContext";
