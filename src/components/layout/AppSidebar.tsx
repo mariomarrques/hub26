@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  Home,
   Package,
-  Store,
   Users,
   Bell,
   MessageSquare,
   Shield,
-  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,19 +13,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import { useAdminPosts } from "@/hooks/use-community-posts";
-import { ComingSoonDialog } from "@/components/ui/coming-soon-dialog";
 
 interface NavItem {
   name: string;
   href: string;
   icon: React.ElementType;
-  comingSoon?: boolean;
 }
 
 const navigation: NavItem[] = [
-  { name: "Home", href: "/", icon: Home },
   { name: "Produtos", href: "/produtos", icon: Package },
-  { name: "Bazar do Marin", href: "/bazar", icon: Store, comingSoon: true },
   { name: "Fornecedores", href: "/fornecedores", icon: Users },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare },
   { name: "Avisos", href: "/avisos", icon: Bell },

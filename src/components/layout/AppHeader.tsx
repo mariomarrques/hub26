@@ -67,8 +67,8 @@ export function AppHeader() {
           </Link>
         </div>
 
-        {/* Search */}
-        <GlobalSearch className="flex-1 max-w-[400px]" />
+        {/* Spacer */}
+        <div className="flex-1" />
 
         {/* Right side: Theme Toggle + Notifications + User Menu */}
         <div className="flex items-center gap-sm">
