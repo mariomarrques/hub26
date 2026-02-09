@@ -119,6 +119,14 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/videos"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Videos /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 
                 {/* Admin routes */}
                 <Route
