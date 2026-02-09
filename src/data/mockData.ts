@@ -119,7 +119,7 @@ export const mockProducts: Product[] = [
     name: "Tênis Nike Air Force Inspired",
     image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80",
     originPrice: "R$ 89,00",
-    resaleRange: "R$ 200 - 280",
+    
     status: "trending",
     category: "Calçados",
     adminNote: "Alta demanda no inverno. Verificar tamanhos disponíveis.",
