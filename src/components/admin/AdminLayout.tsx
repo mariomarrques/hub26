@@ -1,6 +1,6 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, Bell, History, MessageSquare, Package } from "lucide-react";
+import { LayoutDashboard, Users, Bell, History, MessageSquare, Package, Link2 } from "lucide-react";
 
 const adminTabs = [
   { value: "/admin", label: "Dashboard", icon: LayoutDashboard },
