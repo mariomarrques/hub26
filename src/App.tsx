@@ -177,6 +177,14 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/admin/links"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminNavLinks /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 
                 <Route path="*" element={<NotFound />} />
               </Routes>
