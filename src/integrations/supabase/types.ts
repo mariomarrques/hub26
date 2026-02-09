@@ -164,6 +164,39 @@ export type Database = {
         }
         Relationships: []
       }
+      nav_links: {
+        Row: {
+          id: string
+          is_external: boolean
+          key: string
+          label: string
+          position: string
+          sort_order: number
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          id?: string
+          is_external?: boolean
+          key: string
+          label: string
+          position: string
+          sort_order?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          id?: string
+          is_external?: boolean
+          key?: string
+          label?: string
+          position?: string
+          sort_order?: number
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -456,6 +489,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      videos: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          tags: string[] | null
+          thumbnail_url: string | null
+          title: string
+          video_url: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title: string
+          video_url: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          title?: string
+          video_url?: string
         }
         Relationships: []
       }
