@@ -1,21 +1,25 @@
 import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { Home, Search, X, Package, AlertTriangle, ArrowUpDown } from "lucide-react";
-import {
-  Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { ProductCard } from "@/components/products/ProductCard";
+import { Search, X, Package, AlertTriangle, SlidersHorizontal } from "lucide-react";
+import { ProductCard, type ProductCardData } from "@/components/products/ProductCard";
 import { ProductCardSkeleton } from "@/components/products/ProductCardSkeleton";
-import { useProducts } from "@/hooks/use-products";
+import { RealPhotosDialog } from "@/components/products/RealPhotosDialog";
+import { ProductFormDialog } from "@/components/admin/ProductFormDialog";
+import { useProducts, type Product } from "@/hooks/use-products";
 import { useCategories } from "@/hooks/use-categories";
 import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useDebounce } from "@/hooks/use-debounce";
+import { toast } from "sonner";
 
-type SortOption = "default" | "price_asc" | "price_desc";
+type SortOption = "default" | "recent" | "price_asc" | "price_desc";
 
 function parseYuanPrice(priceStr: string): number {
   const cleaned = priceStr.replace(/[¥R$\s]/g, "").replace(",", ".");
@@ -25,93 +29,151 @@ function parseYuanPrice(priceStr: string): number {
 
 const Index = () => {
   const { isAdmin, isModerator } = useAuth();
-  const { data: products, isLoading, error } = useProducts();
+  const { data: products, isLoading, error, createProduct, updateProduct, deleteProduct } = useProducts();
   const { categories } = useCategories();
+  const canManage = isAdmin || isModerator;
 
+  // Filters
   const [search, setSearch] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const debouncedSearch = useDebounce(search, 300);
 
-  const availableTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    categories?.forEach((c) => tagSet.add(c.name));
-    products?.forEach((p) => {
-      if (p.tags) p.tags.forEach((t) => tagSet.add(t));
-    });
-    return Array.from(tagSet).sort();
-  }, [categories, products]);
+  // Admin dialogs
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [duplicatingProduct, setDuplicatingProduct] = useState<Product | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<ProductCardData | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Real photos
+  const [realPhotosOpen, setRealPhotosOpen] = useState(false);
+  const [realPhotosProduct, setRealPhotosProduct] = useState<{ name: string; photos: string[] }>({ name: "", photos: [] });
 
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     let result = products.filter((p) => {
       if (debouncedSearch) {
-        const q = debouncedSearch.toLowerCase();
-        if (!p.name.toLowerCase().includes(q)) return false;
+        if (!p.name.toLowerCase().includes(debouncedSearch.toLowerCase())) return false;
       }
-      if (selectedTags.length > 0) {
-        const productTags = new Set<string>();
-        if (p.tags) p.tags.forEach((t) => productTags.add(t));
-        const cat = categories?.find((c) => c.id === p.category_id);
-        if (cat) productTags.add(cat.name);
-        if (!selectedTags.some((tag) => productTags.has(tag))) return false;
+      if (categoryFilter !== "all") {
+        if (p.category_id !== categoryFilter) return false;
       }
       return true;
     });
 
-    if (sortBy === "price_asc") {
-      result = [...result].sort((a, b) => parseYuanPrice(a.origin_price) - parseYuanPrice(b.origin_price));
-    } else if (sortBy === "price_desc") {
-      result = [...result].sort((a, b) => parseYuanPrice(b.origin_price) - parseYuanPrice(a.origin_price));
+    switch (sortBy) {
+      case "recent":
+        result = [...result].sort((a, b) =>
+          new Date(b.updated_at || b.created_at || "").getTime() - new Date(a.updated_at || a.created_at || "").getTime()
+        );
+        break;
+      case "price_asc":
+        result = [...result].sort((a, b) => parseYuanPrice(a.origin_price) - parseYuanPrice(b.origin_price));
+        break;
+      case "price_desc":
+        result = [...result].sort((a, b) => parseYuanPrice(b.origin_price) - parseYuanPrice(a.origin_price));
+        break;
     }
 
     return result;
-  }, [products, debouncedSearch, selectedTags, categories, sortBy]);
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
+  }, [products, debouncedSearch, categoryFilter, sortBy]);
 
   const clearFilters = () => {
     setSearch("");
-    setSelectedTags([]);
+    setCategoryFilter("all");
     setSortBy("default");
   };
 
-  const canManage = isAdmin || isModerator;
-  const hasActiveFilters = debouncedSearch || selectedTags.length > 0;
+  const hasActiveFilters = !!debouncedSearch || categoryFilter !== "all";
+
+  // Admin handlers
+  const findProduct = (card: ProductCardData) => products?.find((p) => p.id === card.id) || null;
+
+  const handleEdit = (card: ProductCardData) => {
+    setDuplicatingProduct(null);
+    setEditingProduct(findProduct(card));
+    setFormOpen(true);
+  };
+
+  const handleDuplicate = (card: ProductCardData) => {
+    setEditingProduct(null);
+    setDuplicatingProduct(findProduct(card));
+    setFormOpen(true);
+  };
+
+  const handleDeleteClick = (card: ProductCardData) => {
+    setProductToDelete(card);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleViewRealPhotos = (card: ProductCardData) => {
+    // TODO: real photos from DB - for now placeholder
+    const product = findProduct(card);
+    if (product) {
+      setRealPhotosProduct({ name: product.name, photos: [product.image] });
+      setRealPhotosOpen(true);
+    }
+  };
+
+  const handleFormSubmit = async (data: {
+    name: string;
+    origin_price: string;
+    resale_range: string;
+    status: string;
+    category_id: string;
+    admin_note?: string;
+    affiliate_link?: string;
+    image: string;
+  }) => {
+    setIsSubmitting(true);
+    try {
+      if (editingProduct && !duplicatingProduct) {
+        await updateProduct.mutateAsync({ id: editingProduct.id, ...data });
+      } else {
+        await createProduct.mutateAsync(data);
+      }
+      setFormOpen(false);
+      setDuplicatingProduct(null);
+    } catch (error) {
+      console.error("Error saving product:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!productToDelete) return;
+    try {
+      await deleteProduct.mutateAsync(productToDelete.id);
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
+    } catch {
+      toast.error("Erro ao excluir produto");
+    }
+  };
+
+  const mapToCardData = (p: Product): ProductCardData => ({
+    id: p.id,
+    name: p.name,
+    image: p.image,
+    originPrice: p.origin_price,
+    affiliateLink: p.affiliate_link || undefined,
+    hasRealPhotos: false, // TODO: real photos support
+  });
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
-      <Breadcrumb className="animate-fade-in">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link to="/" className="flex items-center gap-1">
-                <Home className="h-4 w-4" />
-                Home
-              </Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Produtos</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-page-title">Produtos</h1>
         <p className="text-sm text-muted-foreground">
-          Encontre produtos para revenda através do seu agente de compras
+          Encontre produtos para importação via agente de compras
         </p>
       </div>
 
-      {/* Search + Sort */}
+      {/* Filters bar */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -130,42 +192,41 @@ const Index = () => {
             </button>
           )}
         </div>
+
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SlidersHorizontal className="h-4 w-4 mr-2 text-muted-foreground" />
+            <SelectValue placeholder="Categoria" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todas categorias</SelectItem>
+            {categories.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
-          <SelectTrigger className="w-[180px]">
-            <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Ordenar" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="default">Mais recentes</SelectItem>
-            <SelectItem value="price_asc">Menor preço</SelectItem>
-            <SelectItem value="price_desc">Maior preço</SelectItem>
+            <SelectItem value="recent">Modificados recentemente</SelectItem>
+            <SelectItem value="price_desc">Mais caro (¥)</SelectItem>
+            <SelectItem value="price_asc">Mais barato (¥)</SelectItem>
           </SelectContent>
         </Select>
+
+        {hasActiveFilters && (
+          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-xs text-muted-foreground self-center">
+            <X className="h-3 w-3 mr-1" />
+            Limpar
+          </Button>
+        )}
       </div>
 
-      {/* Tag Filters */}
-      {availableTags.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {availableTags.map((tag) => (
-            <Badge
-              key={tag}
-              variant={selectedTags.includes(tag) ? "default" : "outline"}
-              className="cursor-pointer transition-colors hover:bg-primary/20"
-              onClick={() => toggleTag(tag)}
-            >
-              {tag}
-            </Badge>
-          ))}
-          {hasActiveFilters && (
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-6 text-xs text-muted-foreground">
-              <X className="h-3 w-3 mr-1" />
-              Limpar filtros
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Error State */}
+      {/* Error */}
       {error && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
@@ -174,7 +235,7 @@ const Index = () => {
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading */}
       {isLoading && (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -183,7 +244,7 @@ const Index = () => {
         </div>
       )}
 
-      {/* Product Grid */}
+      {/* Grid */}
       {!isLoading && !error && (
         <>
           {filteredProducts.length > 0 ? (
@@ -191,30 +252,25 @@ const Index = () => {
               {filteredProducts.map((product, index) => (
                 <ProductCard
                   key={product.id}
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    image: product.image,
-                    originPrice: product.origin_price,
-                    status: product.status,
-                    category: categories?.find((c) => c.id === product.category_id)?.name || "",
-                    adminNote: product.admin_note || undefined,
-                    affiliateLink: product.affiliate_link || undefined,
-                  }}
+                  product={mapToCardData(product)}
                   index={index}
                   canManage={canManage}
+                  onEdit={handleEdit}
+                  onDelete={handleDeleteClick}
+                  onDuplicate={handleDuplicate}
+                  onViewRealPhotos={handleViewRealPhotos}
                 />
               ))}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <Package className="h-12 w-12 text-muted-foreground/30 mb-4" strokeWidth={1.5} />
+              <Package className="h-12 w-12 text-muted-foreground/20 mb-4" strokeWidth={1.5} />
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {hasActiveFilters ? "Nenhum produto encontrado" : "Nenhum produto disponível"}
               </h3>
               <p className="text-sm text-muted-foreground max-w-sm">
                 {hasActiveFilters
-                  ? "Tente ajustar seus filtros ou busca para encontrar o que procura."
+                  ? "Tente ajustar seus filtros ou busca."
                   : "Novos produtos serão adicionados em breve."}
               </p>
               {hasActiveFilters && (
@@ -226,6 +282,45 @@ const Index = () => {
           )}
         </>
       )}
+
+      {/* Admin: Form Dialog */}
+      {canManage && (
+        <ProductFormDialog
+          open={formOpen}
+          onOpenChange={(open) => {
+            setFormOpen(open);
+            if (!open) setDuplicatingProduct(null);
+          }}
+          product={duplicatingProduct || editingProduct}
+          onSubmit={handleFormSubmit}
+          isLoading={isSubmitting}
+          isDuplicating={!!duplicatingProduct}
+        />
+      )}
+
+      {/* Admin: Delete Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir produto</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir "{productToDelete?.name}"? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Excluir</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Real Photos Dialog */}
+      <RealPhotosDialog
+        open={realPhotosOpen}
+        onOpenChange={setRealPhotosOpen}
+        productName={realPhotosProduct.name}
+        photos={realPhotosProduct.photos}
+      />
     </div>
   );
 };
