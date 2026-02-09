@@ -141,7 +141,7 @@ export const mockProducts: Product[] = [
     name: "Camiseta Oversized Streetwear",
     image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80",
     originPrice: "R$ 28,00",
-    resaleRange: "R$ 75 - 110",
+    
     status: "hot",
     category: "Camisas",
     adminNote: "Best-seller absoluto. Não falta estoque.",
