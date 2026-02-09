@@ -1,4 +1,3 @@
-import { Product } from "@/components/products/ProductCard";
 import { UserProfile } from "@/types/member";
 import { Notification } from "@/types/notification";
 
@@ -99,74 +98,6 @@ export const mockMembers: UserProfile[] = [
     name: "Lucas Almeida",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&q=80",
     tier: "member",
-  },
-];
-
-export const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "Camisa Polo Premium Lacoste Style",
-    image: "https://images.unsplash.com/photo-1625910513413-5fc7974e9b3c?w=400&q=80",
-    originPrice: "R$ 45,00",
-    
-    status: "hot",
-    category: "Camisas",
-    adminNote: "Giro testado em 3 cidades. Estoque na China com entrega rápida.",
-    affiliateLink: "#",
-  },
-  {
-    id: "2",
-    name: "Tênis Nike Air Force Inspired",
-    image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80",
-    originPrice: "R$ 89,00",
-    
-    status: "trending",
-    category: "Calçados",
-    adminNote: "Alta demanda no inverno. Verificar tamanhos disponíveis.",
-    affiliateLink: "#",
-  },
-  {
-    id: "3",
-    name: "Relógio Casual Minimalista",
-    image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80",
-    originPrice: "R$ 32,00",
-    
-    status: "new",
-    category: "Acessórios",
-    adminNote: "Novo no catálogo. Ótimo para testar mercado.",
-    affiliateLink: "#",
-  },
-  {
-    id: "4",
-    name: "Camiseta Oversized Streetwear",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80",
-    originPrice: "R$ 28,00",
-    
-    status: "hot",
-    category: "Camisas",
-    adminNote: "Best-seller absoluto. Não falta estoque.",
-    affiliateLink: "#",
-  },
-  {
-    id: "5",
-    name: "Óculos de Sol Vintage",
-    image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80",
-    originPrice: "R$ 18,00",
-    
-    status: "trending",
-    category: "Acessórios",
-    affiliateLink: "#",
-  },
-  {
-    id: "6",
-    name: "Bolsa Crossbody Compacta",
-    image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80",
-    originPrice: "R$ 42,00",
-    
-    status: "new",
-    category: "Acessórios",
-    adminNote: "Perfeita para público jovem. Cores vibrantes disponíveis.",
-    affiliateLink: "#",
   },
 ];
 
