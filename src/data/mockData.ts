@@ -152,7 +152,7 @@ export const mockProducts: Product[] = [
     name: "Óculos de Sol Vintage",
     image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80",
     originPrice: "R$ 18,00",
-    resaleRange: "R$ 55 - 85",
+    
     status: "trending",
     category: "Acessórios",
     affiliateLink: "#",
