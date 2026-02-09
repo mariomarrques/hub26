@@ -162,7 +162,7 @@ export const mockProducts: Product[] = [
     name: "Bolsa Crossbody Compacta",
     image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80",
     originPrice: "R$ 42,00",
-    resaleRange: "R$ 110 - 150",
+    
     status: "new",
     category: "Acessórios",
     adminNote: "Perfeita para público jovem. Cores vibrantes disponíveis.",

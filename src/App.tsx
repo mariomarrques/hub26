@@ -11,8 +11,6 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Bazar from "./pages/Bazar";
-import Busca from "./pages/Busca";
-import Fornecedores from "./pages/Fornecedores";
 import Avisos from "./pages/Avisos";
 import Comunidade from "./pages/Comunidade";
 import Perfil from "./pages/Perfil";
