@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Package, Store, Users, MessageSquare, Bell, Sparkles } from "lucide-react";
+import { Package, Store, Users, MessageSquare, Bell, Sparkles, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ComingSoonDialog } from "@/components/ui/coming-soon-dialog";
@@ -14,7 +14,8 @@ interface NavigationItem {
 }
 
 const navigationItems: NavigationItem[] = [
-  { name: "Produtos", href: "/produtos", icon: Package, color: "cyan" },
+  { name: "Produtos Indicados", href: "/produtos", icon: Package, color: "cyan" },
+  { name: "Vídeos", href: "/videos", icon: Video, color: "blue" },
   { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "amber", comingSoon: true },
   { name: "Fornecedores", href: "/fornecedores", icon: Users, color: "blue" },
   { name: "Comunidade", href: "/comunidade", icon: MessageSquare, color: "teal" },

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+
 import { AppLayout } from "@/components/layout/AppLayout";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -27,7 +28,8 @@ import AdminProducts from "./pages/admin/AdminProducts";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminPosts from "./pages/admin/AdminPosts";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
-
+import AdminNavLinks from "./pages/admin/AdminNavLinks";
+import Videos from "./pages/Videos";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -117,6 +119,14 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
+                <Route
+                  path="/videos"
+                  element={
+                    <ProtectedRoute>
+                      <AppLayout><Videos /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 
                 {/* Admin routes */}
                 <Route
@@ -164,6 +174,14 @@ const App = () => (
                   element={
                     <ProtectedRoute requiredRole="admin">
                       <AppLayout><AdminAuditLogs /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/links"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminNavLinks /></AppLayout>
                     </ProtectedRoute>
                   }
                 />
