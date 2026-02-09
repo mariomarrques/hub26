@@ -281,12 +281,14 @@ export type Database = {
           category_id: string | null
           created_at: string | null
           created_by: string | null
+          description: string | null
           id: string
           image: string
           name: string
           origin_price: string
           resale_range: string
           status: string
+          tags: string[] | null
           updated_at: string | null
         }
         Insert: {
@@ -295,12 +297,14 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          description?: string | null
           id?: string
           image: string
           name: string
           origin_price: string
           resale_range: string
           status?: string
+          tags?: string[] | null
           updated_at?: string | null
         }
         Update: {
@@ -309,12 +313,14 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           created_by?: string | null
+          description?: string | null
           id?: string
           image?: string
           name?: string
           origin_price?: string
           resale_range?: string
           status?: string
+          tags?: string[] | null
           updated_at?: string | null
         }
         Relationships: [
