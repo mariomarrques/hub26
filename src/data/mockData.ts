@@ -108,7 +108,7 @@ export const mockProducts: Product[] = [
     name: "Camisa Polo Premium Lacoste Style",
     image: "https://images.unsplash.com/photo-1625910513413-5fc7974e9b3c?w=400&q=80",
     originPrice: "R$ 45,00",
-    resaleRange: "R$ 120 - 180",
+    
     status: "hot",
     category: "Camisas",
     adminNote: "Giro testado em 3 cidades. Estoque na China com entrega rápida.",
