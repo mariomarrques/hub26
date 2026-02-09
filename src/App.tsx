@@ -11,14 +11,12 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Home from "./pages/Home";
 import Index from "./pages/Index";
 import Bazar from "./pages/Bazar";
-import Busca from "./pages/Busca";
 import Fornecedores from "./pages/Fornecedores";
 import Avisos from "./pages/Avisos";
 import Comunidade from "./pages/Comunidade";
 import Perfil from "./pages/Perfil";
 import EditarPerfil from "./pages/EditarPerfil";
 import Configuracoes from "./pages/Configuracoes";
-import Categoria from "./pages/Categoria";
 import Produto from "./pages/Produto";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -60,22 +58,6 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <AppLayout><Index /></AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/bazar"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout><Bazar /></AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/busca"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout><Busca /></AppLayout>
                     </ProtectedRoute>
                   }
                 />
@@ -124,14 +106,6 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <AppLayout><Configuracoes /></AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/categoria/:slug"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout><Categoria /></AppLayout>
                     </ProtectedRoute>
                   }
                 />

@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { GlobalSearch } from "@/components/search/GlobalSearch";
+
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSidebarContext } from "@/contexts/SidebarContext";
@@ -67,8 +67,8 @@ export function AppHeader() {
           </Link>
         </div>
 
-        {/* Search */}
-        <GlobalSearch className="flex-1 max-w-[400px]" />
+        {/* Spacer */}
+        <div className="flex-1" />
 
         {/* Right side: Theme Toggle + Notifications + User Menu */}
         <div className="flex items-center gap-sm">

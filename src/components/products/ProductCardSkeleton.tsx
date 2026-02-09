@@ -4,9 +4,8 @@ export function ProductCardSkeleton() {
   return (
     <div className="flex flex-col overflow-hidden rounded-card border border-border bg-card animate-pulse">
       {/* Image skeleton */}
-      <div className="relative aspect-[4/3] bg-panel">
+      <div className="relative aspect-square bg-panel">
         <Skeleton className="h-full w-full rounded-none" />
-        {/* Status tag skeleton */}
         <div className="absolute left-sm top-sm">
           <Skeleton className="h-5 w-16 rounded-full" />
         </div>
@@ -15,23 +14,14 @@ export function ProductCardSkeleton() {
       {/* Content skeleton */}
       <div className="flex flex-1 flex-col p-md">
         {/* Category */}
-        <Skeleton className="h-3 w-20 mb-xs" />
+        <Skeleton className="h-3 w-20 mb-1" />
 
         {/* Name */}
         <Skeleton className="h-5 w-full mb-1" />
-        <Skeleton className="h-5 w-3/4 mb-sm" />
+        <Skeleton className="h-5 w-3/4 mb-2" />
 
-        {/* Pricing */}
-        <div className="mb-md space-y-xs">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-3 w-12" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-3 w-14" />
-            <Skeleton className="h-4 w-20" />
-          </div>
-        </div>
+        {/* Price */}
+        <Skeleton className="h-4 w-16 mb-3" />
 
         {/* Button */}
         <div className="mt-auto">

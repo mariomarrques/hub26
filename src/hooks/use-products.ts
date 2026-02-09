@@ -19,6 +19,8 @@ export interface Product {
   category_id: string | null;
   admin_note: string | null;
   affiliate_link: string | null;
+  description: string | null;
+  tags: string[] | null;
   created_at: string | null;
   updated_at: string | null;
 }

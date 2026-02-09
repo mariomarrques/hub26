@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Tag, TrendingUp, Flame, Sparkles } from "lucide-react";
+import { ArrowLeft, ExternalLink, Tag, TrendingUp, Flame, Sparkles, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useProduct } from "@/hooks/use-products";
 import { RelatedProducts } from "@/components/products/RelatedProducts";
-import { PriceDisplay } from "@/components/products/PriceDisplay";
+import cssbuyLogo from "@/assets/cssbuy-logo.png";
 
 const statusConfig: Record<string, { label: string; icon: React.ElementType; className: string }> = {
   hot: { label: "Hot", icon: Flame, className: "bg-orange-500/10 text-orange-500 border-orange-500/20" },
@@ -26,6 +26,11 @@ export default function Produto() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: product, isLoading, error } = useProduct(id || "");
+
+  // Format price
+  const formattedPrice = product
+    ? product.origin_price.includes("¥") ? product.origin_price : `¥ ${product.origin_price}`
+    : "";
 
   if (isLoading) {
     return (
@@ -51,14 +56,14 @@ export default function Produto() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar
         </Button>
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground">Produto não encontrado.</p>
-            <Button variant="outline" onClick={() => navigate("/busca")} className="mt-4">
-              Ir para busca
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Package className="h-12 w-12 text-muted-foreground/30 mb-4" strokeWidth={1.5} />
+          <h3 className="text-lg font-semibold text-foreground mb-2">Produto não encontrado</h3>
+          <p className="text-sm text-muted-foreground">Este produto pode ter sido removido.</p>
+          <Button variant="outline" onClick={() => navigate("/produtos")} className="mt-4">
+            Ver todos os produtos
+          </Button>
+        </div>
       </div>
     );
   }
@@ -79,7 +84,7 @@ export default function Produto() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to="/busca">Busca</Link>
+              <Link to="/produtos">Produtos</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -99,17 +104,16 @@ export default function Produto() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="relative">
-          <div className="aspect-square overflow-hidden rounded-xl border bg-muted">
+          <div className="aspect-square overflow-hidden rounded-xl border bg-panel">
             <img
               src={product.image}
               alt={product.name}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-contain"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = "/placeholder.svg";
               }}
             />
           </div>
-          {/* Status Badge on Image */}
           <Badge className={`absolute top-4 left-4 ${status.className}`}>
             <StatusIcon className="mr-1 h-3 w-3" />
             {status.label}
@@ -120,13 +124,10 @@ export default function Produto() {
         <div className="flex flex-col">
           {/* Category */}
           {product.category && (
-            <Link 
-              to={`/categoria/${product.category.slug}`}
-              className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
-            >
-              <Tag className="mr-1.5 h-3.5 w-3.5" />
+            <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground mb-2">
+              <Tag className="inline mr-1.5 h-3.5 w-3.5" />
               {product.category.name}
-            </Link>
+            </span>
           )}
 
           {/* Product Name */}
@@ -134,20 +135,20 @@ export default function Produto() {
             {product.name}
           </h1>
 
-          {/* Pricing Card */}
+          {/* Price - simple */}
           <Card className="mb-6">
-            <CardContent className="p-4 space-y-3">
-              <div className="flex justify-between items-center gap-4">
-                <span className="text-sm text-muted-foreground shrink-0">Preço de Origem</span>
-                <PriceDisplay originPrice={product.origin_price} size="md" className="text-right" />
-              </div>
-              <div className="border-t" />
+            <CardContent className="p-4">
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">Faixa de Revenda</span>
-                <span className="font-semibold text-primary">R$ {product.resale_range}</span>
+                <span className="text-sm text-muted-foreground">Preço de Origem</span>
+                <span className="text-lg font-semibold">{formattedPrice}</span>
               </div>
             </CardContent>
           </Card>
+
+          {/* Description */}
+          {product.description && (
+            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{product.description}</p>
+          )}
 
           {/* Admin Note */}
           {product.admin_note && (
@@ -166,16 +167,17 @@ export default function Produto() {
             </Card>
           )}
 
-          {/* CTA Button */}
+          {/* CTA Button - Comprar via Agente */}
           <div className="mt-auto">
             {product.affiliate_link && product.affiliate_link !== "#" ? (
               <Button 
                 size="lg" 
-                className="w-full"
-                onClick={() => window.open(product.affiliate_link!, "_blank")}
+                className="w-full gap-3 font-semibold text-base"
+                onClick={() => window.open(product.affiliate_link!, "_blank", "noopener,noreferrer")}
               >
-                Ver na Loja
-                <ExternalLink className="ml-2 h-4 w-4" />
+                <img src={cssbuyLogo} alt="CSSBuy" className="h-5 w-auto" />
+                Comprar via Agente
+                <ExternalLink className="h-4 w-4" />
               </Button>
             ) : (
               <Button size="lg" className="w-full" disabled>
@@ -184,7 +186,7 @@ export default function Produto() {
             )}
           </div>
 
-          {/* Timestamps */}
+          {/* Timestamp */}
           <p className="text-xs text-muted-foreground mt-4 text-center">
             Adicionado em {new Date(product.created_at || "").toLocaleDateString("pt-BR")}
           </p>

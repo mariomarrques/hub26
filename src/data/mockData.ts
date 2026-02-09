@@ -108,7 +108,7 @@ export const mockProducts: Product[] = [
     name: "Camisa Polo Premium Lacoste Style",
     image: "https://images.unsplash.com/photo-1625910513413-5fc7974e9b3c?w=400&q=80",
     originPrice: "R$ 45,00",
-    resaleRange: "R$ 120 - 180",
+    
     status: "hot",
     category: "Camisas",
     adminNote: "Giro testado em 3 cidades. Estoque na China com entrega rápida.",
@@ -119,7 +119,7 @@ export const mockProducts: Product[] = [
     name: "Tênis Nike Air Force Inspired",
     image: "https://images.unsplash.com/photo-1600269452121-4f2416e55c28?w=400&q=80",
     originPrice: "R$ 89,00",
-    resaleRange: "R$ 200 - 280",
+    
     status: "trending",
     category: "Calçados",
     adminNote: "Alta demanda no inverno. Verificar tamanhos disponíveis.",
@@ -130,7 +130,7 @@ export const mockProducts: Product[] = [
     name: "Relógio Casual Minimalista",
     image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=400&q=80",
     originPrice: "R$ 32,00",
-    resaleRange: "R$ 89 - 120",
+    
     status: "new",
     category: "Acessórios",
     adminNote: "Novo no catálogo. Ótimo para testar mercado.",
@@ -141,7 +141,7 @@ export const mockProducts: Product[] = [
     name: "Camiseta Oversized Streetwear",
     image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&q=80",
     originPrice: "R$ 28,00",
-    resaleRange: "R$ 75 - 110",
+    
     status: "hot",
     category: "Camisas",
     adminNote: "Best-seller absoluto. Não falta estoque.",
@@ -152,7 +152,7 @@ export const mockProducts: Product[] = [
     name: "Óculos de Sol Vintage",
     image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=400&q=80",
     originPrice: "R$ 18,00",
-    resaleRange: "R$ 55 - 85",
+    
     status: "trending",
     category: "Acessórios",
     affiliateLink: "#",
@@ -162,7 +162,7 @@ export const mockProducts: Product[] = [
     name: "Bolsa Crossbody Compacta",
     image: "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&q=80",
     originPrice: "R$ 42,00",
-    resaleRange: "R$ 110 - 150",
+    
     status: "new",
     category: "Acessórios",
     adminNote: "Perfeita para público jovem. Cores vibrantes disponíveis.",
