@@ -109,31 +109,6 @@ export function AppSidebar() {
           {navigation.map((item, index) => {
             const isActive = location.pathname === item.href;
             
-            if (item.comingSoon) {
-              return (
-                <div
-                  key={item.name}
-                  onClick={() => handleComingSoonClick(item)}
-                  className={cn(
-                    "group flex items-center gap-sm rounded-nav px-md py-sm h-nav-item text-[14px] font-medium cursor-pointer transition-all duration-hover ease-hover",
-                    "text-text-secondary hover:bg-hover hover:text-foreground"
-                  )}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <item.icon
-                    className="h-[18px] w-[18px] flex-shrink-0 text-text-muted group-hover:text-foreground transition-colors"
-                    strokeWidth={1.5}
-                  />
-                  <span className="truncate">{item.name}</span>
-                  {/* Badge "Em breve" */}
-                  <span className="ml-auto flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-amber-500/15 text-amber-500 border border-amber-500/25">
-                    <Sparkles className="h-2.5 w-2.5" />
-                    Breve
-                  </span>
-                </div>
-              );
-            }
-            
             return (
               <NavLink
                 key={item.name}
@@ -206,12 +181,6 @@ export function AppSidebar() {
           )}
         </nav>
       </aside>
-
-      <ComingSoonDialog 
-        open={showComingSoon} 
-        onOpenChange={setShowComingSoon}
-        featureName={comingSoonFeature}
-      />
     </>
   );
 }

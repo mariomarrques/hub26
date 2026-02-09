@@ -112,14 +112,6 @@ const App = () => (
                   }
                 />
                 <Route
-                  path="/categoria/:slug"
-                  element={
-                    <ProtectedRoute>
-                      <AppLayout><Categoria /></AppLayout>
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
                   path="/produto/:id"
                   element={
                     <ProtectedRoute>
