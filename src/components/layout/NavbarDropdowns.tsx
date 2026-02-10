@@ -43,17 +43,21 @@ export function CSSBuyDropdown({ className }: DropdownProps) {
 
   return (
     <div className={cn(
-      "absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50",
-      "w-52 bg-card border border-border rounded-xl shadow-xl p-2",
-      "animate-fade-in",
+      "absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50",
       className
     )}>
-      {links.map((link) => (
-        <DropdownItem key={link.id} link={link} />
-      ))}
-      {links.length === 0 && (
-        <p className="text-xs text-muted-foreground p-3 text-center">Nenhum link configurado</p>
-      )}
+      <div className="w-56 bg-card border border-border rounded-xl shadow-xl p-2">
+        {links.map((link) => (
+          <DropdownItem
+            key={link.id}
+            link={link}
+            highlight={link.key === "cssbuy_fornecedor"}
+          />
+        ))}
+        {links.length === 0 && (
+          <p className="text-xs text-muted-foreground p-3 text-center">Nenhum link configurado</p>
+        )}
+      </div>
     </div>
   );
 }
