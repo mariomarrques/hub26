@@ -77,7 +77,7 @@ export function AppHeader() {
         </Link>
 
         {/* Center Nav - Dynamic from DB */}
-        <nav className="flex items-center gap-0.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-full px-1.5 py-1">
+        <nav className="flex items-center gap-0.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-full px-1.5 py-1 overflow-x-auto max-w-[55vw] md:max-w-none scrollbar-none">
           {navbarItems.map((item) => {
             const Icon = ICON_MAP[item.key] || LayoutGrid;
             const active = isActive(item);
