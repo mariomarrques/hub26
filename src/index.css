@@ -258,9 +258,9 @@
     background-size: 40px 40px;
   }
 
-  /* Radial gradient for home */
+  /* Radial gradient for home — uses opacity to avoid solid color block */
   .bg-gradient-radial {
-    background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
+    background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.5) 70%);
   }
 
   /* Global ambient background gradient */
@@ -277,6 +277,13 @@
       radial-gradient(ellipse 80% 50% at 20% 0%, hsl(174 80% 25% / 0.12) 0%, transparent 60%),
       radial-gradient(ellipse 60% 40% at 80% 100%, hsl(174 70% 30% / 0.08) 0%, transparent 50%),
       radial-gradient(ellipse 50% 60% at 50% 50%, hsl(200 60% 15% / 0.06) 0%, transparent 70%);
+  }
+  /* Light mode ambient — teal tints over light background */
+  .light .bg-ambient::before {
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 0%, hsl(174 60% 40% / 0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, hsl(174 50% 45% / 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse 50% 60% at 50% 50%, hsl(200 40% 50% / 0.04) 0%, transparent 70%);
   }
 
   /* Glass card surface */
@@ -336,7 +343,14 @@
   }
 
   .card-hover:hover {
-    background-color: hsl(var(--hover-background));
+    background-color: hsl(var(--hover-background) / 0.6);
+    box-shadow: 0 0 20px -8px hsl(var(--glow));
+  }
+
+  /* Glass card hover refinement */
+  .glass-card:hover {
+    border-color: hsl(0 0% 100% / 0.1);
+    box-shadow: 0 4px 24px -6px hsl(var(--glow));
   }
 
   /* Subtle glow effect */

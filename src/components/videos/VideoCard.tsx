@@ -9,7 +9,7 @@ interface VideoCardProps {
 export function VideoCard({ video, onPlay }: VideoCardProps) {
   return (
     <div
-      className="group rounded-xl border border-border bg-card overflow-hidden card-hover hover:shadow-card-hover cursor-pointer"
+      className="group rounded-xl border border-white/[0.06] bg-card/40 backdrop-blur-sm overflow-hidden transition-all duration-200 ease-in-out hover:border-white/[0.1] hover:shadow-[0_4px_24px_-6px_hsl(var(--glow))] cursor-pointer"
       onClick={() => onPlay(video)}
     >
       {/* Thumbnail */}

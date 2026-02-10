@@ -43,8 +43,8 @@ const Home = () => {
         {/* Grid Background */}
         <div className="absolute inset-0 bg-grid-pattern opacity-20" />
         
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-radial" />
+        {/* Gradient Overlay — low opacity to let ambient show through */}
+        <div className="absolute inset-0 bg-gradient-radial opacity-60" />
         
         {/* Content */}
         <div className="relative z-10 text-center space-y-8 px-4">
