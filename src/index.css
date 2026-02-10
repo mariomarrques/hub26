@@ -388,9 +388,10 @@
   background: hsl(var(--text-secondary));
 }
 
-/* Focus states - 100ms ease-in as per spec */
+/* Focus states - smooth glow */
 *:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
-  transition: outline 100ms ease-in;
+  box-shadow: 0 0 12px -2px hsl(var(--glow));
+  transition: outline 150ms ease-in-out, box-shadow 150ms ease-in-out;
 }
