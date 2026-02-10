@@ -172,7 +172,7 @@ export default {
       boxShadow: {
         'card': '0 4px 24px -4px rgba(0, 0, 0, 0.3)',
         'card-hover': '0 8px 32px -4px rgba(0, 0, 0, 0.4)',
-        'glow': '0 0 20px -5px hsl(217 100% 65% / 0.3)',
+        'glow': '0 0 20px -5px hsl(var(--glow))',
         '2xs': 'var(--shadow-2xs)',
         'xs': 'var(--shadow-xs)',
         'sm': 'var(--shadow-sm)',

@@ -36,7 +36,7 @@ export default function Login() {
       <div className="absolute inset-0 bg-gradient-radial" />
       
       {/* Ambient Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/8 rounded-full blur-3xl" />
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-[420px] animate-fade-in">

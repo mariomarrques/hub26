@@ -86,7 +86,7 @@ export function AppHeader() {
             const navContent = (
               <span
                 className={cn(
-                  "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-colors flex items-center justify-center gap-1.5",
+                  "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5",
                   "text-foreground/70 hover:text-primary",
                   active && "text-primary"
                 )}
@@ -101,7 +101,7 @@ export function AppHeader() {
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   >
                     <div className="w-6 h-[2.5px] bg-primary rounded-full" />
-                    <div className="absolute w-6 h-2 bg-primary/20 rounded-full blur-sm top-0" />
+                    <div className="absolute w-8 h-3 bg-primary/15 rounded-full blur-md -top-0.5" />
                   </motion.div>
                 )}
               </span>
