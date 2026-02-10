@@ -13,7 +13,7 @@ export function VideoCard({ video, onPlay }: VideoCardProps) {
       onClick={() => onPlay(video)}
     >
       {/* Thumbnail */}
-      <div className="relative aspect-video bg-muted/20 overflow-hidden">
+      <div className="relative bg-muted/20 overflow-hidden" style={{ aspectRatio: '9/14' }}>
         {video.thumbnail_url ? (
           <img src={video.thumbnail_url} alt={video.title} className="w-full h-full object-cover" />
         ) : (
