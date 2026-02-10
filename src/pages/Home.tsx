@@ -14,24 +14,16 @@ interface NavigationItem {
 }
 
 const navigationItems: NavigationItem[] = [
-  { name: "Produtos Indicados", href: "/produtos", icon: Package, color: "cyan" },
-  { name: "Vídeos", href: "/videos", icon: Video, color: "blue" },
-  { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "amber", comingSoon: true },
+  { name: "Produtos Indicados", href: "/produtos", icon: Package, color: "teal" },
+  { name: "Vídeos", href: "/videos", icon: Video, color: "teal" },
+  { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "teal", comingSoon: true },
 ];
 
 const getButtonClasses = (color: string, comingSoon?: boolean) => {
   if (comingSoon) {
-    return "border-amber-500/50 text-amber-400 hover:bg-amber-500/10 hover:border-amber-400";
+    return "border-primary/40 text-foreground/60 hover:bg-primary/5 hover:border-primary/60 hover:text-foreground/80";
   }
-  
-  const colorMap: Record<string, string> = {
-    cyan: "border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 hover:border-cyan-400",
-    blue: "border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:border-blue-400",
-    teal: "border-teal-500/50 text-teal-400 hover:bg-teal-500/10 hover:border-teal-400",
-    emerald: "border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400",
-    amber: "border-amber-500/50 text-amber-400 hover:bg-amber-500/10 hover:border-amber-400",
-  };
-  return colorMap[color] || colorMap.cyan;
+  return "border-primary/40 text-foreground/80 hover:bg-primary/8 hover:border-primary/60 hover:text-foreground";
 };
 
 const Home = () => {
