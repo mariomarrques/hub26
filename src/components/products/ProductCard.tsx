@@ -105,7 +105,7 @@ export function ProductCard({
       <div className="flex flex-1 flex-col pt-3 pb-1 px-1">
         {/* Name - bigger and bolder */}
         <Link to={`/produto/${product.id}`}>
-          <h3 className="text-[15px] font-bold text-foreground line-clamp-2 hover:text-primary transition-colors duration-hover mb-1">
+          <h3 className="text-base font-bold text-foreground line-clamp-2 hover:text-primary transition-colors duration-hover mb-1">
             {product.name}
           </h3>
         </Link>
@@ -141,19 +141,21 @@ export function ProductCard({
             </Button>
           )}
 
-          {/* Real photos link with counter */}
+          {/* Real photos button */}
           {product.hasRealPhotos && product.realPhotosCount && product.realPhotosCount > 0 && (
-            <button
-              className="w-full flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors py-1"
+            <Button
+              variant="secondary"
+              size="sm"
+              className="w-full justify-center gap-2 font-semibold text-[13px] bg-muted/80 hover:bg-muted text-foreground"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 onViewRealPhotos?.(product);
               }}
             >
-              <Camera className="h-3 w-3" />
-              Ver fotos reais ({product.realPhotosCount})
-            </button>
+              <Camera className="h-3.5 w-3.5" />
+              Ver Fotos Reais ({product.realPhotosCount})
+            </Button>
           )}
         </div>
       </div>

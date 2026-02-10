@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useCurrencyRate } from "@/hooks/use-currency-rate";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -31,30 +32,38 @@ export function PriceDisplay({
     : `¥ ${originPrice}`;
 
   const sizeClasses = {
-    sm: { origin: "text-xs font-bold text-muted-foreground", converted: "text-sm font-semibold text-primary" },
-    md: { origin: "text-xs font-bold text-muted-foreground", converted: "text-[15px] font-bold text-success" },
-    lg: { origin: "text-sm font-bold text-muted-foreground", converted: "text-xl font-bold text-success" },
+    sm: { label: "text-[10px]", price: "text-sm font-bold text-muted-foreground", converted: "text-base font-semibold text-primary" },
+    md: { label: "text-[10px]", price: "text-base font-bold text-muted-foreground", converted: "text-lg font-bold text-success" },
+    lg: { label: "text-xs", price: "text-lg font-bold text-muted-foreground", converted: "text-2xl font-bold text-success" },
   };
 
   return (
     <div className={className}>
-      <div className="flex items-baseline justify-between gap-2">
-        {/* Yuan price - left, bold */}
-        <span className={sizeClasses[size].origin}>
-          Preço China {formattedOrigin}
-        </span>
+      <div className="flex items-start justify-between gap-2">
+        {/* Yuan price - left, stacked */}
+        <div className="flex flex-col">
+          <span className={cn(sizeClasses[size].label, "text-muted-foreground/70 uppercase tracking-wider font-medium")}>
+            Preço China
+          </span>
+          <span className={sizeClasses[size].price}>
+            {formattedOrigin}
+          </span>
+        </div>
 
-        {/* BRL estimated price - right, bold, colored */}
+        {/* BRL estimated price - right, stacked */}
         {showConversion && (
-          <>
+          <div className="flex flex-col items-end">
+            <span className={cn(sizeClasses[size].label, "text-muted-foreground/70 uppercase tracking-wider font-medium")}>
+              Estimado
+            </span>
             {isLoading ? (
-              <Skeleton className="h-4 w-20 inline-block" />
+              <Skeleton className="h-5 w-20" />
             ) : convertedPrice ? (
               <span className={sizeClasses[size].converted}>
                 R$ {convertedPrice}
               </span>
             ) : null}
-          </>
+          </div>
         )}
       </div>
     </div>
