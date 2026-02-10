@@ -86,22 +86,22 @@ export function AppHeader() {
             const navContent = (
               <span
                 className={cn(
-                  "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-colors flex items-center gap-1.5",
+                  "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-colors flex items-center justify-center gap-1.5",
                   "text-foreground/70 hover:text-primary",
                   active && "text-primary"
                 )}
               >
-                <Icon className="h-4 w-4" strokeWidth={1.5} />
+                <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
                 <span className="hidden md:inline">{item.label}</span>
                 {item.is_external && <ExternalLink className="h-3 w-3 text-muted-foreground hidden md:inline" />}
                 {active && (
                   <motion.div
                     layoutId="navbar-tubelight"
-                    className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-8 h-[3px]"
+                    className="absolute bottom-0 inset-x-0 flex justify-center pointer-events-none"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   >
-                    <div className="w-full h-full bg-primary rounded-full" />
-                    <div className="absolute w-full h-3 bg-primary/20 rounded-full blur-sm -top-1" />
+                    <div className="w-6 h-[2.5px] bg-primary rounded-full" />
+                    <div className="absolute w-6 h-2 bg-primary/20 rounded-full blur-sm top-0" />
                   </motion.div>
                 )}
               </span>
