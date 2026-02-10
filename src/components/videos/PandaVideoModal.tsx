@@ -17,14 +17,14 @@ export function PandaVideoModal({ video, open, onOpenChange }: PandaVideoModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0 overflow-hidden">
-        <DialogHeader className="p-4 pb-0">
-          <DialogTitle className="text-lg">{video.title}</DialogTitle>
+      <DialogContent className="max-w-sm sm:max-w-md md:max-w-lg p-0 overflow-hidden mx-auto">
+        <DialogHeader className="p-3 pb-0">
+          <DialogTitle className="text-base">{video.title}</DialogTitle>
         </DialogHeader>
 
-        <div className="px-4 pb-4 space-y-4">
+        <div className="px-3 pb-3 space-y-3">
           {embedSrc ? (
-            <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
+            <div className="relative w-full rounded-lg overflow-hidden bg-black" style={{ aspectRatio: "9 / 16", maxHeight: "75vh" }}>
               <iframe
                 src={embedSrc}
                 className="absolute inset-0 w-full h-full"
@@ -33,7 +33,7 @@ export function PandaVideoModal({ video, open, onOpenChange }: PandaVideoModalPr
               />
             </div>
           ) : (
-            <div className="w-full aspect-video rounded-lg bg-muted/20 flex items-center justify-center">
+            <div className="w-full rounded-lg bg-muted/20 flex items-center justify-center" style={{ aspectRatio: "9 / 16", maxHeight: "75vh" }}>
               <Play className="h-16 w-16 text-muted-foreground/30" />
               <p className="text-sm text-muted-foreground ml-2">Vídeo não disponível</p>
             </div>
@@ -42,11 +42,11 @@ export function PandaVideoModal({ video, open, onOpenChange }: PandaVideoModalPr
           {video.is_downloadable && video.downloadable_url && (
             <div className="flex justify-center">
               <Button
-                size="lg"
-                className="gap-3 font-semibold text-base px-8"
+                size="default"
+                className="gap-2 font-semibold text-sm px-6 w-full sm:w-auto"
                 onClick={() => window.open(video.downloadable_url!, "_blank", "noopener,noreferrer")}
               >
-                <Download className="h-5 w-5" />
+                <Download className="h-4 w-4" />
                 Baixar em Full HD
               </Button>
             </div>
