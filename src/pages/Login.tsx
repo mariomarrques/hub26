@@ -30,18 +30,19 @@ export default function Login() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4 bg-ambient">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-15" />
       <div className="absolute inset-0 bg-gradient-radial" />
       
       {/* Ambient Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/8 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[300px] bg-primary/5 rounded-full blur-3xl" />
 
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-[420px] animate-fade-in">
         {/* Glass Card */}
-        <div className="rounded-2xl border border-white/[0.08] bg-card/80 backdrop-blur-xl shadow-2xl shadow-black/20">
+        <div className="rounded-2xl border border-white/[0.06] bg-card/60 backdrop-blur-xl shadow-2xl shadow-black/30">
           {/* Header */}
           <div className="px-8 pt-10 pb-2 text-center">
             {/* Logo */}

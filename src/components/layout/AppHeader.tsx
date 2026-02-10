@@ -87,11 +87,11 @@ export function AppHeader() {
               <span
                 className={cn(
                   "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5",
-                  "text-foreground/70 hover:text-primary",
+                  "text-foreground/60 hover:text-foreground/90",
                   active && "text-primary"
                 )}
               >
-                <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
+                <Icon className="h-4 w-4 flex-shrink-0 transition-all duration-200" strokeWidth={1.5} />
                 <span className="hidden md:inline">{item.label}</span>
                 {item.is_external && <ExternalLink className="h-3 w-3 text-muted-foreground hidden md:inline" />}
                 {active && (

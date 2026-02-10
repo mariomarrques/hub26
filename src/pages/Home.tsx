@@ -79,7 +79,7 @@ const Home = () => {
                   
                   {/* Badge "Em breve" para itens comingSoon */}
                   {item.comingSoon && (
-                    <span className="absolute -top-2 -right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase bg-amber-500 text-amber-950 shadow-lg">
+                    <span className="absolute -top-2 -right-2 flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[8px] font-bold uppercase bg-primary text-primary-foreground shadow-lg">
                       <Sparkles className="h-2 w-2" />
                       Breve
                     </span>

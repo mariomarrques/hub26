@@ -125,7 +125,7 @@ export function ProductCard({
           {product.affiliateLink ? (
             <Button
               size="sm"
-              className="w-full justify-center items-center gap-2 font-bold text-[13px] bg-[hsl(100,55%,40%)] hover:bg-[hsl(100,55%,35%)] text-white"
+              className="w-full justify-center items-center gap-2 font-bold text-[13px] bg-primary hover:bg-primary/80 text-primary-foreground transition-all duration-200"
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
