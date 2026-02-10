@@ -86,7 +86,7 @@ export function AppHeader() {
             const navContent = (
               <span
                 className={cn(
-                  "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5",
+                  "relative cursor-pointer text-[13px] font-semibold px-2 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5 whitespace-nowrap",
                   "text-foreground/60 hover:text-foreground/90",
                   active && "text-primary"
                 )}
