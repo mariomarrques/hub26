@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload, X, Camera, Plus } from "lucide-react";
-import { ProductVideoManager } from "@/components/admin/ProductVideoManager";
 import { useCategories } from "@/hooks/use-categories";
 import { useProductImageUpload } from "@/hooks/use-product-image-upload";
 import { CurrencyInput } from "@/components/ui/currency-input";
@@ -294,11 +293,6 @@ export function ProductFormDialog({
                   onChange={handleRealPhotoUpload} disabled={isUploadingReal} />
               </label>
             </div>
-
-            {/* Product Videos - only show when editing existing product */}
-            {product && !isDuplicating && (
-              <ProductVideoManager productId={product.id} />
-            )}
 
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>

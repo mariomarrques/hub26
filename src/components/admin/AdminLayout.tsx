@@ -1,11 +1,12 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, Bell, History, MessageSquare, Package, Link2 } from "lucide-react";
+import { LayoutDashboard, Users, Bell, History, MessageSquare, Package, Link2, Video } from "lucide-react";
 
 const adminTabs = [
   { value: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { value: "/admin/usuarios", label: "Usuários", icon: Users },
   { value: "/admin/produtos", label: "Produtos", icon: Package },
+  { value: "/admin/videos", label: "Vídeos", icon: Video },
   { value: "/admin/notificacoes", label: "Notificações", icon: Bell },
   { value: "/admin/posts", label: "Posts", icon: MessageSquare },
   { value: "/admin/logs", label: "Logs", icon: History },

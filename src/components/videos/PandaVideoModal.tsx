@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Play } from "lucide-react";
-import type { ProductVideo } from "@/hooks/use-product-videos";
+import type { HubVideo } from "@/hooks/use-hub-videos";
 
 interface PandaVideoModalProps {
-  video: ProductVideo | null;
+  video: HubVideo | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -23,7 +23,6 @@ export function PandaVideoModal({ video, open, onOpenChange }: PandaVideoModalPr
         </DialogHeader>
 
         <div className="px-4 pb-4 space-y-4">
-          {/* Player */}
           {embedSrc ? (
             <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-black">
               <iframe
@@ -40,7 +39,6 @@ export function PandaVideoModal({ video, open, onOpenChange }: PandaVideoModalPr
             </div>
           )}
 
-          {/* Download Button */}
           {video.is_downloadable && video.downloadable_url && (
             <div className="flex justify-center">
               <Button
