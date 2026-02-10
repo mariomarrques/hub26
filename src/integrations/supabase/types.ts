@@ -164,6 +164,57 @@ export type Database = {
         }
         Relationships: []
       }
+      hub_videos: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          downloadable_url: string | null
+          embed_url: string | null
+          file_size_mb: number | null
+          id: string
+          is_downloadable: boolean
+          original_filename: string | null
+          panda_video_id: string | null
+          sort_order: number
+          thumbnail_url: string | null
+          title: string
+          upload_status: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          downloadable_url?: string | null
+          embed_url?: string | null
+          file_size_mb?: number | null
+          id?: string
+          is_downloadable?: boolean
+          original_filename?: string | null
+          panda_video_id?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title: string
+          upload_status?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          downloadable_url?: string | null
+          embed_url?: string | null
+          file_size_mb?: number | null
+          id?: string
+          is_downloadable?: boolean
+          original_filename?: string | null
+          panda_video_id?: string | null
+          sort_order?: number
+          thumbnail_url?: string | null
+          title?: string
+          upload_status?: string
+        }
+        Relationships: []
+      }
       nav_links: {
         Row: {
           id: string
@@ -303,56 +354,6 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "community_posts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      product_videos: {
-        Row: {
-          created_at: string
-          created_by: string | null
-          downloadable_url: string | null
-          embed_url: string | null
-          id: string
-          is_downloadable: boolean
-          panda_video_id: string | null
-          product_id: string
-          sort_order: number
-          thumbnail_url: string | null
-          title: string
-        }
-        Insert: {
-          created_at?: string
-          created_by?: string | null
-          downloadable_url?: string | null
-          embed_url?: string | null
-          id?: string
-          is_downloadable?: boolean
-          panda_video_id?: string | null
-          product_id: string
-          sort_order?: number
-          thumbnail_url?: string | null
-          title: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string | null
-          downloadable_url?: string | null
-          embed_url?: string | null
-          id?: string
-          is_downloadable?: boolean
-          panda_video_id?: string | null
-          product_id?: string
-          sort_order?: number
-          thumbnail_url?: string | null
-          title?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_videos_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
