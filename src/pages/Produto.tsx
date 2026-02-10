@@ -9,6 +9,7 @@ import {
 import { useProduct } from "@/hooks/use-products";
 import { RelatedProducts } from "@/components/products/RelatedProducts";
 import { PriceDisplay } from "@/components/products/PriceDisplay";
+import { ProductVideoSection } from "@/components/videos/ProductVideoSection";
 import cssbuyLogo from "@/assets/cssbuy-logo.png";
 
 export default function Produto() {
@@ -153,6 +154,9 @@ export default function Produto() {
           </p>
         </div>
       </div>
+
+      {/* Product Videos */}
+      <ProductVideoSection productId={product.id} />
 
       {product.category_id && (
         <RelatedProducts
