@@ -77,7 +77,7 @@ export function AppHeader() {
         </Link>
 
         {/* Center Nav - Dynamic from DB */}
-        <nav className="flex items-center gap-0.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-full px-1.5 py-1">
+        <nav className="flex items-center gap-0.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-full px-1.5 py-1 overflow-x-auto max-w-[55vw] md:max-w-none scrollbar-none">
           {navbarItems.map((item) => {
             const Icon = ICON_MAP[item.key] || LayoutGrid;
             const active = isActive(item);
@@ -86,7 +86,7 @@ export function AppHeader() {
             const navContent = (
               <span
                 className={cn(
-                  "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5",
+                  "relative cursor-pointer text-[13px] font-semibold px-2 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5 whitespace-nowrap",
                   "text-foreground/60 hover:text-foreground/90",
                   active && "text-primary"
                 )}
@@ -143,7 +143,7 @@ export function AppHeader() {
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 md:gap-1 flex-shrink-0">
           {isAdmin && (
             <Tooltip>
               <TooltipTrigger asChild>
