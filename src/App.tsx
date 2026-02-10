@@ -179,6 +179,14 @@ const App = () => (
                   }
                 />
                 <Route
+                  path="/admin/videos"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <AppLayout><AdminVideos /></AppLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/admin/links"
                   element={
                     <ProtectedRoute requiredRole="admin">

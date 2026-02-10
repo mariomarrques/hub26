@@ -294,11 +294,6 @@ export function ProductFormDialog({
               </label>
             </div>
 
-            {/* Product Videos - only show when editing existing product */}
-            {product && !isDuplicating && (
-              <ProductVideoManager productId={product.id} />
-            )}
-
             <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
               <Button type="submit" disabled={isLoading || isUploading || isUploadingReal}>

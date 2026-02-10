@@ -154,9 +154,6 @@ export default function Produto() {
         </div>
       </div>
 
-      {/* Product Videos */}
-      <ProductVideoSection productId={product.id} />
-
       {product.category_id && (
         <RelatedProducts
           categoryId={product.category_id}

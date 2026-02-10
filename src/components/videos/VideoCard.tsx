@@ -1,14 +1,12 @@
-import { Play, Download } from "lucide-react";
-import { Video } from "lucide-react";
-import type { ProductVideo } from "@/hooks/use-product-videos";
+import { Play, Download, Video } from "lucide-react";
+import type { HubVideo } from "@/hooks/use-hub-videos";
 
 interface VideoCardProps {
-  video: ProductVideo;
-  productName?: string;
-  onPlay: (video: ProductVideo) => void;
+  video: HubVideo;
+  onPlay: (video: HubVideo) => void;
 }
 
-export function VideoCard({ video, productName, onPlay }: VideoCardProps) {
+export function VideoCard({ video, onPlay }: VideoCardProps) {
   return (
     <div
       className="group rounded-xl border border-border bg-card overflow-hidden card-hover hover:shadow-card-hover cursor-pointer"
@@ -40,8 +38,8 @@ export function VideoCard({ video, productName, onPlay }: VideoCardProps) {
       {/* Info */}
       <div className="p-3">
         <h3 className="text-sm font-semibold text-foreground truncate">{video.title}</h3>
-        {productName && (
-          <p className="text-xs text-muted-foreground mt-1 truncate">{productName}</p>
+        {video.description && (
+          <p className="text-xs text-muted-foreground mt-1 truncate">{video.description}</p>
         )}
       </div>
     </div>
