@@ -1,163 +1,118 @@
 
-
-# Plano: Nova Navbar Tubelight + Pagina de Videos + Links Admin
+# Plano: Videos Independentes (sem vinculo a produtos)
 
 ## Resumo
 
-Substituir o header atual (hamburger + sidebar) por uma navbar centralizada estilo "tubelight" com menus dropdown, adicionar uma nova pagina de Videos, e criar um painel admin para gerenciar os links externos.
+Desacoplar completamente o sistema de videos dos produtos. Os videos passam a ser uma entidade independente, gerenciada exclusivamente pelo painel admin, e exibidos apenas na pagina `/videos`. A estrutura fica preparada para upload direto no futuro.
 
 ---
 
-## 1. Instalar dependencia
+## 1. Banco de dados
 
-- Adicionar `framer-motion` ao projeto (necessario para a animacao tubelight)
+A tabela `product_videos` sera substituida por uma nova tabela `hub_videos` com campos pensados para o fluxo independente e futuro upload:
 
-## 2. Criar componente TubelightNavbar
+| Campo | Tipo | Descricao |
+|-------|------|-----------|
+| id | uuid (PK) | Identificador unico |
+| title | text | Nome exibido ao usuario |
+| original_filename | text, nullable | Nome original do arquivo (para futuro upload) |
+| panda_video_id | text, nullable | ID do video no PandaVideo |
+| embed_url | text, nullable | URL de embed do PandaVideo |
+| thumbnail_url | text, nullable | URL da thumbnail |
+| downloadable_url | text, nullable | URL para download em Full HD |
+| is_downloadable | boolean, default true | Permite download? |
+| description | text, nullable | Descricao opcional |
+| file_size_mb | numeric, nullable | Tamanho do arquivo (futuro) |
+| upload_status | text, default 'manual' | Status: 'manual', 'uploading', 'processing', 'ready', 'error' (preparado para upload futuro) |
+| sort_order | integer, default 0 | Ordenacao |
+| created_at | timestamptz | Data de criacao |
+| created_by | uuid, nullable | Quem adicionou |
 
-**Arquivo:** `src/components/ui/tubelight-navbar.tsx`
+RLS: leitura para autenticados, escrita para admins/moderadores.
 
-- Adaptar o componente do prompt de Next.js para React Router (trocar `Link` de next por `Link` de react-router-dom, remover `"use client"`)
-- A navbar fica centralizada na tela, fixa no topo
-- Layout: **Logo (esquerda)** | **Itens centrais (CSSBuy, Catalogo, Videos, Suporte)** | **Acoes usuario (direita)**
-- O item ativo recebe o efeito "tubelight" (glow animado abaixo)
-- Responsivo: em mobile, os itens mostram apenas icones
+Migration tambem remove a tabela `product_videos`.
 
-## 3. Estrutura dos itens da navbar
+## 2. Remover vinculo de videos com produtos
 
-| Item | Tipo | Hover/Click |
-|------|------|-------------|
-| Logo Hub 26 | Link para `/` | Sem dropdown |
-| CSSBuy (China) | Dropdown | "Aulas" (link externo) + "Produtos Indicados" (link interno `/produtos`) |
-| Catalogo | Dropdown | Grid 2 colunas com categorias (ex: Copa do Mundo, Brasileirao, Lancamentos, La Liga, Premier League, Bundesliga, NBA, Jaquetas) -- todos links externos com badge de link externo |
-| Videos | Link interno | Navega para `/videos` |
-| Suporte | Link externo | Abre link WhatsApp (configuravel) com badge de link externo |
+### Arquivos a remover/limpar:
+- **Remover** `src/components/admin/ProductVideoManager.tsx`
+- **Remover** `src/components/videos/ProductVideoSection.tsx`
+- **Remover** `src/hooks/use-product-videos.ts`
 
-- Todos os links externos mostram o icone `ExternalLink` ao lado do texto
-- "Produtos Indicados" e um link interno, sem badge externo
+### Arquivos a editar:
+- **`src/components/admin/ProductFormDialog.tsx`** -- remover import e uso do `ProductVideoManager`
+- **`src/pages/Produto.tsx`** -- remover import e uso do `ProductVideoSection`
 
-## 4. Dropdowns dos itens
+## 3. Novo hook: `use-hub-videos.ts`
 
-- Usar componentes Radix `NavigationMenu` ja existente no projeto para os dropdowns (hover-triggered)
-- **CSSBuy dropdown:** 2 itens em coluna simples
-- **Catalogo dropdown:** Grid 2 colunas (como na referencia anexada) com os itens de categoria, cada um com icone de link externo
-- Background escuro, alinhado a identidade visual do Hub 26
+- Query para listar todos os videos (`hub_videos`) ordenados por `sort_order` e `created_at`
+- Mutations: criar, atualizar e deletar videos
+- Tipo `HubVideo` com todos os campos da tabela
+- Preparado com campo `upload_status` para fluxo futuro de upload
 
-## 5. Area direita da navbar
+## 4. Nova pagina admin: `AdminVideos.tsx`
 
-Manter no canto direito:
-- Toggle tema (sol/lua)
-- Notificacoes (sino)
-- Avatar do usuario com dropdown (Perfil, Configuracoes, Sair)
+Pagina dedicada no painel admin (`/admin/videos`) para gerenciar videos:
 
-## 6. Remover Sidebar
+- Tabela listando todos os videos com: thumbnail (miniatura), titulo, nome original, status de download, acoes
+- Botao "Adicionar Video" que abre dialog com formulario:
+  - Titulo (obrigatorio)
+  - Nome original do arquivo (opcional, para referencia)
+  - Panda Video ID (opcional)
+  - Embed URL (opcional)
+  - Thumbnail URL (opcional)
+  - URL de Download (opcional)
+  - Descricao (opcional)
+  - Toggle "Permitir download"
+- Acoes por video: editar, excluir
+- Area de upload desabilitada com badge "Em breve" (preparando para o futuro)
 
-- Remover `AppSidebar.tsx` do layout
-- Remover `SidebarContext.tsx` (toggle/hamburger nao sera mais necessario)
-- Simplificar `AppLayout.tsx`: remover sidebar, remover hamburger do header
-- O `main` content nao precisa mais de offset lateral
+### Adicionar aba "Videos" no admin:
+- **`src/components/admin/AdminLayout.tsx`** -- adicionar tab `/admin/videos` com icone `Video`
 
-## 7. Renomear "Produtos" para "Produtos Indicados"
+## 5. Atualizar pagina Videos (`/videos`)
 
-- Em `Index.tsx`: mudar titulo da pagina de "Produtos" para "Produtos Indicados"
-- Na rota continua sendo `/produtos`
+- Trocar de `useAllProductVideos` para `useHubVideos`
+- Remover qualquer referencia a "produto relacionado" nos cards
+- Filtro de busca apenas por titulo/descricao
+- Cards mostram: thumbnail, play, badge HD, titulo
+- Modal PandaVideo com botao "Baixar em Full HD"
 
-## 8. Nova pagina: Videos
+## 6. Atualizar componentes de video
 
-**Arquivo:** `src/pages/Videos.tsx`
+- **`VideoCard.tsx`** -- trocar tipo de `ProductVideo` para `HubVideo`, remover prop `productName`
+- **`PandaVideoModal.tsx`** -- trocar tipo de `ProductVideo` para `HubVideo`
 
-Baseada na referencia visual enviada:
-- Titulo: "Biblioteca de **Videos**" (destaque em cor primaria)
-- Subtitulo descritivo
-- Barra de busca por titulo/nome
-- Secao de filtros colapsavel (Categoria, Time, Kit, Ano, Versao, Campeonato) com botoes "Aplicar" e "Limpar filtros"
-- Grid de cards de video (3 colunas desktop, 2 tablet, 1 mobile)
-- Cada card:
-  - Thumbnail com botao play central
-  - Badge "Baixar" no canto superior direito
-  - Titulo do arquivo abaixo
-- Estados: loading (skeletons), empty, error
+## 7. Rota nova no App.tsx
 
-**Tabela no banco:** `videos`
-- `id` (uuid, PK)
-- `title` (text)
-- `description` (text, nullable)
-- `video_url` (text) -- URL do arquivo
-- `thumbnail_url` (text, nullable)
-- `category` (text, nullable)
-- `tags` (text[], nullable)
-- `created_at` (timestamptz)
-- `created_by` (uuid, ref profiles)
-- RLS: leitura para todos autenticados, escrita para admins
-
-**Rota:** `/videos` (protegida, dentro do AppLayout)
-
-## 9. Tabela de links configuraveis (Admin)
-
-**Tabela no banco:** `nav_links`
-- `id` (uuid, PK)
-- `key` (text, unique) -- identificador (ex: "cssbuy_aulas", "suporte_whatsapp", "catalogo_copa_do_mundo")
-- `label` (text) -- nome exibido
-- `url` (text, nullable) -- URL de destino
-- `is_external` (boolean, default true)
-- `position` (text) -- "cssbuy" | "catalogo" | "suporte"
-- `sort_order` (int, default 0)
-- `updated_at` (timestamptz)
-- RLS: leitura para todos autenticados, escrita para admins
-
-**Pagina admin:** `src/pages/admin/AdminNavLinks.tsx`
-- Tabela listando todos os links agrupados por posicao
-- Editar URL de cada link
-- Adicionar/remover itens do catalogo
-- Rota: `/admin/links`
-
-**Hook:** `src/hooks/use-nav-links.ts`
-- Query para buscar todos os links
-- Mutations para atualizar URLs
-
-## 10. Seed dos links iniciais
-
-Inserir na migration os links padroes com URL vazia:
-- cssbuy_aulas (CSSBuy > Aulas)
-- catalogo_copa_do_mundo, catalogo_brasileirao, catalogo_lancamentos, catalogo_la_liga, catalogo_premier_league, catalogo_bundesliga, catalogo_nba, catalogo_jaquetas
-- suporte_whatsapp
-
-## 11. Atualizar rotas (App.tsx)
-
-- Adicionar rota `/videos` (protegida)
-- Adicionar rota `/admin/links` (protegida, admin)
-- Manter todas as rotas existentes
-
-## 12. Atualizar Home
-
-- Atualizar os botoes de navegacao da Home para refletir a nova estrutura:
-  - "Produtos Indicados" (em vez de "Produtos")
-  - "Videos" (novo)
-  - Manter Fornecedores, Comunidade, Avisos
+- Adicionar rota `/admin/videos` protegida com role admin
 
 ---
 
 ## Detalhes Tecnicos
 
 ### Arquivos novos:
-- `src/components/ui/tubelight-navbar.tsx` -- componente base da navbar
-- `src/components/layout/NavbarDropdowns.tsx` -- dropdowns de CSSBuy e Catalogo
-- `src/pages/Videos.tsx` -- pagina de videos
-- `src/pages/admin/AdminNavLinks.tsx` -- admin de links
-- `src/hooks/use-nav-links.ts` -- hook para links configuraveis
-- `src/hooks/use-videos.ts` -- hook para videos
-- Migration SQL para tabelas `nav_links` e `videos`
+- `src/hooks/use-hub-videos.ts`
+- `src/pages/admin/AdminVideos.tsx`
+- Migration SQL (criar `hub_videos`, dropar `product_videos`)
 
-### Arquivos modificados:
-- `src/components/layout/AppHeader.tsx` -- reescrito com tubelight navbar
-- `src/components/layout/AppLayout.tsx` -- remover sidebar
-- `src/App.tsx` -- novas rotas
-- `src/pages/Home.tsx` -- atualizar botoes
-- `src/pages/Index.tsx` -- renomear titulo
+### Arquivos editados:
+- `src/components/admin/AdminLayout.tsx` (nova aba)
+- `src/components/admin/ProductFormDialog.tsx` (remover video manager)
+- `src/pages/Produto.tsx` (remover video section)
+- `src/pages/Videos.tsx` (usar novo hook)
+- `src/components/videos/VideoCard.tsx` (novo tipo)
+- `src/components/videos/PandaVideoModal.tsx` (novo tipo)
+- `src/App.tsx` (nova rota admin)
 
 ### Arquivos removidos:
-- `src/components/layout/AppSidebar.tsx` -- substituida pela navbar
-- `src/contexts/SidebarContext.tsx` -- nao mais necessario
+- `src/components/admin/ProductVideoManager.tsx`
+- `src/components/videos/ProductVideoSection.tsx`
+- `src/hooks/use-product-videos.ts`
 
-### Dependencias:
-- `framer-motion` (nova)
-
+### Preparacao para upload futuro:
+- Campo `upload_status` na tabela com estados definidos
+- Campo `original_filename` para rastrear o arquivo original
+- Campo `file_size_mb` para controle
+- Area de upload na UI do admin com placeholder "Em breve"
+- Quando implementado, o fluxo sera: upload local -> envio para PandaVideo via API -> salvar `panda_video_id` + `downloadable_url` automaticamente
