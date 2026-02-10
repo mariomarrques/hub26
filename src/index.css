@@ -258,9 +258,9 @@
     background-size: 40px 40px;
   }
 
-  /* Radial gradient for home */
+  /* Radial gradient for home — uses opacity to avoid solid color block */
   .bg-gradient-radial {
-    background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background)) 70%);
+    background: radial-gradient(ellipse at center, transparent 0%, hsl(var(--background) / 0.5) 70%);
   }
 
   /* Global ambient background gradient */
