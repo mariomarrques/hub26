@@ -1,4 +1,4 @@
-import { Hexagon, ChevronDown, User, Settings, LogOut, Moon, Sun, ExternalLink, ShoppingBag, LayoutGrid, Video, Headphones, Shield } from "lucide-react";
+import { Hexagon, ChevronDown, User, Settings, LogOut, Moon, Sun, ExternalLink, Home, ShoppingBag, LayoutGrid, Video, Headphones, Shield, LucideIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
@@ -16,25 +16,19 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NotificationDropdown } from "@/components/notifications/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavLinks } from "@/hooks/use-nav-links";
+import { useNavLinks, type NavLink } from "@/hooks/use-nav-links";
 import { cn } from "@/lib/utils";
 import { CSSBuyDropdown, CatalogoDropdown } from "./NavbarDropdowns";
 
-interface NavItemConfig {
-  name: string;
-  path?: string;
-  icon: React.ElementType;
-  hasDropdown?: boolean;
-  external?: boolean;
-  getUrl?: () => string | null;
-}
+const ICON_MAP: Record<string, LucideIcon> = {
+  navbar_home: Home,
+  navbar_cssbuy: ShoppingBag,
+  navbar_catalogo: LayoutGrid,
+  navbar_videos: Video,
+  navbar_suporte: Headphones,
+};
 
-const NAV_ITEMS: NavItemConfig[] = [
-  { name: "CSSBuy", icon: ShoppingBag, hasDropdown: true },
-  { name: "Catálogo", icon: LayoutGrid, hasDropdown: true },
-  { name: "Vídeos", icon: Video, path: "/videos" },
-  { name: "Suporte", icon: Headphones, external: true },
-];
+const DROPDOWN_KEYS = ["navbar_cssbuy", "navbar_catalogo"];
 
 export function AppHeader() {
   const { profile, isAdmin, signOut } = useAuth();
@@ -43,6 +37,9 @@ export function AppHeader() {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const location = useLocation();
   const { getLinksByPosition } = useNavLinks();
+
+  const navbarItems = getLinksByPosition("navbar");
+  const suporteLink = getLinksByPosition("suporte")[0];
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -53,12 +50,21 @@ export function AppHeader() {
 
   const displayName = profile?.name || "Usuário";
 
-  const suporteLink = getLinksByPosition("suporte")[0];
-
-  const isActive = (item: NavItemConfig) => {
-    if (item.path) return location.pathname === item.path;
-    if (item.name === "CSSBuy") return location.pathname === "/produtos";
+  const isActive = (item: NavLink) => {
+    if (item.url) return location.pathname === item.url;
+    if (item.key === "navbar_cssbuy") return location.pathname === "/produtos";
     return false;
+  };
+
+  const getDropdownForItem = (item: NavLink) => {
+    if (item.key === "navbar_cssbuy") return <CSSBuyDropdown />;
+    if (item.key === "navbar_catalogo") return <CatalogoDropdown />;
+    return null;
+  };
+
+  const getHref = (item: NavLink) => {
+    if (item.key === "navbar_suporte") return suporteLink?.url || item.url || "#";
+    return item.url || "#";
   };
 
   return (
@@ -70,11 +76,12 @@ export function AppHeader() {
           <span className="text-lg font-bold text-foreground tracking-tight hidden sm:block">Hub 26</span>
         </Link>
 
-        {/* Center Nav - Tubelight style */}
+        {/* Center Nav - Dynamic from DB */}
         <nav className="flex items-center gap-0.5 bg-card/60 backdrop-blur-sm border border-border rounded-full px-1.5 py-1">
-          {NAV_ITEMS.map((item) => {
-            const Icon = item.icon;
+          {navbarItems.map((item) => {
+            const Icon = ICON_MAP[item.key] || LayoutGrid;
             const active = isActive(item);
+            const hasDropdown = DROPDOWN_KEYS.includes(item.key);
 
             const navContent = (
               <span
@@ -85,8 +92,8 @@ export function AppHeader() {
                 )}
               >
                 <Icon className="h-4 w-4" strokeWidth={1.5} />
-                <span className="hidden md:inline">{item.name}</span>
-                {item.external && <ExternalLink className="h-3 w-3 text-muted-foreground hidden md:inline" />}
+                <span className="hidden md:inline">{item.label}</span>
+                {item.is_external && <ExternalLink className="h-3 w-3 text-muted-foreground hidden md:inline" />}
                 {active && (
                   <motion.div
                     layoutId="navbar-tubelight"
@@ -100,26 +107,25 @@ export function AppHeader() {
               </span>
             );
 
-            if (item.hasDropdown) {
+            if (hasDropdown) {
               return (
                 <div
-                  key={item.name}
+                  key={item.id}
                   className="relative"
-                  onMouseEnter={() => setHoveredItem(item.name)}
+                  onMouseEnter={() => setHoveredItem(item.key)}
                   onMouseLeave={() => setHoveredItem(null)}
                 >
                   {navContent}
-                  {hoveredItem === item.name && item.name === "CSSBuy" && <CSSBuyDropdown />}
-                  {hoveredItem === item.name && item.name === "Catálogo" && <CatalogoDropdown />}
+                  {hoveredItem === item.key && getDropdownForItem(item)}
                 </div>
               );
             }
 
-            if (item.external) {
+            if (item.is_external) {
               return (
                 <a
-                  key={item.name}
-                  href={suporteLink?.url || "#"}
+                  key={item.id}
+                  href={getHref(item)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -129,7 +135,7 @@ export function AppHeader() {
             }
 
             return (
-              <Link key={item.name} to={item.path || "/"}>
+              <Link key={item.id} to={item.url || "/"}>
                 {navContent}
               </Link>
             );
@@ -138,7 +144,6 @@ export function AppHeader() {
 
         {/* Right side */}
         <div className="flex items-center gap-1">
-          {/* Admin link */}
           {isAdmin && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -152,7 +157,6 @@ export function AppHeader() {
             </Tooltip>
           )}
 
-          {/* Theme Toggle */}
           {mounted && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -168,10 +172,8 @@ export function AppHeader() {
             </Tooltip>
           )}
 
-          {/* Notifications */}
           <NotificationDropdown />
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center gap-1.5 px-2 hover:bg-accent">
