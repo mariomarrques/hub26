@@ -68,19 +68,19 @@ export function CatalogoDropdown({ className }: DropdownProps) {
 
   return (
     <div className={cn(
-      "absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50",
-      "w-80 bg-card border border-border rounded-xl shadow-xl p-3",
-      "animate-fade-in",
+      "absolute top-full left-1/2 -translate-x-1/2 pt-2 z-50",
       className
     )}>
-      <div className="grid grid-cols-2 gap-1">
-        {links.map((link) => (
-          <DropdownItem key={link.id} link={link} />
-        ))}
+      <div className="w-80 bg-card border border-border rounded-xl shadow-xl p-3">
+        <div className="grid grid-cols-2 gap-1">
+          {links.map((link) => (
+            <DropdownItem key={link.id} link={link} />
+          ))}
+        </div>
+        {links.length === 0 && (
+          <p className="text-xs text-muted-foreground p-3 text-center">Nenhum link configurado</p>
+        )}
       </div>
-      {links.length === 0 && (
-        <p className="text-xs text-muted-foreground p-3 text-center">Nenhum link configurado</p>
-      )}
     </div>
   );
 }
