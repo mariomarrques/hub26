@@ -41,13 +41,6 @@ function DropdownItem({ link, highlight, subtitle }: { link: NavLink; highlight?
       {content}
     </Link>
   );
-  }
-
-  return (
-    <Link to={link.url || "#"} className={baseClass}>
-      <span>{link.label}</span>
-    </Link>
-  );
 }
 
 export function CSSBuyDropdown({ className }: DropdownProps) {
