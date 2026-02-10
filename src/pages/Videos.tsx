@@ -60,7 +60,7 @@ const Videos = () => {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="rounded-xl border border-border bg-card overflow-hidden">
-              <Skeleton className="aspect-video w-full" />
+              <Skeleton className="w-full" style={{ aspectRatio: '9/14' }} />
               <div className="p-3 space-y-2">
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
