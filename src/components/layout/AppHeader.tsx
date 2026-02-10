@@ -68,7 +68,7 @@ export function AppHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-background/60 backdrop-blur-xl border-b border-white/[0.04]">
       <div className="flex h-full items-center justify-between px-4 md:px-6 max-w-[1440px] mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
@@ -77,7 +77,7 @@ export function AppHeader() {
         </Link>
 
         {/* Center Nav - Dynamic from DB */}
-        <nav className="flex items-center gap-0.5 bg-card/60 backdrop-blur-sm border border-border rounded-full px-1.5 py-1">
+        <nav className="flex items-center gap-0.5 bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] rounded-full px-1.5 py-1">
           {navbarItems.map((item) => {
             const Icon = ICON_MAP[item.key] || LayoutGrid;
             const active = isActive(item);
@@ -87,11 +87,11 @@ export function AppHeader() {
               <span
                 className={cn(
                   "relative cursor-pointer text-[13px] font-semibold px-3 md:px-4 py-2 rounded-full transition-all duration-200 ease-in-out flex items-center justify-center gap-1.5",
-                  "text-foreground/70 hover:text-primary",
+                  "text-foreground/60 hover:text-foreground/90",
                   active && "text-primary"
                 )}
               >
-                <Icon className="h-4 w-4 flex-shrink-0" strokeWidth={1.5} />
+                <Icon className="h-4 w-4 flex-shrink-0 transition-all duration-200" strokeWidth={1.5} />
                 <span className="hidden md:inline">{item.label}</span>
                 {item.is_external && <ExternalLink className="h-3 w-3 text-muted-foreground hidden md:inline" />}
                 {active && (
