@@ -105,7 +105,7 @@ export function ProductCard({
       <div className="flex flex-1 flex-col pt-3 pb-1 px-1">
         {/* Name - bigger and bolder */}
         <Link to={`/produto/${product.id}`}>
-          <h3 className="text-[15px] font-bold text-foreground line-clamp-2 hover:text-primary transition-colors duration-hover mb-1">
+          <h3 className="text-base font-bold text-foreground line-clamp-2 hover:text-primary transition-colors duration-hover mb-1">
             {product.name}
           </h3>
         </Link>
