@@ -313,7 +313,7 @@
 
   /* Subtle glow effect */
   .glow-accent {
-    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 20px -5px hsl(var(--glow));
   }
 
   /* Fade in animation - page load effect */
