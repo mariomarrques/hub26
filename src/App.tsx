@@ -41,7 +41,7 @@ const App = () => (
           <NotificationProvider>
             <Toaster />
             <Sonner />
-            <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <Routes>
                 {/* Public routes */}
                 <Route path="/login" element={<Login />} />
