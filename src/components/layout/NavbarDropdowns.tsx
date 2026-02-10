@@ -7,7 +7,7 @@ interface DropdownProps {
   className?: string;
 }
 
-function DropdownItem({ link, highlight }: { link: NavLink; highlight?: boolean }) {
+function DropdownItem({ link, highlight, subtitle }: { link: NavLink; highlight?: boolean; subtitle?: string }) {
   const baseClass = cn(
     "flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
     highlight
@@ -16,23 +16,29 @@ function DropdownItem({ link, highlight }: { link: NavLink; highlight?: boolean 
     !link.url && "opacity-50 pointer-events-none"
   );
 
+  const content = (
+    <>
+      <span className="flex-1">
+        {link.label}
+        {subtitle && (
+          <span className="block text-[10px] font-normal text-muted-foreground mt-0.5">{subtitle}</span>
+        )}
+      </span>
+      {link.is_external && <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />}
+    </>
+  );
+
   if (link.is_external) {
     return (
-      <a
-        href={link.url || "#"}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={baseClass}
-      >
-        <span className="flex-1">{link.label}</span>
-        <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+      <a href={link.url || "#"} target="_blank" rel="noopener noreferrer" className={baseClass}>
+        {content}
       </a>
     );
   }
 
   return (
     <Link to={link.url || "#"} className={baseClass}>
-      <span>{link.label}</span>
+      {content}
     </Link>
   );
 }
@@ -52,6 +58,7 @@ export function CSSBuyDropdown({ className }: DropdownProps) {
             key={link.id}
             link={link}
             highlight={link.key === "cssbuy_fornecedor"}
+            subtitle={link.key === "cssbuy_fornecedor" ? "senha: aaajersey" : undefined}
           />
         ))}
         {links.length === 0 && (
