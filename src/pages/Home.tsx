@@ -17,9 +17,6 @@ const navigationItems: NavigationItem[] = [
   { name: "Produtos Indicados", href: "/produtos", icon: Package, color: "cyan" },
   { name: "Vídeos", href: "/videos", icon: Video, color: "blue" },
   { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "amber", comingSoon: true },
-  { name: "Fornecedores", href: "/fornecedores", icon: Users, color: "blue" },
-  { name: "Comunidade", href: "/comunidade", icon: MessageSquare, color: "teal" },
-  { name: "Avisos", href: "/avisos", icon: Bell, color: "emerald" },
 ];
 
 const getButtonClasses = (color: string, comingSoon?: boolean) => {
