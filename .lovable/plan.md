@@ -1,118 +1,79 @@
 
-# Plano: Videos Independentes (sem vinculo a produtos)
 
-## Resumo
+# Plano: Correcao Estetica Global do Hub 26
 
-Desacoplar completamente o sistema de videos dos produtos. Os videos passam a ser uma entidade independente, gerenciada exclusivamente pelo painel admin, e exibidos apenas na pagina `/videos`. A estrutura fica preparada para upload direto no futuro.
+## Problemas Identificados
+
+### 1. Divisao branca no conteudo principal
+O `AppLayout.tsx` aplica `bg-ambient` no wrapper, mas o `<main>` nao herda o fundo corretamente. A classe `bg-ambient::before` usa `position: fixed` o que funciona, porem o conteudo dentro do `<main>` (e as paginas como Home) nao tem fundo transparente -- no tema claro, o `--background` e quase branco (`0 0% 98%`), criando uma "divisao" visivel entre a navbar (que tem blur/glass) e o conteudo abaixo.
+
+A Home tambem tem `bg-gradient-radial` que faz fade para `hsl(var(--background))`, o que no tema claro cria uma mancha branca solida.
+
+### 2. Cards de produtos e videos sem efeito "glass"
+Os cards de produto (`ProductCard.tsx`) usam `bg-transparent` e os de video (`VideoCard.tsx`) usam `bg-card` sem blur nem borda glass. Falta o acabamento "vidro escuro premium" da referencia.
 
 ---
 
-## 1. Banco de dados
+## Mudancas Planejadas
 
-A tabela `product_videos` sera substituida por uma nova tabela `hub_videos` com campos pensados para o fluxo independente e futuro upload:
+### Etapa 1 -- Corrigir o fundo global (eliminar a divisao branca)
 
-| Campo | Tipo | Descricao |
-|-------|------|-----------|
-| id | uuid (PK) | Identificador unico |
-| title | text | Nome exibido ao usuario |
-| original_filename | text, nullable | Nome original do arquivo (para futuro upload) |
-| panda_video_id | text, nullable | ID do video no PandaVideo |
-| embed_url | text, nullable | URL de embed do PandaVideo |
-| thumbnail_url | text, nullable | URL da thumbnail |
-| downloadable_url | text, nullable | URL para download em Full HD |
-| is_downloadable | boolean, default true | Permite download? |
-| description | text, nullable | Descricao opcional |
-| file_size_mb | numeric, nullable | Tamanho do arquivo (futuro) |
-| upload_status | text, default 'manual' | Status: 'manual', 'uploading', 'processing', 'ready', 'error' (preparado para upload futuro) |
-| sort_order | integer, default 0 | Ordenacao |
-| created_at | timestamptz | Data de criacao |
-| created_by | uuid, nullable | Quem adicionou |
+**Arquivo: `src/index.css`**
+- No tema `.light`, escurecer o `--background` para um tom mais escuro/neutro que nao quebre a atmosfera, OU (melhor abordagem) garantir que o `bg-ambient::before` funcione tambem no light mode com gradientes equivalentes usando cores do tema claro.
+- Ajustar `.bg-gradient-radial` para usar opacidade e nao cor solida, evitando a "mancha branca".
+- Adicionar variante light do `.bg-ambient::before` que use gradientes teal suaves sobre fundo claro.
 
-RLS: leitura para autenticados, escrita para admins/moderadores.
+**Arquivo: `src/components/layout/AppLayout.tsx`**
+- Garantir que o `<main>` tenha `bg-transparent` explicito para que o fundo ambient passe por baixo sem interrupcao.
 
-Migration tambem remove a tabela `product_videos`.
+**Arquivo: `src/pages/Home.tsx`**
+- Ajustar o `bg-gradient-radial` overlay para nao criar bloco solido -- usar opacidade mais baixa.
 
-## 2. Remover vinculo de videos com produtos
+### Etapa 2 -- Aplicar efeito "glass" nos cards de produtos e videos
 
-### Arquivos a remover/limpar:
-- **Remover** `src/components/admin/ProductVideoManager.tsx`
-- **Remover** `src/components/videos/ProductVideoSection.tsx`
-- **Remover** `src/hooks/use-product-videos.ts`
+**Arquivo: `src/components/products/ProductCard.tsx`**
+- Trocar `bg-transparent` por efeito glass: `bg-card/40 backdrop-blur-sm border border-white/[0.06]`
+- Adicionar hover com glow sutil: `hover:border-white/[0.1] hover:shadow-card`
 
-### Arquivos a editar:
-- **`src/components/admin/ProductFormDialog.tsx`** -- remover import e uso do `ProductVideoManager`
-- **`src/pages/Produto.tsx`** -- remover import e uso do `ProductVideoSection`
+**Arquivo: `src/components/videos/VideoCard.tsx`**
+- Trocar `bg-card` por glass equivalente: `bg-card/40 backdrop-blur-sm border-white/[0.06]`
+- Manter o hover existente mas adicionar transicao de borda/sombra
 
-## 3. Novo hook: `use-hub-videos.ts`
+**Arquivo: `src/components/products/ProductCardSkeleton.tsx`**
+- Alinhar visual do skeleton com o estilo glass dos cards
 
-- Query para listar todos os videos (`hub_videos`) ordenados por `sort_order` e `created_at`
-- Mutations: criar, atualizar e deletar videos
-- Tipo `HubVideo` com todos os campos da tabela
-- Preparado com campo `upload_status` para fluxo futuro de upload
+### Etapa 3 -- Refinar hover e micro-interacoes
 
-## 4. Nova pagina admin: `AdminVideos.tsx`
-
-Pagina dedicada no painel admin (`/admin/videos`) para gerenciar videos:
-
-- Tabela listando todos os videos com: thumbnail (miniatura), titulo, nome original, status de download, acoes
-- Botao "Adicionar Video" que abre dialog com formulario:
-  - Titulo (obrigatorio)
-  - Nome original do arquivo (opcional, para referencia)
-  - Panda Video ID (opcional)
-  - Embed URL (opcional)
-  - Thumbnail URL (opcional)
-  - URL de Download (opcional)
-  - Descricao (opcional)
-  - Toggle "Permitir download"
-- Acoes por video: editar, excluir
-- Area de upload desabilitada com badge "Em breve" (preparando para o futuro)
-
-### Adicionar aba "Videos" no admin:
-- **`src/components/admin/AdminLayout.tsx`** -- adicionar tab `/admin/videos` com icone `Video`
-
-## 5. Atualizar pagina Videos (`/videos`)
-
-- Trocar de `useAllProductVideos` para `useHubVideos`
-- Remover qualquer referencia a "produto relacionado" nos cards
-- Filtro de busca apenas por titulo/descricao
-- Cards mostram: thumbnail, play, badge HD, titulo
-- Modal PandaVideo com botao "Baixar em Full HD"
-
-## 6. Atualizar componentes de video
-
-- **`VideoCard.tsx`** -- trocar tipo de `ProductVideo` para `HubVideo`, remover prop `productName`
-- **`PandaVideoModal.tsx`** -- trocar tipo de `ProductVideo` para `HubVideo`
-
-## 7. Rota nova no App.tsx
-
-- Adicionar rota `/admin/videos` protegida com role admin
+**Arquivo: `src/index.css`**
+- Ajustar `.card-hover:hover` para usar aumento sutil de luminosidade em vez de cor solida
+- Garantir que `glass-card` tenha transicao suave no hover
 
 ---
 
 ## Detalhes Tecnicos
 
-### Arquivos novos:
-- `src/hooks/use-hub-videos.ts`
-- `src/pages/admin/AdminVideos.tsx`
-- Migration SQL (criar `hub_videos`, dropar `product_videos`)
+### CSS -- Correcao do bg-ambient para light mode
+Adicionar media/class query em `.bg-ambient::before` que use gradientes com opacidades adequadas para fundo claro (tons teal sobre cinza claro, em vez de sobre preto).
 
-### Arquivos editados:
-- `src/components/admin/AdminLayout.tsx` (nova aba)
-- `src/components/admin/ProductFormDialog.tsx` (remover video manager)
-- `src/pages/Produto.tsx` (remover video section)
-- `src/pages/Videos.tsx` (usar novo hook)
-- `src/components/videos/VideoCard.tsx` (novo tipo)
-- `src/components/videos/PandaVideoModal.tsx` (novo tipo)
-- `src/App.tsx` (nova rota admin)
+### Glass Card Pattern
+```text
+background: hsl(var(--card) / 0.4)
+backdrop-filter: blur(12px)
+border: 1px solid hsl(0 0% 100% / 0.06)   (dark)
+        1px solid hsl(0 0% 0% / 0.06)      (light)
+transition: border-color 200ms, box-shadow 200ms
+hover: border-color + shadow-card sutil
+```
 
-### Arquivos removidos:
-- `src/components/admin/ProductVideoManager.tsx`
-- `src/components/videos/ProductVideoSection.tsx`
-- `src/hooks/use-product-videos.ts`
+### Arquivos modificados (total: 5)
+1. `src/index.css` -- bg-ambient light mode, glass refinements, gradient fix
+2. `src/components/layout/AppLayout.tsx` -- main transparent
+3. `src/pages/Home.tsx` -- gradient overlay opacity
+4. `src/components/products/ProductCard.tsx` -- glass card
+5. `src/components/videos/VideoCard.tsx` -- glass card
 
-### Preparacao para upload futuro:
-- Campo `upload_status` na tabela com estados definidos
-- Campo `original_filename` para rastrear o arquivo original
-- Campo `file_size_mb` para controle
-- Area de upload na UI do admin com placeholder "Em breve"
-- Quando implementado, o fluxo sera: upload local -> envio para PandaVideo via API -> salvar `panda_video_id` + `downloadable_url` automaticamente
+### Sem alteracoes em:
+- Layout, posicao de elementos, icones
+- Fluxos, rotas, logica
+- Dados ou permissoes
+
