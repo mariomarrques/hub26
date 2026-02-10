@@ -38,9 +38,9 @@ export function ProductCard({
     <div
       className={cn(
         "group relative flex flex-col overflow-hidden rounded-card",
-        "bg-transparent",
-        "transition-all duration-hover ease-hover",
-        "hover:bg-card/30 animate-slide-up"
+        "bg-card/40 backdrop-blur-sm border border-white/[0.06]",
+        "transition-all duration-200 ease-in-out",
+        "hover:border-white/[0.1] hover:shadow-[0_4px_24px_-6px_hsl(var(--glow))] animate-slide-up"
       )}
       style={{ animationDelay: `${index * 60}ms` }}
     >

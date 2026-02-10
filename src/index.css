@@ -343,7 +343,14 @@
   }
 
   .card-hover:hover {
-    background-color: hsl(var(--hover-background));
+    background-color: hsl(var(--hover-background) / 0.6);
+    box-shadow: 0 0 20px -8px hsl(var(--glow));
+  }
+
+  /* Glass card hover refinement */
+  .glass-card:hover {
+    border-color: hsl(0 0% 100% / 0.1);
+    box-shadow: 0 4px 24px -6px hsl(var(--glow));
   }
 
   /* Subtle glow effect */
