@@ -68,7 +68,7 @@ export function AppHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-background/80 backdrop-blur-md border-b border-border">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-background/60 backdrop-blur-xl border-b border-white/[0.04]">
       <div className="flex h-full items-center justify-between px-4 md:px-6 max-w-[1440px] mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
