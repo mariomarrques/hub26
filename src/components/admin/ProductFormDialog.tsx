@@ -15,7 +15,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Loader2, Upload, X, Camera, Plus } from "lucide-react";
-import { ProductVideoManager } from "@/components/admin/ProductVideoManager";
 import { useCategories } from "@/hooks/use-categories";
 import { useProductImageUpload } from "@/hooks/use-product-image-upload";
 import { CurrencyInput } from "@/components/ui/currency-input";
