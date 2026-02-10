@@ -58,6 +58,7 @@ export function CSSBuyDropdown({ className }: DropdownProps) {
             key={link.id}
             link={link}
             highlight={link.key === "cssbuy_fornecedor"}
+            subtitle={link.key === "cssbuy_fornecedor" ? "senha: aaajersey" : undefined}
           />
         ))}
         {links.length === 0 && (
