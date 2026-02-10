@@ -29,6 +29,7 @@ import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminPosts from "./pages/admin/AdminPosts";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
 import AdminNavLinks from "./pages/admin/AdminNavLinks";
+import AdminVideos from "./pages/admin/AdminVideos";
 import Videos from "./pages/Videos";
 const queryClient = new QueryClient();
 
