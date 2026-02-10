@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Package, Store, Users, MessageSquare, Bell, Sparkles, Video } from "lucide-react";
+import { Package, Store, Sparkles, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ComingSoonDialog } from "@/components/ui/coming-soon-dialog";
