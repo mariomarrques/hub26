@@ -143,7 +143,7 @@ export function AppHeader() {
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5 md:gap-1 flex-shrink-0">
           {isAdmin && (
             <Tooltip>
               <TooltipTrigger asChild>
