@@ -7,9 +7,9 @@ export interface UserWithRole {
   id: string;
   name: string;
   avatar_url: string | null;
-  created_at: string;
+  created_at: string | null;
   role: AppRole;
-  email: string;
+  email: string | null;
 }
 
 export interface AdminStats {
@@ -27,20 +27,35 @@ export interface BulkNotificationParams {
   targetRoles?: AppRole[];
 }
 
-export function useAdminUsers() {
+interface AdminUsersQueryOptions {
+  limit?: number;
+  offset?: number;
+}
+
+export function useAdminUsers(options?: AdminUsersQueryOptions) {
+  const limit = options?.limit;
+  const offset = options?.offset ?? 0;
+
   return useQuery({
-    queryKey: ["admin", "users"],
+    queryKey: ["admin", "users", { limit: limit ?? null, offset }],
     queryFn: async (): Promise<UserWithRole[]> => {
-      const { data, error } = await supabase.rpc("get_all_users_with_roles");
+      const { data, error } = await supabase.rpc("get_admin_users", {
+        p_limit: limit ?? null,
+        p_offset: offset,
+      });
 
       if (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching admin users:", error);
         throw error;
       }
 
       return (data || []) as UserWithRole[];
     },
   });
+}
+
+export function useRecentAdminUsers(limit = 5) {
+  return useAdminUsers({ limit, offset: 0 });
 }
 
 export function useAdminStats() {

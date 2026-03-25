@@ -447,50 +447,115 @@ export type Database = {
       suppliers: {
         Row: {
           admin_note: string | null
+          avatar_url: string | null
           categories: string[] | null
           contact: string | null
-          created_at: string | null
+          country: string | null
+          created_at: string
           created_by: string | null
+          group_link: string | null
           id: string
+          is_approved: boolean
           link: string | null
           name: string
+          prep_time: string | null
+          shipping_method: string | null
+          shipping_time: string | null
           rating_communication: number | null
           rating_delivery: number | null
           rating_quality: number | null
           status: string
           updated_at: string | null
+          whatsapp_link: string | null
         }
         Insert: {
           admin_note?: string | null
+          avatar_url?: string | null
           categories?: string[] | null
           contact?: string | null
-          created_at?: string | null
+          country?: string | null
+          created_at?: string
           created_by?: string | null
+          group_link?: string | null
           id?: string
+          is_approved?: boolean
           link?: string | null
           name: string
+          prep_time?: string | null
+          shipping_method?: string | null
+          shipping_time?: string | null
           rating_communication?: number | null
           rating_delivery?: number | null
           rating_quality?: number | null
           status?: string
           updated_at?: string | null
+          whatsapp_link?: string | null
         }
         Update: {
           admin_note?: string | null
+          avatar_url?: string | null
           categories?: string[] | null
           contact?: string | null
-          created_at?: string | null
+          country?: string | null
+          created_at?: string
           created_by?: string | null
+          group_link?: string | null
           id?: string
+          is_approved?: boolean
           link?: string | null
           name?: string
+          prep_time?: string | null
+          shipping_method?: string | null
+          shipping_time?: string | null
           rating_communication?: number | null
           rating_delivery?: number | null
           rating_quality?: number | null
           status?: string
           updated_at?: string | null
+          whatsapp_link?: string | null
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_approved: boolean
+          rating: number
+          supplier_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_approved?: boolean
+          rating: number
+          supplier_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_approved?: boolean
+          rating?: number
+          supplier_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_notification_settings: {
         Row: {
@@ -584,6 +649,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_admin_users: {
+        Args: {
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
       get_all_users_with_roles: {
         Args: never
         Returns: {

@@ -17,7 +17,7 @@ import {
   ArrowRight,
   MessageSquare
 } from "lucide-react";
-import { useAdminStats, useAdminUsers } from "@/hooks/use-admin";
+import { useAdminStats, useRecentAdminUsers } from "@/hooks/use-admin";
 import { useAdminPosts } from "@/hooks/use-community-posts";
 import { useProducts } from "@/hooks/use-products";
 import { formatRelativeTime } from "@/lib/date-utils";
@@ -39,11 +39,30 @@ const roleLabels: Record<AppRole, string> = {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { data: stats, isLoading: loadingStats } = useAdminStats();
-  const { data: users, isLoading: loadingUsers } = useAdminUsers();
+  const {
+    data: recentUsers = [],
+    isLoading: loadingUsers,
+    isError: recentUsersIsError,
+    error: recentUsersError,
+  } = useRecentAdminUsers(5);
   const { pendingPosts, isLoading: loadingPosts } = useAdminPosts();
   const { data: products, isLoading: loadingProducts } = useProducts();
 
-  const recentUsers = users?.slice(0, 5) || [];
+  const recentUsersMessage = (() => {
+    if (!recentUsersError || typeof recentUsersError !== "object") {
+      return "Não foi possível carregar usuários recentes.";
+    }
+
+    const maybeError = recentUsersError as { code?: unknown; message?: unknown };
+    const code = typeof maybeError.code === "string" ? maybeError.code : "";
+    const message = typeof maybeError.message === "string" ? maybeError.message : "";
+
+    if (code === "42501" || message.toLowerCase().includes("unauthorized")) {
+      return "Você não tem permissão para visualizar usuários recentes.";
+    }
+
+    return "Não foi possível carregar usuários recentes.";
+  })();
 
   const statCards = [
     {
@@ -124,7 +143,7 @@ export default function AdminDashboard() {
             <CardContent>
               {loadingUsers ? (
                 <div className="space-y-3">
-                  {[...Array(4)].map((_, i) => (
+                  {[...Array(5)].map((_, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <Skeleton className="h-9 w-9 rounded-full" />
                       <div className="flex-1 space-y-1.5">
@@ -135,13 +154,17 @@ export default function AdminDashboard() {
                     </div>
                   ))}
                 </div>
+              ) : recentUsersIsError ? (
+                <p className="text-center text-muted-foreground py-6">
+                  {recentUsersMessage}
+                </p>
               ) : recentUsers.length === 0 ? (
                 <p className="text-center text-muted-foreground py-6">
                   Nenhum usuário encontrado
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {recentUsers.slice(0, 4).map((user) => (
+                  {recentUsers.map((user) => (
                     <div
                       key={user.id}
                       className="flex items-center gap-3 rounded-lg border p-2.5"
@@ -155,7 +178,7 @@ export default function AdminDashboard() {
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium truncate">{user.name}</p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {formatRelativeTime(user.created_at)}
+                          {user.created_at ? formatRelativeTime(user.created_at) : "Data indisponível"}
                         </p>
                       </div>
                       <Badge

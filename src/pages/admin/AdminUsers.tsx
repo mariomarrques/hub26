@@ -39,7 +39,7 @@ const roleLabels: Record<AppRole, string> = {
 };
 
 export default function AdminUsers() {
-  const { data: users, isLoading } = useAdminUsers();
+  const { data: users, isLoading, isError, error } = useAdminUsers();
   const updateRole = useUpdateUserRole();
 
   const [search, setSearch] = useState("");
@@ -58,6 +58,35 @@ export default function AdminUsers() {
       return matchesSearch && matchesRole;
     });
   }, [users, search, roleFilter]);
+
+  const errorMessage = useMemo(() => {
+    if (!error) return "Erro ao carregar usuários.";
+
+    if (error instanceof Error && error.message) {
+      return error.message;
+    }
+
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof (error as { message?: unknown }).message === "string"
+    ) {
+      return (error as { message: string }).message;
+    }
+
+    return "Erro ao carregar usuários.";
+  }, [error]);
+
+  const isUnauthorizedError = useMemo(() => {
+    if (!error || typeof error !== "object") return false;
+
+    const maybeError = error as { code?: unknown; message?: unknown };
+    const code = typeof maybeError.code === "string" ? maybeError.code : "";
+    const message = typeof maybeError.message === "string" ? maybeError.message : "";
+
+    return code === "42501" || message.toLowerCase().includes("unauthorized");
+  }, [error]);
 
   const handleEditRole = (user: UserWithRole) => {
     setSelectedUser(user);
@@ -134,6 +163,22 @@ export default function AdminUsers() {
                     </TableCell>
                   </TableRow>
                 ))
+              ) : isError ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    <p className="font-medium text-destructive">
+                      {isUnauthorizedError ? "Acesso negado" : "Erro ao carregar usuários"}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {isUnauthorizedError
+                        ? "Você não tem permissão para visualizar a lista de usuários."
+                        : "Não foi possível carregar os usuários no momento."}
+                    </p>
+                    {import.meta.env.DEV && (
+                      <p className="mt-1 text-xs text-muted-foreground">{errorMessage}</p>
+                    )}
+                  </TableCell>
+                </TableRow>
               ) : filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center">
@@ -157,7 +202,7 @@ export default function AdminUsers() {
                       </div>
                     </TableCell>
                     <TableCell className="hidden md:table-cell text-muted-foreground">
-                      {user.email}
+                      {user.email || "—"}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -168,7 +213,7 @@ export default function AdminUsers() {
                       </Badge>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell text-muted-foreground text-sm">
-                      {formatRelativeTime(user.created_at)}
+                      {user.created_at ? formatRelativeTime(user.created_at) : "Data indisponível"}
                     </TableCell>
                     <TableCell>
                       <Button

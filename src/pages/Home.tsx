@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Package, Store, Sparkles, Video } from "lucide-react";
+import { Package, Store, Sparkles, Users, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ComingSoonDialog } from "@/components/ui/coming-soon-dialog";
@@ -13,10 +13,22 @@ interface NavigationItem {
   comingSoon?: boolean;
 }
 
+const ENABLE_BAZAR_HOME_BUTTON = false;
+
+// Mantido em standby para reativação simples, sem remover código legado.
+const bazarNavigationItem: NavigationItem = {
+  name: "Bazar do Marin",
+  href: "/bazar",
+  icon: Store,
+  color: "teal",
+  comingSoon: true,
+};
+
 const navigationItems: NavigationItem[] = [
   { name: "Produtos Indicados", href: "/produtos", icon: Package, color: "teal" },
   { name: "Vídeos", href: "/videos", icon: Video, color: "teal" },
-  { name: "Bazar do Marin", href: "/bazar", icon: Store, color: "teal", comingSoon: true },
+  { name: "Fornecedores", href: "/fornecedores", icon: Users, color: "teal" },
+  ...(ENABLE_BAZAR_HOME_BUTTON ? [bazarNavigationItem] : []),
 ];
 
 const getButtonClasses = (color: string, comingSoon?: boolean) => {
